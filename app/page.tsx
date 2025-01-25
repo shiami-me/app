@@ -17,7 +17,7 @@ export default function Home() {
             Coming Soon
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground">
-            We're bringing something revolutionary to the world of DeFAI! Stay tuned.
+            We&apos;re bringing something revolutionary to the world of DeFAI! Stay tuned.
           </p>
           <div className="flex items-center space-x-2">
             <a
