@@ -73,3 +73,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.text-shadow-silver {
+  text-shadow: 0 0 8px rgba(192, 192, 192, 0.8), 0 0 16px rgba(192, 192, 192, 0.6), 0 0 24px rgba(192, 192, 192, 0.4);
+}
