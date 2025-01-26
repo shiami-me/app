@@ -4,9 +4,9 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-black font-[family-name:var(--font-audiowide)]">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-black font-[family-name:var(--font-roboto-mono)]">
       <div className="absolute top-6 left-6">
-        <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-600 to-gray-800 dark:from-gray-300 dark:via-gray-100 dark:to-gray-400 bg-clip-text text-transparent tracking-wider font-[family-name:var(--font-geist-mono)]">
+        <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-600 to-gray-800 dark:from-gray-300 dark:via-gray-100 dark:to-gray-400 bg-clip-text text-transparent tracking-wider font-[family-name:var(--font-roboto-mono)]">
           shiami
         </div>
       </div>
