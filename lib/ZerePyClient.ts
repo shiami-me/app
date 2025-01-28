@@ -5,7 +5,6 @@ export class ZerePyClient {
 
     constructor(baseUrl: string = "http://localhost:8000") {
         this.baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-        this.loadAgent("eternalai-example");
     }
 
     private async _makeRequest(method: string, endpoint: string, options: { body?: any; headers?: Record<string, string> } = {}): Promise<JsonResponse> {

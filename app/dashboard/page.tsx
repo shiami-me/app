@@ -44,6 +44,8 @@ export default function Page() {
       setIsLoading(true);
 
       try {
+        await client.loadAgent("eternalai-example");
+
         const response = await client.performAction(
           "groq",
           "generate-text",
