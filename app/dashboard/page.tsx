@@ -68,7 +68,7 @@ export default function Page() {
 
   // Custom renderer for code blocks
   const components = {
-    code({ node, inline, className, children, ...props }: any) {
+    code({ inline, className, children, ...props }: any) {
       const match = /language-(\w+)/.exec(className || '');
       const language = match ? match[1] : '';
       
