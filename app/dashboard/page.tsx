@@ -19,6 +19,7 @@ import {
   vs,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { ZerePyClient } from "@/lib/ZerePyClient";
+import { Loader2, Send } from "lucide-react";
 
 interface Source {
   url: string;
@@ -29,7 +30,51 @@ interface Message {
   id: number;
   text: string;
   sender: "user" | "bot";
+  browserLogs?: Array<{ memory: string; goal: string; url: string }>;
 }
+
+type BrowserAction =
+  | { go_to_url: { url: string } }
+  | { input_text: { index: number; text: string } }
+  | { click_element: { index: number } }
+  | { extract_content: { include_links: boolean } }
+  | { done: { text: string } };
+
+type BrowserState = {
+  evaluation_previous_goal: string;
+  memory: string;
+  next_goal: string;
+};
+
+type BrowserResult = {
+  is_done: boolean;
+  extracted_content?: string;
+  include_in_memory?: boolean;
+};
+
+type BrowserHistoryEntry = {
+  model_output: {
+    current_state: BrowserState;
+    action: BrowserAction[];
+  };
+  result: BrowserResult[];
+  state?: {
+    tabs?: { page_id: number; url: string; title: string }[];
+    interacted_element?: (string | null)[];
+    url?: string;
+    title?: string;
+  };
+};
+
+type BrowserResponse = {
+  status: string;
+  result: {
+    status: string;
+    result: {
+      history: BrowserHistoryEntry[];
+    };
+  };
+};
 
 const parseResponse = (
   text: string
@@ -66,48 +111,98 @@ export default function Page() {
     { id: 1, text: "Hello! How can I assist you today?", sender: "bot" },
   ]);
   const [input, setInput] = useState("");
+  const [agent, setAgent] = useState<string | null>(null);
   const [openSourceIndex, setOpenSourceIndex] = useState<number | null>(null);
+  const [useBrowser, setUseBrowser] = useState(false);
+  const [browserLogs, setBrowserLogs] = useState<
+    Array<{ memory: string; goal: string; url: string }>
+  >([]);
+  const [showLogs, setShowLogs] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
 
   const client = new ZerePyClient("http://localhost:8000");
 
-  const handleSend = async () => {
-    if (input.trim()) {
-      setMessages((prev) => [
-        ...prev,
-        { id: prev.length + 1, text: input, sender: "user" },
-      ]);
-      setInput("");
-      setIsLoading(true);
+  const sendMessage = async () => {
+    if (!input.trim()) return;
 
-      try {
-        await client.loadAgent("eternalai-example");
+    const userMessage = input;
+    setInput("");
+    setMessages((prev) => [
+      ...prev,
+      { id: prev.length + 1, sender: "user", text: userMessage },
+    ]);
 
+    setIsLoading(true);
+    try {
+      // Load agent first
+      if (!agent) {
+        const agentRes = await client.loadAgent("eternalai-example");
+        setAgent(JSON.stringify(agentRes));
+      }
+
+      if (useBrowser) {
+        const response = await client.performAction("browser_use", "browse", [
+          userMessage,
+        ]);
+
+        // Type assertion and processing browser response
+        const browserResponse = response as BrowserResponse;
+        const history = browserResponse.result.result.history;
+
+        // Collect logs
+        const logs = history.map((entry) => ({
+          memory: entry.model_output.current_state.memory,
+          goal: entry.model_output.current_state.next_goal,
+          url: entry.state?.url || "N/A",
+        }));
+        setBrowserLogs(logs);
+
+        // Find the final response
+        const finalEntry = history.find((entry) =>
+          entry.result.some((r) => r.is_done)
+        );
+
+        if (finalEntry) {
+          const doneAction = finalEntry.model_output.action.find(
+            (a) => "done" in a
+          ) as { done: { text: string } } | undefined;
+
+          const responseText = doneAction?.done.text || "No response found";
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: prev.length + 1,
+              sender: "bot",
+              text: responseText,
+              browserLogs: logs,
+            },
+          ]);
+        }
+      } else {
+        // Use GROQ generate-text action
         const response = await client.performAction("groq", "generate-text", [
-          input,
+          userMessage,
           "You are a helpful AI assistant",
         ]);
-
         setMessages((prev) => [
           ...prev,
-          { id: prev.length + 1, text: response.result, sender: "bot" },
+          { id: prev.length + 1, sender: "bot", text: response.result },
         ]);
-      } catch (error) {
-        console.error("Error generating response:", error);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: prev.length + 1,
-            text: "Sorry, something went wrong. Please try again.",
-            sender: "bot",
-          },
-        ]);
-      } finally {
-        setIsLoading(false);
       }
+    } catch (error) {
+      console.error(error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          sender: "bot",
+          text: "Sorry, there was an error processing your request.",
+        },
+      ]);
     }
+    setIsLoading(false);
   };
 
   // Custom renderer for code blocks
@@ -201,6 +296,63 @@ export default function Page() {
           {response}
         </ReactMarkdown>
 
+        {message.browserLogs && (
+          <div className="mt-2">
+            <button
+              onClick={() =>
+                setOpenSourceIndex(
+                  openSourceIndex === message.id ? null : message.id
+                )
+              }
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
+            >
+              <svg
+                className={`h-4 w-4 transition-transform ${
+                  openSourceIndex === message.id ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+              {openSourceIndex === message.id
+                ? "Hide browser logs"
+                : "Show browser logs"}
+            </button>
+
+            {openSourceIndex === message.id && (
+              <div className="mt-2 rounded-lg bg-muted/50 p-3 animate-in slide-in-from-top-1">
+                <div className="space-y-2">
+                  {message.browserLogs.map((log, i) => (
+                    <div
+                      key={i}
+                      className="text-sm border-b border-muted-foreground/20 pb-2 last:border-0"
+                    >
+                      <div className="grid grid-cols-[80px,1fr] gap-2">
+                        <span className="font-medium">Memory:</span>
+                        <span>{log.memory}</span>
+                      </div>
+                      <div className="grid grid-cols-[80px,1fr] gap-2">
+                        <span className="font-medium">Goal:</span>
+                        <span>{log.goal}</span>
+                      </div>
+                      <div className="grid grid-cols-[80px,1fr] gap-2">
+                        <span className="font-medium">URL:</span>
+                        <span className="break-all">{log.url}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {sources.length > 0 && (
           <div className="mt-4 space-y-2">
             <div className="flex items-center space-x-2">
@@ -286,35 +438,45 @@ export default function Page() {
             </ScrollArea>
 
             <div className="border-t p-4">
-              <div className="flex gap-2">
+              <div className="flex space-x-2">
                 <Input
-                  type="text"
-                  placeholder="Type a message..."
-                  className="flex-1"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSend()}
-                  disabled={isLoading}
+                  placeholder="Type your message..."
+                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 />
-                <Button onClick={handleSend} disabled={isLoading}>
+
+                <button
+                  onClick={() => setUseBrowser(!useBrowser)}
+                  className={`px-4 py-2 rounded-md border transition-colors ${
+                    useBrowser
+                      ? "border-green-500 text-green-500 hover:bg-green-50"
+                      : "border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  Search
+                </button>
+
+                <Button
+                  onClick={sendMessage}
+                  disabled={isLoading || !input.trim()}
+                >
                   {isLoading ? (
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-                    </svg>
+                    <Send className="h-4 w-4" />
                   )}
                 </Button>
               </div>
+
+              {useBrowser && browserLogs.length > 0 && !showLogs && (
+                <button
+                  onClick={() => setShowLogs(true)}
+                  className="mt-2 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Show browser logs
+                </button>
+              )}
             </div>
           </div>
         </div>
