@@ -87,7 +87,7 @@ const parseResponse = (
       return { sources: [], response: text };
     }
 
-    const [_, sourcesJson, remainingText] = match;
+    const [, sourcesJson, remainingText] = match;
 
     try {
       const sources = JSON.parse(sourcesJson) as Source[];
@@ -96,7 +96,7 @@ const parseResponse = (
         sources,
         response: remainingText.trim(),
       };
-    } catch (parseError) {
+    } catch {
       // If JSON parsing failed, it means this wasn't actually a sources array
       return { sources: [], response: text };
     }
@@ -114,11 +114,6 @@ export default function Page() {
   const [agent, setAgent] = useState<string | null>(null);
   const [openSourceIndex, setOpenSourceIndex] = useState<number | null>(null);
   const [useBrowser, setUseBrowser] = useState(false);
-  const [browserLogs, setBrowserLogs] = useState<
-    Array<{ memory: string; goal: string; url: string }>
-  >([]);
-  const [showLogs, setShowLogs] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
 
@@ -157,7 +152,6 @@ export default function Page() {
           goal: entry.model_output.current_state.next_goal,
           url: entry.state?.url || "N/A",
         }));
-        setBrowserLogs(logs);
 
         // Find the final response
         const finalEntry = history.find((entry) =>
