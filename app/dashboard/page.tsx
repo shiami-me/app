@@ -468,15 +468,6 @@ export default function Page() {
                   )}
                 </Button>
               </div>
-
-              {useBrowser && browserLogs.length > 0 && !showLogs && (
-                <button
-                  onClick={() => setShowLogs(true)}
-                  className="mt-2 text-sm text-muted-foreground hover:text-foreground"
-                >
-                  Show browser logs
-                </button>
-              )}
             </div>
           </div>
         </div>
