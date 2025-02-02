@@ -138,7 +138,7 @@ export default function Page() {
     try {
       // Load agent first
       if (!agent) {
-        const agentRes = await client.loadAgent("eternalai-example");
+        const agentRes = await client.loadAgent("shiami");
         setAgent(JSON.stringify(agentRes));
       }
 
