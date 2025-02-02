@@ -20,6 +20,7 @@ import {
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { Loader2, Send } from "lucide-react";
+import Link from "next/link";
 
 interface Source {
   url: string;
@@ -257,14 +258,14 @@ export default function Page() {
         <div className="px-3 py-2 animate-in slide-in-from-top-1">
           <div className="rounded-lg bg-muted/50 p-3">
             <div className="mb-2">
-              <a
+              <Link
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-500 hover:underline break-all"
               >
                 {source.url}
-              </a>
+              </Link>
             </div>
             <ReactMarkdown
               components={components}
@@ -338,7 +339,14 @@ export default function Page() {
                       </div>
                       <div className="grid grid-cols-[80px,1fr] gap-2">
                         <span className="font-medium">URL:</span>
-                        <span className="break-all">{log.url}</span>
+                        <Link
+                          href={log.url}
+                          target="_blank"
+                          className="text-blue-500 hover:underline break-all"
+                          rel="noopener noreferrer"
+                        >
+                          {log.url}
+                        </Link>
                       </div>
                     </div>
                   ))}
