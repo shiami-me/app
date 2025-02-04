@@ -21,6 +21,7 @@ import {
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { Loader2, Send } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Source {
   url: string;
@@ -177,7 +178,7 @@ export default function Page() {
         }
       } else {
         // Use GROQ generate-text action
-        const response = await client.performAction("groq", "generate-text", [
+        const response = await client.performAction("gemini", "generate-text", [
           userMessage,
           "You are a helpful AI assistant",
         ]);
@@ -280,109 +281,149 @@ export default function Page() {
   );
 
   const renderBotMessage = (message: Message) => {
-    const { sources, response } = parseResponse(message.text);
+    const response = message.text;
 
-    return (
-      <div className="space-y-4">
-        <ReactMarkdown
-          components={components}
-          className="text-sm prose dark:prose-invert max-w-none"
-        >
-          {response}
-        </ReactMarkdown>
+    // Match the image_paths array
+    const imagePathsMatch = response.match(/"image_paths":\s*(\[[^\]]*\])/);
 
-        {message.browserLogs && (
-          <div className="mt-2">
-            <button
-              onClick={() =>
-                setOpenSourceIndex(
-                  openSourceIndex === message.id ? null : message.id
-                )
-              }
-              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
+    // Match the width and height values
+    const widthMatch = response.match(/"width":\s*(\d+)/);
+    const heightMatch = response.match(/"height":\s*(\d+)/);
+
+    if (imagePathsMatch && widthMatch && heightMatch) {
+      const imagePaths = JSON.parse(imagePathsMatch[1]);
+      const width = parseInt(widthMatch[1], 10);
+      const height = parseInt(heightMatch[1], 10);
+
+      console.log("Image Paths:", imagePaths);
+      console.log("Width:", width);
+      console.log("Height:", height);
+
+      // Check if the response contains image_paths
+      if (imagePaths && imagePaths.length > 0) {
+        return (
+          <div className="space-y-4">
+            <div
+              className="relative w-full max-w-full"
+              style={{ width: `${width}px`, height: `${height}px` }}
             >
-              <svg
-                className={`h-4 w-4 transition-transform ${
-                  openSourceIndex === message.id ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-              {openSourceIndex === message.id
-                ? "Hide browser logs"
-                : "Show browser logs"}
-            </button>
+              <Image
+                src={`http://localhost:8000${imagePaths[0]}`}
+                alt={`Generated image`}
+                fill
+                className="object-contain rounded-lg"
+                sizes={`(max-width: ${width}px) 100vw, ${width}px`}
+                priority
+              />
+            </div>
+          </div>
+        );
+      }
+    } else {
+      const { sources, response } = parseResponse(message.text);
 
-            {openSourceIndex === message.id && (
-              <div className="mt-2 rounded-lg bg-muted/50 p-3 animate-in slide-in-from-top-1">
-                <div className="space-y-2">
-                  {message.browserLogs.map((log, i) => (
-                    <div
-                      key={i}
-                      className="text-sm border-b border-muted-foreground/20 pb-2 last:border-0"
-                    >
-                      <div className="grid grid-cols-[80px,1fr] gap-2">
-                        <span className="font-medium">Memory:</span>
-                        <span>{log.memory}</span>
-                      </div>
-                      <div className="grid grid-cols-[80px,1fr] gap-2">
-                        <span className="font-medium">Goal:</span>
-                        <span>{log.goal}</span>
-                      </div>
-                      <div className="grid grid-cols-[80px,1fr] gap-2">
-                        <span className="font-medium">URL:</span>
-                        <Link
-                          href={log.url}
-                          target="_blank"
-                          className="text-blue-500 hover:underline break-all"
-                          rel="noopener noreferrer"
-                        >
-                          {log.url}
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        {sources.length > 0 && (
-          <div className="mt-4 space-y-2">
-            <div className="flex items-center space-x-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-muted-foreground"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+      return (
+        <div className="space-y-4">
+          <ReactMarkdown
+            components={components}
+            className="text-sm prose dark:prose-invert max-w-none"
+          >
+            {response}
+          </ReactMarkdown>
+
+          {message.browserLogs && (
+            <div className="mt-2">
+              <button
+                onClick={() =>
+                  setOpenSourceIndex(
+                    openSourceIndex === message.id ? null : message.id
+                  )
+                }
+                className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-              <p className="text-sm font-medium text-muted-foreground">
-                Sources
-              </p>
+                <svg
+                  className={`h-4 w-4 transition-transform ${
+                    openSourceIndex === message.id ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+                {openSourceIndex === message.id
+                  ? "Hide browser logs"
+                  : "Show browser logs"}
+              </button>
+
+              {openSourceIndex === message.id && (
+                <div className="mt-2 rounded-lg bg-muted/50 p-3 animate-in slide-in-from-top-1">
+                  <div className="space-y-2">
+                    {message.browserLogs.map((log, i) => (
+                      <div
+                        key={i}
+                        className="text-sm border-b border-muted-foreground/20 pb-2 last:border-0"
+                      >
+                        <div className="grid grid-cols-[80px,1fr] gap-2">
+                          <span className="font-medium">Memory:</span>
+                          <span>{log.memory}</span>
+                        </div>
+                        <div className="grid grid-cols-[80px,1fr] gap-2">
+                          <span className="font-medium">Goal:</span>
+                          <span>{log.goal}</span>
+                        </div>
+                        <div className="grid grid-cols-[80px,1fr] gap-2">
+                          <span className="font-medium">URL:</span>
+                          <Link
+                            href={log.url}
+                            target="_blank"
+                            className="text-blue-500 hover:underline break-all"
+                            rel="noopener noreferrer"
+                          >
+                            {log.url}
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="space-y-2">
-              {sources.map((source, index) => renderSource(source, index))}
+          )}
+          {sources.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center space-x-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 text-muted-foreground"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Sources
+                </p>
+              </div>
+              <div className="space-y-2">
+                {sources.map((source, index) => renderSource(source, index))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-    );
+          )}
+        </div>
+      );
+    }
   };
 
   return (
