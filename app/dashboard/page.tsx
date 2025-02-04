@@ -282,25 +282,25 @@ export default function Page() {
 
   const renderBotMessage = (message: Message) => {
     const response = message.text;
+    if (response) {
+      const ipfsHashMatch = response.match(/"ipfs_hash":\s*"([^"]+)"/);
 
-    // Match the image_paths array
-    const imagePathsMatch = response.match(/"image_paths":\s*(\[[^\]]*\])/);
+      // Match the width and height values
+      const widthMatch = response.match(/"width":\s*(\d+)/);
+      const heightMatch = response.match(/"height":\s*(\d+)/);
 
-    // Match the width and height values
-    const widthMatch = response.match(/"width":\s*(\d+)/);
-    const heightMatch = response.match(/"height":\s*(\d+)/);
+      if (ipfsHashMatch && widthMatch && heightMatch) {
+        const ipfsHash = ipfsHashMatch[1];
+        const width = parseInt(widthMatch[1], 10);
+        const height = parseInt(heightMatch[1], 10);
 
-    if (imagePathsMatch && widthMatch && heightMatch) {
-      const imagePaths = JSON.parse(imagePathsMatch[1]);
-      const width = parseInt(widthMatch[1], 10);
-      const height = parseInt(heightMatch[1], 10);
+        console.log("IPFS Hash:", ipfsHash);
+        console.log("Width:", width);
+        console.log("Height:", height);
 
-      console.log("Image Paths:", imagePaths);
-      console.log("Width:", width);
-      console.log("Height:", height);
+        // Construct the IPFS URL
+        const ipfsUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
 
-      // Check if the response contains image_paths
-      if (imagePaths && imagePaths.length > 0) {
         return (
           <div className="space-y-4">
             <div
@@ -308,7 +308,7 @@ export default function Page() {
               style={{ width: `${width}px`, height: `${height}px` }}
             >
               <Image
-                src={`http://localhost:8000${imagePaths[0]}`}
+                src={ipfsUrl}
                 alt={`Generated image`}
                 fill
                 className="object-contain rounded-lg"
@@ -318,111 +318,118 @@ export default function Page() {
             </div>
           </div>
         );
+      } else {
+        const { sources, response } = parseResponse(message.text);
+
+        return (
+          <div className="space-y-4">
+            <ReactMarkdown
+              components={components}
+              className="text-sm prose dark:prose-invert max-w-none"
+            >
+              {response}
+            </ReactMarkdown>
+
+            {message.browserLogs && (
+              <div className="mt-2">
+                <button
+                  onClick={() =>
+                    setOpenSourceIndex(
+                      openSourceIndex === message.id ? null : message.id
+                    )
+                  }
+                  className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
+                >
+                  <svg
+                    className={`h-4 w-4 transition-transform ${
+                      openSourceIndex === message.id ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                  {openSourceIndex === message.id
+                    ? "Hide browser logs"
+                    : "Show browser logs"}
+                </button>
+
+                {openSourceIndex === message.id && (
+                  <div className="mt-2 rounded-lg bg-muted/50 p-3 animate-in slide-in-from-top-1">
+                    <div className="space-y-2">
+                      {message.browserLogs.map((log, i) => (
+                        <div
+                          key={i}
+                          className="text-sm border-b border-muted-foreground/20 pb-2 last:border-0"
+                        >
+                          <div className="grid grid-cols-[80px,1fr] gap-2">
+                            <span className="font-medium">Memory:</span>
+                            <span>{log.memory}</span>
+                          </div>
+                          <div className="grid grid-cols-[80px,1fr] gap-2">
+                            <span className="font-medium">Goal:</span>
+                            <span>{log.goal}</span>
+                          </div>
+                          <div className="grid grid-cols-[80px,1fr] gap-2">
+                            <span className="font-medium">URL:</span>
+                            <Link
+                              href={log.url}
+                              target="_blank"
+                              className="text-blue-500 hover:underline break-all"
+                              rel="noopener noreferrer"
+                            >
+                              {log.url}
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            {sources.length > 0 && (
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center space-x-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-muted-foreground"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
+                  </svg>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Sources
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {sources.map((source, index) => renderSource(source, index))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
       }
     } else {
-      const { sources, response } = parseResponse(message.text);
-
       return (
-        <div className="space-y-4">
-          <ReactMarkdown
-            components={components}
-            className="text-sm prose dark:prose-invert max-w-none"
-          >
-            {response}
-          </ReactMarkdown>
-
-          {message.browserLogs && (
-            <div className="mt-2">
-              <button
-                onClick={() =>
-                  setOpenSourceIndex(
-                    openSourceIndex === message.id ? null : message.id
-                  )
-                }
-                className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
-              >
-                <svg
-                  className={`h-4 w-4 transition-transform ${
-                    openSourceIndex === message.id ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-                {openSourceIndex === message.id
-                  ? "Hide browser logs"
-                  : "Show browser logs"}
-              </button>
-
-              {openSourceIndex === message.id && (
-                <div className="mt-2 rounded-lg bg-muted/50 p-3 animate-in slide-in-from-top-1">
-                  <div className="space-y-2">
-                    {message.browserLogs.map((log, i) => (
-                      <div
-                        key={i}
-                        className="text-sm border-b border-muted-foreground/20 pb-2 last:border-0"
-                      >
-                        <div className="grid grid-cols-[80px,1fr] gap-2">
-                          <span className="font-medium">Memory:</span>
-                          <span>{log.memory}</span>
-                        </div>
-                        <div className="grid grid-cols-[80px,1fr] gap-2">
-                          <span className="font-medium">Goal:</span>
-                          <span>{log.goal}</span>
-                        </div>
-                        <div className="grid grid-cols-[80px,1fr] gap-2">
-                          <span className="font-medium">URL:</span>
-                          <Link
-                            href={log.url}
-                            target="_blank"
-                            className="text-blue-500 hover:underline break-all"
-                            rel="noopener noreferrer"
-                          >
-                            {log.url}
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          {sources.length > 0 && (
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center space-x-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-muted-foreground"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Sources
-                </p>
-              </div>
-              <div className="space-y-2">
-                {sources.map((source, index) => renderSource(source, index))}
-              </div>
-            </div>
-          )}
+        <div className="text-sm">
+          Something went wrong
         </div>
       );
+  
     }
   };
 
