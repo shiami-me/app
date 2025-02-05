@@ -2,7 +2,6 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import { darkTheme, getDefaultConfig, lightTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { sonic } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { useTheme } from "next-themes";
 
@@ -27,7 +26,7 @@ const config = getDefaultConfig({
     blockExplorers: {
       default: {
         name: 'Sonic Blaze Testnet Explorer',
-        url: 'https://blaze.soniclabs.com/',
+        url: 'https://testnet.soniclabs.com/',
       },
     },
     testnet: true,
