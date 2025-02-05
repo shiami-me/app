@@ -22,6 +22,7 @@ import { ZerePyClient } from "@/lib/ZerePyClient";
 import { Loader2, Send } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface Source {
   url: string;
@@ -441,7 +442,8 @@ export default function Page() {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
           </div>
-          <div className="ml-auto px-4">
+          <div className="ml-auto px-4 flex items-center gap-2">
+            <ConnectButton/>
             <ModeToggle />
           </div>
         </header>
