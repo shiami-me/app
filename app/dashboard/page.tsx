@@ -23,6 +23,9 @@ import { Loader2, Send } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Config, useAccount, usePrepareTransactionRequest, useSendTransaction } from "wagmi";
+import { parseEther, parseGwei } from "viem";
+import { SendTransactionMutate } from "wagmi/query";
 
 interface Source {
   url: string;
@@ -119,17 +122,19 @@ export default function Page() {
   const [useBrowser, setUseBrowser] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
+  const account = useAccount()
+  const { sendTransaction, status } = useSendTransaction()
 
   const client = new ZerePyClient("http://localhost:8000");
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage = input;
+    const userMessage = `${input} Connected Wallet(sender) - ${account.address}`;
     setInput("");
     setMessages((prev) => [
       ...prev,
-      { id: prev.length + 1, sender: "user", text: userMessage },
+      { id: prev.length + 1, sender: "user", text: input },
     ]);
 
     setIsLoading(true);
@@ -281,14 +286,18 @@ export default function Page() {
     </div>
   );
 
-  const renderBotMessage = (message: Message) => {
+  const renderBotMessage = (message: Message, sendTransaction: SendTransactionMutate<Config, unknown>, status: "error" | "idle" | "pending" | "success") => {
     const response = message.text;
+
     if (response) {
       const ipfsHashMatch = response.match(/"ipfs_hash":\s*"([^"]+)"/);
 
       // Match the width and height values
       const widthMatch = response.match(/"width":\s*(\d+)/);
       const heightMatch = response.match(/"height":\s*(\d+)/);
+
+      const txMatch = response.match(/"tx":\s*({[^}]+})/);
+      console.log(txMatch)
 
       if (ipfsHashMatch && widthMatch && heightMatch) {
         const ipfsHash = ipfsHashMatch[1];
@@ -319,6 +328,69 @@ export default function Page() {
             </div>
           </div>
         );
+      } else if (txMatch) {
+        try {
+          const txData = JSON.parse(txMatch[1]);
+          console.log((txData.value.toString()))
+          if (txData) {
+            const tx = txData;
+            
+            // Add wagmi hooks for transaction
+            const result = {
+              to: tx.to,
+              value: ((tx.value).toString()),
+              gas: BigInt(tx.gas),
+              gasPrice: BigInt(tx.gasPrice),
+              chainId: tx.chainId,
+              data: tx.data ? tx.data : null,
+            };
+  
+            return (
+              <div className="space-y-4">
+                <div className="rounded-lg bg-muted/50 p-4">
+                  <h3 className="font-medium mb-2">Transaction Details</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="grid grid-cols-[100px,1fr] gap-2">
+                      <span className="font-medium">To:</span>
+                      <span className="truncate">{tx.to}</span>
+                    </div>
+                    <div className="grid grid-cols-[100px,1fr] gap-2">
+                      <span className="font-medium">Value:</span>
+                      <span>{((tx.value)).toString()} ETH</span>
+                    </div>
+                    <div className="grid grid-cols-[100px,1fr] gap-2">
+                      <span className="font-medium">Gas Price:</span>
+                      <span>{(Number(tx.gasPrice)).toString()} Gwei</span>
+                    </div>
+                    <div className="grid grid-cols-[100px,1fr] gap-2">
+                      <span className="font-medium">Chain ID:</span>
+                      <span>{tx.chainId}</span>
+                    </div>
+                  </div>
+                  <Button 
+                    className="mt-4"
+                    onClick={() => sendTransaction(result)} 
+                    disabled={status === "success" || status === "pending"}
+                  >
+                    {status !== "idle" ? (status !== "success" ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Confirming...</span>
+                      </div>
+                    ) : (
+                      <span>Confirmed</span>
+                    )) : (
+                      <span>Confirm Transaction</span>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            );
+          }
+        } catch (error) {
+          console.error('Error parsing transaction data:', error);
+        }
+      
       } else {
         const { sources, response } = parseResponse(message.text);
 
@@ -479,7 +551,7 @@ export default function Page() {
                       }`}
                     >
                       {message.sender === "bot" ? (
-                        renderBotMessage(message)
+                        renderBotMessage(message, sendTransaction, status)
                       ) : (
                         <p className="text-sm">{message.text}</p>
                       )}
