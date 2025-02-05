@@ -23,8 +23,7 @@ import { Loader2, Send } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Config, useAccount, usePrepareTransactionRequest, useSendTransaction } from "wagmi";
-import { parseEther, parseGwei } from "viem";
+import { Config, useAccount, useSendTransaction } from "wagmi";
 import { SendTransactionMutate } from "wagmi/query";
 
 interface Source {
