@@ -130,7 +130,7 @@ export default function Page() {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage = `${input} Connected Wallet(sender) - ${account.address}`;
+    const userMessage = `${input}`;
     setInput("");
     setMessages((prev) => [
       ...prev,
@@ -186,7 +186,7 @@ export default function Page() {
         // Use GROQ generate-text action
         const response = await client.performAction("gemini", "generate-text", [
           userMessage,
-          "You are a helpful AI assistant",
+          `You are a helpful AI assistant - Connected Wallet(sender for sonic transactions) - ${account.address}`,
         ]);
         setMessages((prev) => [
           ...prev,
