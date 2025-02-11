@@ -26,7 +26,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Config, useAccount, useSendTransaction } from "wagmi";
 import { SendTransactionMutateAsync } from "wagmi/query";
 import { formatEther } from "viem";
-import { json } from "stream/consumers";
 
 interface Source {
   url: string;
