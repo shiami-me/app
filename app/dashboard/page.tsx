@@ -343,8 +343,7 @@ export default function Page() {
             // Add wagmi hooks for transaction
             const result = {
               to: tx.to,
-              value: tx.value.toString(),
-              gas: BigInt(tx.gas),
+              value: tx.value ? tx.value.toString() : "0",
               gasPrice: BigInt(tx.gasPrice),
               chainId: tx.chainId,
               data: tx.data ? tx.data : null,
