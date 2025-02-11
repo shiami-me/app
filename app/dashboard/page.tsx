@@ -26,6 +26,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Config, useAccount, useSendTransaction } from "wagmi";
 import { SendTransactionMutateAsync } from "wagmi/query";
 import { formatEther } from "viem";
+import { json } from "stream/consumers";
 
 interface Source {
   url: string;
@@ -299,10 +300,14 @@ export default function Page() {
       // Match the width and height values
       const widthMatch = response.match(/"width":\s*(\d+)/);
       const heightMatch = response.match(/"height":\s*(\d+)/);
+      let txMatch;
 
-      const txMatch = response.match(/"tx":\s*({[^}]+})/);
+      try {
+        txMatch = JSON.parse(JSON.parse(response));
+      } catch {
+        txMatch = false;
+      }
       console.log(txMatch);
-
       if (ipfsHashMatch && widthMatch && heightMatch) {
         const ipfsHash = ipfsHashMatch[1];
         const width = parseInt(widthMatch[1], 10);
@@ -334,11 +339,8 @@ export default function Page() {
         );
       } else if (txMatch) {
         try {
-          const txData = JSON.parse(txMatch[1]);
-          console.log(txData.value.toString());
-          if (txData) {
-            const tx = txData;
-
+          if (txMatch.type === "transfer" || txMatch.type === "swap") {
+            const tx = txMatch;
             // Add wagmi hooks for transaction
             const result = {
               to: tx.to,
@@ -355,20 +357,26 @@ export default function Page() {
                   <h3 className="font-medium mb-2">Transaction Details</h3>
                   <div className="space-y-2 text-sm">
                     <div className="grid grid-cols-[100px,1fr] gap-2">
+                      <span className="font-medium">Tx Type:</span>
+                      <span className="truncate">
+                        {tx.type.toLocaleUpperCase()}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-[100px,1fr] gap-2">
                       <span className="font-medium">To:</span>
-                      <span className="truncate">{tx.to}</span>
+                      <span className="truncate">{result.to}</span>
                     </div>
                     <div className="grid grid-cols-[100px,1fr] gap-2">
                       <span className="font-medium">Value:</span>
-                      <span>{formatEther(tx.value.toString())} ETH</span>
+                      <span>{formatEther(result.value)}</span>
                     </div>
                     <div className="grid grid-cols-[100px,1fr] gap-2">
                       <span className="font-medium">Gas Price:</span>
-                      <span>{Number(tx.gasPrice).toString()} Gwei</span>
+                      <span>{Number(result.gasPrice) / 1e9} Gwei</span>
                     </div>
                     <div className="grid grid-cols-[100px,1fr] gap-2">
                       <span className="font-medium">Chain ID:</span>
-                      <span>{tx.chainId}</span>
+                      <span>{result.chainId}</span>
                     </div>
                   </div>
                   <Button
@@ -377,7 +385,7 @@ export default function Page() {
                       await sendTransaction(result, {
                         onSuccess: async (data) => {
                           console.log(data);
-                          const confirmMessage = `Token transfer done - https://testnet.soniclabs.com/${data}`;
+                          const confirmMessage = `${txMatch.type} done - https://testnet.soniclabs.com/${data}`;
                           await client.performAction(
                             "gemini",
                             "continue-execution",
@@ -408,6 +416,72 @@ export default function Page() {
                     ) : (
                       <span>Confirm Transaction</span>
                     )}
+                  </Button>
+                </div>
+              </div>
+            );
+          } else if ("approve" in txMatch) {
+            const tx = txMatch["approve"];
+            return (
+              <div className="space-y-4">
+                <div className="rounded-lg bg-muted/50 p-4">
+                  <h3 className="font-medium mb-2">Swap Details</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="grid grid-cols-[120px,1fr] gap-2">
+                      <span className="font-medium">Type:</span>
+                      <span className="truncate">
+                        Approve Token Transfer
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-[120px,1fr] gap-2">
+                      <span className="font-medium">Amount In:</span>
+                      <span>{formatEther(tx.amountIn)}</span>
+                    </div>
+                    <div className="grid grid-cols-[120px,1fr] gap-2">
+                      <span className="font-medium">Amount Out:</span>
+                      <span>{formatEther(tx.amountOut)}</span>
+                    </div>
+                    <div className="grid grid-cols-[120px,1fr] gap-2">
+                      <span className="font-medium">USD Value In:</span>
+                      <span>${tx.amountInUsd}</span>
+                    </div>
+                    <div className="grid grid-cols-[120px,1fr] gap-2">
+                      <span className="font-medium">USD Value Out:</span>
+                      <span>${tx.amountOutUsd}</span>
+                    </div>
+                    <div className="grid grid-cols-[120px,1fr] gap-2">
+                      <span className="font-medium">Gas (Est.):</span>
+                      <span>{tx.gas} units</span>
+                    </div>
+                    <div className="grid grid-cols-[120px,1fr] gap-2">
+                      <span className="font-medium">Gas Price:</span>
+                      <span>{Number(tx.gasPrice) / 1e9} Gwei</span>
+                    </div>
+                    <div className="grid grid-cols-[120px,1fr] gap-2">
+                      <span className="font-medium">Gas USD:</span>
+                      <span>${tx.gasUsd}</span>
+                    </div>
+                    {tx.route && tx.route[0] && tx.route[0][0] && (
+                      <div className="grid grid-cols-[120px,1fr] gap-2">
+                        <span className="font-medium">Exchange:</span>
+                        <span>{tx.route[0][0].exchange}</span>
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    className="mt-4"
+                    onClick={async () => {
+                      setMessages((prev) => [
+                        ...prev,
+                        {
+                          id: prev.length + 1,
+                          sender: "bot",
+                          text: JSON.stringify(JSON.stringify({...txMatch["swap"], type: "swap"})),
+                        },
+                      ]);
+                    }}
+                  >
+                    Approve Swap
                   </Button>
                 </div>
               </div>
