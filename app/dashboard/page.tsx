@@ -325,7 +325,7 @@ export default function Page() {
       const widthMatch = response.match(/"width":\s*(\d+)/);
       const heightMatch = response.match(/"height":\s*(\d+)/);
       const match = response.match(/\{.*?\}/);
-      let txMatch = match ? JSON.parse(match[0]) : false;
+      const txMatch = match ? JSON.parse(match[0]) : false;
 
       console.log(txMatch);
       if (ipfsHashMatch && widthMatch && heightMatch) {
