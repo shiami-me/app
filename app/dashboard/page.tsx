@@ -23,9 +23,34 @@ import { Loader2, Send } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Config, useAccount, useSendTransaction } from "wagmi";
+import { Config, useAccount, usePublicClient, useSendTransaction } from "wagmi";
 import { SendTransactionMutateAsync } from "wagmi/query";
-import { formatEther } from "viem";
+import { waitForTransactionReceipt } from "@wagmi/core";
+import { encodeFunctionData, formatEther } from "viem";
+import { config } from "@/providers/WalletProvider";
+
+const ERC20_ABI = [
+  {
+    constant: true,
+    inputs: [
+      { name: "_owner", type: "address" },
+      { name: "_spender", type: "address" },
+    ],
+    name: "allowance",
+    outputs: [{ name: "", type: "uint256" }],
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      { name: "_spender", type: "address" },
+      { name: "_value", type: "uint256" },
+    ],
+    name: "approve",
+    outputs: [{ name: "", type: "bool" }],
+    type: "function",
+  },
+];
 
 interface Source {
   url: string;
@@ -126,7 +151,7 @@ export default function Page() {
   const { sendTransactionAsync, status } = useSendTransaction();
 
   const client = new ZerePyClient("http://localhost:8000");
-
+  const publicClient = usePublicClient();
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -299,13 +324,9 @@ export default function Page() {
       // Match the width and height values
       const widthMatch = response.match(/"width":\s*(\d+)/);
       const heightMatch = response.match(/"height":\s*(\d+)/);
-      let txMatch;
+      const match = response.match(/\{.*?\}/);
+      let txMatch = match ? JSON.parse(match[0]) : false;
 
-      try {
-        txMatch = JSON.parse(JSON.parse(response));
-      } catch {
-        txMatch = false;
-      }
       console.log(txMatch);
       if (ipfsHashMatch && widthMatch && heightMatch) {
         const ipfsHash = ipfsHashMatch[1];
@@ -338,15 +359,30 @@ export default function Page() {
         );
       } else if (txMatch) {
         try {
-          if (txMatch.type === "transfer" || txMatch.type === "swap") {
+          if (
+            txMatch.type === "transfer" ||
+            txMatch.type === "swap" ||
+            txMatch.type === "deposit" ||
+            txMatch.type === "borrow" ||
+            txMatch.type === "repay" ||
+            txMatch.type === "withdraw"
+          ) {
             const tx = txMatch;
             // Add wagmi hooks for transaction
             const result = {
               to: tx.to,
               value: tx.value ? tx.value.toString() : "0",
-              gasPrice: BigInt(tx.gasPrice),
               chainId: tx.chainId,
-              data: tx.data ? tx.data : null,
+              data: tx.data || undefined,
+              gas: tx.gas ? BigInt(tx.gas) : undefined,
+              maxFeePerGas: tx.maxFeePerGas
+                ? BigInt(tx.maxFeePerGas)
+                : undefined,
+              maxPriorityFeePerGas: tx.maxPriorityFeePerGas
+                ? BigInt(tx.maxPriorityFeePerGas) > BigInt(tx.maxFeePerGas) // Ensure valid values
+                  ? BigInt(tx.maxFeePerGas)
+                  : BigInt(tx.maxPriorityFeePerGas)
+                : undefined,
             };
 
             return (
@@ -369,17 +405,64 @@ export default function Page() {
                       <span>{formatEther(result.value)}</span>
                     </div>
                     <div className="grid grid-cols-[100px,1fr] gap-2">
-                      <span className="font-medium">Gas Price:</span>
-                      <span>{Number(result.gasPrice) / 1e9} Gwei</span>
-                    </div>
-                    <div className="grid grid-cols-[100px,1fr] gap-2">
                       <span className="font-medium">Chain ID:</span>
                       <span>{result.chainId}</span>
                     </div>
                   </div>
                   <Button
                     className="mt-4"
-                    onClick={async () =>
+                    onClick={async () => {
+                      if (
+                        txMatch.type === "deposit" ||
+                        txMatch.type === "repay"
+                      ) {
+                        const allowance = (await publicClient?.readContract({
+                          address: txMatch.tokenAddress as `0x${string}`,
+                          abi: ERC20_ABI,
+                          functionName: "allowance",
+                          args: [account.address, txMatch.to],
+                        })) as unknown as bigint; // ✅ Explicit cast
+
+                        console.log(`Allowance: ${allowance}`);
+
+                        if (BigInt(allowance) >= BigInt(txMatch.amount)) {
+                          console.log(
+                            "Sufficient allowance, no need to approve."
+                          );
+                        } else {
+                          // Step 2: Approve if allowance is insufficient
+                          console.log("Approving token...");
+
+                          const approveTx = await sendTransaction({
+                            to: txMatch.tokenAddress as `0x${string}`,
+                            data: encodeFunctionData({
+                              abi: ERC20_ABI,
+                              functionName: "approve",
+                              args: [txMatch.to, txMatch.amount],
+                            }),
+                            chainId: tx.chainId,
+                          });
+
+                          console.log("Approval TX sent: ", approveTx);
+                          const txReceipt = await waitForTransactionReceipt(
+                            config,
+                            {
+                              hash: approveTx,
+                            }
+                          );
+                          if (txReceipt.status === "reverted") {
+                            setMessages((prev) => [
+                              ...prev,
+                              {
+                                id: prev.length + 1,
+                                sender: "bot",
+                                text: "Approval failed. Please try again.",
+                              },
+                            ]);
+                            return;
+                          }
+                        }
+                      }
                       await sendTransaction(result, {
                         onSuccess: async (data) => {
                           console.log(data);
@@ -398,8 +481,8 @@ export default function Page() {
                             },
                           ]);
                         },
-                      })
-                    }
+                      });
+                    }}
                     disabled={status === "success" || status === "pending"}
                   >
                     {status !== "idle" ? (
@@ -427,9 +510,7 @@ export default function Page() {
                   <div className="space-y-2 text-sm">
                     <div className="grid grid-cols-[120px,1fr] gap-2">
                       <span className="font-medium">Type:</span>
-                      <span className="truncate">
-                        Approve Token Transfer
-                      </span>
+                      <span className="truncate">Approve Token Transfer</span>
                     </div>
                     <div className="grid grid-cols-[120px,1fr] gap-2">
                       <span className="font-medium">Amount In:</span>
@@ -469,14 +550,96 @@ export default function Page() {
                   <Button
                     className="mt-4"
                     onClick={async () => {
-                      setMessages((prev) => [
-                        ...prev,
-                        {
-                          id: prev.length + 1,
-                          sender: "bot",
-                          text: JSON.stringify(JSON.stringify({...txMatch["swap"], type: "swap"})),
-                        },
-                      ]);
+                      const tx = txMatch["approve"];
+                      if (
+                        tx.tokenIn !==
+                        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+                      ) {
+                        // Need to approve token first
+                        try {
+                          // Step 1: Check Allowance
+                          const allowance = (await publicClient?.readContract({
+                            address: tx.tokenIn as `0x${string}`,
+                            abi: ERC20_ABI,
+                            functionName: "allowance",
+                            args: [account.address, tx.routerAddress],
+                          })) as unknown as bigint; // ✅ Explicit cast
+
+                          console.log(`Allowance: ${allowance}`);
+
+                          if (BigInt(allowance) >= BigInt(tx.amountIn)) {
+                            console.log(
+                              "Sufficient allowance, no need to approve."
+                            );
+                          } else {
+                            // Step 2: Approve if allowance is insufficient
+                            console.log("Approving token...");
+
+                            const approveTx = await sendTransaction({
+                              to: tx.tokenIn as `0x${string}`,
+                              data: encodeFunctionData({
+                                abi: ERC20_ABI,
+                                functionName: "approve",
+                                args: [tx.routerAddress, tx.amountIn],
+                              }),
+                              chainId: tx.chainId,
+                            });
+
+                            console.log("Approval TX sent: ", approveTx);
+                            const txReceipt = await waitForTransactionReceipt(
+                              config,
+                              {
+                                hash: approveTx,
+                              }
+                            );
+                            if (txReceipt.status === "reverted") {
+                              setMessages((prev) => [
+                                ...prev,
+                                {
+                                  id: prev.length + 1,
+                                  sender: "bot",
+                                  text: "Approval failed. Please try again.",
+                                },
+                              ]);
+                              return;
+                            }
+                          }
+
+                          setMessages((prev) => [
+                            ...prev,
+                            {
+                              id: prev.length + 1,
+                              sender: "bot",
+                              text: JSON.stringify(
+                                JSON.stringify({
+                                  ...txMatch["swap"],
+                                  type: "swap",
+                                })
+                              ),
+                            },
+                          ]);
+                        } catch (error) {
+                          console.error(
+                            "Error in allowance check or approval:",
+                            error
+                          );
+                        }
+                      } else {
+                        // Native token, no approval needed
+                        setMessages((prev) => [
+                          ...prev,
+                          {
+                            id: prev.length + 1,
+                            sender: "bot",
+                            text: JSON.stringify(
+                              JSON.stringify({
+                                ...txMatch["swap"],
+                                type: "swap",
+                              })
+                            ),
+                          },
+                        ]);
+                      }
                     }}
                   >
                     Approve Swap
