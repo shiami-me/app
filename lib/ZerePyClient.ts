@@ -1,6 +1,23 @@
 type JsonResponse = Record<string, any>;
 
 export class ZerePyClient {
+    async listTools(): Promise<JsonResponse> {
+        return await this._makeRequest("GET", "/api/tools");
+    }
+
+    async createAgent(name: string, tools: any[]): Promise<JsonResponse> {
+        return await this._makeRequest("POST", "/api/agents", {
+            body: JSON.stringify({ name, tools }),
+            headers: { "Content-Type": "application/json" }
+        });
+    }
+
+    async createAgentFromPrompt(prompt: string): Promise<JsonResponse> {
+        return await this._makeRequest("POST", "/api/natural-language", {
+            body: JSON.stringify({ prompt }),
+            headers: { "Content-Type": "application/json" }
+        });
+    }
     private baseUrl: string;
 
     constructor(baseUrl: string = "http://localhost:8000") {
