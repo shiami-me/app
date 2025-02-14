@@ -3,6 +3,7 @@ import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { WalletProvider } from "@/providers/WalletProvider";
+import { ChatProvider } from "@/providers/ChatProvider";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -28,9 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${roboto.variable} ${robotoMono.variable} antialiased`}
-      >
+      <body className={`${roboto.variable} ${robotoMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -38,7 +37,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <WalletProvider>
-            {children}
+            <ChatProvider>{children}</ChatProvider>
           </WalletProvider>
         </ThemeProvider>
       </body>
