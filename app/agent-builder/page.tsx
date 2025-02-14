@@ -1,7 +1,6 @@
-// Initial implementation of the agent builder page
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -9,7 +8,6 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { ToolCard } from "@/components/ui/tool-card";
-import { useEffect } from "react";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 
 interface Tool {
@@ -31,6 +29,7 @@ export default function AgentBuilder() {
   const [tools, setTools] = useState<Tool[]>([]);
   const [selectedTools, setSelectedTools] = useState<Tool[]>([]);
   const [agentName, setAgentName] = useState("");
+  const [toast, setToast] = useState<{ title: string; description?: string; variant: "success" | "error" } | null>(null);
 
   // Load tools from API
   useEffect(() => {
@@ -39,12 +38,6 @@ export default function AgentBuilder() {
       setTools(response.tools);
     });
   }, []);
-
-export default function AgentBuilder() {
-  const [selectedTools, setSelectedTools] = useState<Tool[]>([]);
-  const [agentName, setAgentName] = useState("");
-
-  const [toast, setToast] = useState<{ title: string; description?: string; variant: "success" | "error" } | null>(null);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -221,7 +214,7 @@ export default function AgentBuilder() {
                         variant: "error"
                       });
                     }
-                  }
+                  }}
                 >
                   Create Agent
                 </button>
