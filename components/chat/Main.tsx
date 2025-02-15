@@ -23,9 +23,9 @@ const ChatMain: React.FC<Props> = ({
     <>
       {messages.length === 0 && (
         <div className="flex justify-center">
-          <div className="max-w-[75%] rounded-lg bg-muted p-3 text-center">
-            <p className="text-md">
-              Welcome! Type a message to start chatting.
+          <div className="max-w-[75%] p-3 text-center">
+            <p className="text-4xl font-bold font-[family-name:var(--font-roboto-mono)]">
+              Hi! I'm Shiami. Your personal DeFi assistant.
             </p>
           </div>
         </div>

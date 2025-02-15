@@ -42,8 +42,8 @@ export default function Page() {
         </header>
 
         <div className="flex flex-1 flex-col gap-4 md:p-4 pt-0">
-          <div className="flex flex-1 flex-col gap-4 md:p-4 pt-0 items-center">
-            <div className="w-full md:w-4/5 h-[calc(100vh-8rem)] flex flex-col rounded-lg bg-background shadow-sm">
+          <div className="flex flex-1 flex-col gap-4 md:p-4 pt-0 items-center justify-center">
+            <div className={`w-full md:w-4/5${messages.length > 0 ? " h-[calc(100vh-8rem)]" : ""} flex flex-col rounded-lg bg-background shadow-sm`}>
               <ScrollArea className="flex flex-1 justify-center items-center p-4">
                 <div className="w-full flex flex-col gap-7">
                   <ChatMain
