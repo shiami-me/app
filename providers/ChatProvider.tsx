@@ -4,7 +4,6 @@ import { Message } from "@/types/messages";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { useAccount } from "wagmi";
 import { useSendMessage } from "@/hooks/useSendMessage";
-import { useLoadAgent } from "@/hooks/useLoadAgent";
 
 interface ChatContextType {
   messages: Message[];
@@ -30,7 +29,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const account = useAccount();
   const client = new ZerePyClient("http://localhost:8000");
 
-  const agent = useLoadAgent(client, "shiami");
   const sendMessage = useSendMessage(client, account, setMessages, setIsLoading, useBrowser);
 
   return (
