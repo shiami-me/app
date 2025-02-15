@@ -42,27 +42,29 @@ export default function Page() {
         </header>
 
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="flex h-[calc(100vh-8rem)] flex-col rounded-lg bg-background shadow-sm">
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                <ChatMain 
-                  messages={messages}
-                  setMessages={setMessages}
-                  status={status}
-                  client={client}
-                  sendTransactionAsync={sendTransactionAsync}
-                />
-              </div>
-            </ScrollArea>
+          <div className="flex flex-1 flex-col gap-4 p-4 pt-0 items-center">
+            <div className="w-full md:w-1/2 h-[calc(100vh-8rem)] flex flex-col rounded-lg bg-background shadow-sm">
+              <ScrollArea className="flex flex-1 justify-center items-center p-4">
+                <div className="w-full flex flex-col gap-4">
+                  <ChatMain
+                    messages={messages}
+                    setMessages={setMessages}
+                    status={status}
+                    client={client}
+                    sendTransactionAsync={sendTransactionAsync}
+                  />
+                </div>
+              </ScrollArea>
 
-            <div className="border-t p-4">
-              <div className="flex space-x-2">
-                <SendMessage
-                  sendMessage={sendMessage}
-                  loading={loading}
-                  useBrowser={useBrowser}
-                  setUseBrowser={setUseBrowser}
-                />
+              <div className="border-t p-4 flex justify-center">
+                <div className="w-full">
+                  <SendMessage
+                    sendMessage={sendMessage}
+                    loading={loading}
+                    useBrowser={useBrowser}
+                    setUseBrowser={setUseBrowser}
+                  />
+                </div>
               </div>
             </div>
           </div>

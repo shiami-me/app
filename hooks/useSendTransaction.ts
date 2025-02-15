@@ -7,6 +7,7 @@ import { ZerePyClient } from "@/lib/ZerePyClient";
 import { ERC20_ABI } from "@/utils/abis";
 import { BaseTransaction } from "@/types/transaction";
 import { config } from "@/providers/WalletProvider";
+import { useCancelTransaction } from "@/hooks/useCancelTransaction";
 
 interface UseSendTransactionProps {
   tx: BaseTransaction;
@@ -26,6 +27,13 @@ export const useSendTransaction = ({
   client,
 }: UseSendTransactionProps) => {
   const publicClient = usePublicClient();
+  const cancelTransaction = useCancelTransaction({
+    txType: tx.type,
+    client,
+    setMessages,
+    messages,
+    isUser: false,
+  });
 
   return useCallback(async () => {
     const result = {
@@ -66,14 +74,7 @@ export const useSendTransaction = ({
           hash: approveTx,
         });
         if (txReceipt.status === "reverted") {
-          setMessages([
-            ...messages,
-            {
-              id: messages.length + 1,
-              sender: "bot",
-              text: "Approval failed. Please try again.",
-            },
-          ]);
+          await cancelTransaction();
           return;
         }
       }
@@ -82,18 +83,37 @@ export const useSendTransaction = ({
     await sendTransaction(result, {
       onSuccess: async (data: any) => {
         const confirmMessage = `${tx.type} done - https://testnet.soniclabs.com/${data}`;
-        await client.performAction("gemini", "continue-execution", [
-          confirmMessage,
-        ]);
-        setMessages([
-          ...messages,
-          {
-            id: messages.length + 1,
-            sender: "bot",
-            text: confirmMessage,
-          },
-        ]);
+        const txReceipt = await waitForTransactionReceipt(config, {
+          hash: data,
+        });
+        if (txReceipt.status === "reverted") {
+          await cancelTransaction();
+        } else {
+          await client.performAction("gemini", "continue-execution", [
+            confirmMessage,
+          ]);
+          setMessages([
+            ...messages,
+            {
+              id: messages.length + 1,
+              sender: "bot",
+              text: confirmMessage,
+            },
+          ]);
+        }
+      },
+      onError: async () => {
+        await cancelTransaction();
       },
     });
-  }, [tx, account, sendTransaction, setMessages, messages, client, publicClient]);
+  }, [
+    tx,
+    account,
+    sendTransaction,
+    setMessages,
+    messages,
+    client,
+    publicClient,
+    cancelTransaction,
+  ]);
 };

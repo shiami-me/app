@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Message, Source } from "@/types/messages";
 import Link from "next/link";
 import { JSX, useState } from "react";
@@ -20,7 +20,7 @@ const Sources: React.FC<Props> = (props: Props) => {
     <div className="space-y-4">
       <ReactMarkdown
         components={props.components}
-        className="text-sm prose dark:prose-invert max-w-none"
+        className="text-sm prose dark:prose-invert max-w-none break-words whitespace-pre-wrap"
       >
         {props.response}
       </ReactMarkdown>
@@ -30,9 +30,7 @@ const Sources: React.FC<Props> = (props: Props) => {
           <button
             onClick={() =>
               setOpenSourceIndex(
-                openSourceIndex === props.message.id
-                  ? null
-                  : props.message.id
+                openSourceIndex === props.message.id ? null : props.message.id
               )
             }
             className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"
@@ -115,9 +113,7 @@ const Sources: React.FC<Props> = (props: Props) => {
               <div key={index} className="space-y-2">
                 <button
                   onClick={() =>
-                    setOpenSourceIndex(
-                      openSourceIndex === index ? null : index
-                    )
+                    setOpenSourceIndex(openSourceIndex === index ? null : index)
                   }
                   className="flex w-full items-center justify-between rounded-full bg-muted px-4 py-2 text-sm hover:bg-muted/70 transition-colors"
                 >

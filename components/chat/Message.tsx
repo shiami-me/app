@@ -70,11 +70,17 @@ const RenderMessage: React.FC<Props> = ({
 
       const ipfsUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
 
-      return <RenderImage ipfsUrl={ipfsUrl} width={width} height={height} />;
+      return (
+        <div key={message.id} className="flex justify-start">
+          <div className="max-w-[75%] rounded-lg p-3 bg-muted">
+            <RenderImage ipfsUrl={ipfsUrl} width={width} height={height} />;
+          </div>
+        </div>
+      );
     } else {
       let txMatch;
       try {
-        txMatch = JSON.parse(response)
+        txMatch = JSON.parse(response);
       } catch {
         const match = response.match(/\{.*?\}/);
         txMatch = match ? JSON.parse(match[0]) : false;
@@ -95,12 +101,16 @@ const RenderMessage: React.FC<Props> = ({
         const { sources, response } = parseResponse(message.text);
 
         return (
-          <Sources
-            sources={sources}
-            components={components}
-            message={message}
-            response={response}
-          />
+          <div key={message.id} className="flex justify-start">
+            <div className="max-w-[75%] rounded-3xl p-5 bg-muted">
+              <Sources
+                sources={sources}
+                components={components}
+                message={message}
+                response={response}
+              />
+            </div>
+          </div>
         );
       }
     }

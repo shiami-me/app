@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2, Send, Wallet, Globe } from "lucide-react";
 import React from "react";
 import { useSendTransaction } from "@/hooks/useSendTransaction";
 import { BaseTransaction } from "@/types/transaction";
@@ -15,6 +16,7 @@ interface Props {
   setMessages: (messages: Message[]) => void;
   messages: Message[];
   client: ZerePyClient;
+  closeModal: () => void;
 }
 
 const SendTransaction: React.FC<Props> = ({
@@ -25,7 +27,8 @@ const SendTransaction: React.FC<Props> = ({
   status,
   messages,
   client,
-}: Props) => {
+  closeModal,
+}) => {
   const handleSendTransaction = useSendTransaction({
     tx,
     account,
@@ -36,36 +39,55 @@ const SendTransaction: React.FC<Props> = ({
   });
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-lg bg-muted/50 p-4">
-        <h3 className="font-medium mb-2">Transaction Details</h3>
-        <div className="space-y-2 text-sm">
-          <div className="grid grid-cols-[100px,1fr] gap-2">
-            <span className="font-medium">Tx Type:</span>
-            <span className="truncate">{tx.type.toLocaleUpperCase()}</span>
+    <Card className="w-full sm:w-[420px] md:w-[540px] lg:w-[640px] shadow-xl bg-gradient-to-br from-green-600 to-green-800 dark:from-green-500 dark:to-green-700 text-white rounded-2xl overflow-hidden border-0">
+      <CardHeader className="py-5 px-6 border-b border-white/10 text-center">
+        <CardTitle className="text-2xl font-semibold tracking-wide font-[family-name:var(--font-roboto-mono)]">
+          {tx.type}
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="p-6 space-y-6">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+            <Wallet className="h-5 w-5 text-white/80" />
+            <div className="flex flex-col">
+              <span className="text-white/80 text-sm">Recipient</span>
+              <span className="font-semibold truncate">{tx.to}</span>
+            </div>
           </div>
-          <div className="grid grid-cols-[100px,1fr] gap-2">
-            <span className="font-medium">To:</span>
-            <span className="truncate">{tx.to}</span>
+
+          <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+            <Send className="h-5 w-5 text-white/80" />
+            <div className="flex flex-col">
+              <span className="text-white/80 text-sm">Value</span>
+              <span className="font-semibold">
+                {formatEther(BigInt(tx.value ? tx.value.toString() : "0"))} ETH
+              </span>
+            </div>
           </div>
-          <div className="grid grid-cols-[100px,1fr] gap-2">
-            <span className="font-medium">Value:</span>
-            <span>{formatEther(BigInt(tx.value ? tx.value.toString() : "0"))}</span>
-          </div>
-          <div className="grid grid-cols-[100px,1fr] gap-2">
-            <span className="font-medium">Chain ID:</span>
-            <span>{tx.chainId}</span>
+
+          <div className="flex items-center gap-3">
+            <Globe className="h-5 w-5 text-white/80" />
+            <div className="flex flex-col">
+              <span className="text-white/80 text-sm">Chain ID</span>
+              <span className="font-semibold">{tx.chainId}</span>
+            </div>
           </div>
         </div>
+
         <Button
-          className="mt-4"
-          onClick={handleSendTransaction}
+          className="w-full mt-2 bg-white dark:bg-black text-green-800 dark:text-white hover:bg-green-100 dark:hover:bg-green-900 transition-all duration-300 font-semibold py-2 rounded-lg shadow-md"
+          variant="default"
+          onClick={async () => {
+            await handleSendTransaction();
+            closeModal();
+          }}
           disabled={status === "success" || status === "pending"}
         >
           {status !== "idle" ? (
             status !== "success" ? (
               <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-green-800" />
                 <span>Confirming...</span>
               </div>
             ) : (
@@ -75,8 +97,8 @@ const SendTransaction: React.FC<Props> = ({
             <span>Confirm Transaction</span>
           )}
         </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

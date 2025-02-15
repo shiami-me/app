@@ -6,6 +6,8 @@ import { Message } from "@/types/messages";
 import { ERC20_ABI } from "@/utils/abis";
 import { ApproveTransaction } from "@/types/transaction";
 import { config } from "@/providers/WalletProvider";
+import { useCancelTransaction } from "@/hooks/useCancelTransaction";
+import { ZerePyClient } from "@/lib/ZerePyClient";
 
 interface UseApproveTransactionProps {
   tx: ApproveTransaction;
@@ -13,6 +15,7 @@ interface UseApproveTransactionProps {
   sendTransaction: any;
   setMessages: (messages: Message[]) => void;
   messages: Message[];
+  client: ZerePyClient;
 }
 
 export const useApproveTransaction = ({
@@ -21,8 +24,16 @@ export const useApproveTransaction = ({
   sendTransaction,
   setMessages,
   messages,
+  client
 }: UseApproveTransactionProps) => {
   const publicClient = usePublicClient();
+  const cancelTransaction = useCancelTransaction({
+    txType: "approve",
+    client: client,
+    setMessages,
+    messages,
+    isUser: false
+  });
 
   return useCallback(async () => {
     const txApprove = tx["approve"];
@@ -51,14 +62,7 @@ export const useApproveTransaction = ({
             hash: approveTx,
           });
           if (txApproveReceipt.status === "reverted") {
-            setMessages([
-              ...messages,
-              {
-                id: messages.length + 1,
-                sender: "bot",
-                text: "Approval failed. Please try again.",
-              },
-            ]);
+            await cancelTransaction();
             return;
           }
         }
@@ -78,6 +82,7 @@ export const useApproveTransaction = ({
         ]);
       } catch (error) {
         console.error("Error in allowance check or approval:", error);
+        await cancelTransaction();
       }
     } else {
       setMessages([
@@ -92,5 +97,5 @@ export const useApproveTransaction = ({
         },
       ]);
     }
-  }, [tx, account, sendTransaction, setMessages, messages, publicClient]);
+  }, [tx, account, sendTransaction, setMessages, messages, publicClient, cancelTransaction]);
 };

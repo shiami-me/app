@@ -45,13 +45,13 @@ export const config = getDefaultConfig({
       },
       rpcUrls: {
         default: {
-          http: ["https://virtual.sonic.rpc.tenderly.co/3ce9a6f9-6e60-4f43-b85f-2d87187146d5"],
+          http: ["https://virtual.sonic.rpc.tenderly.co/4524cca9-5fd4-4050-8e54-76098f0196ca"],
         },
       },
       blockExplorers: {
         default: {
           name: "Sonic Explorer",
-          url: "https://dashboard.tenderly.co/explorer/vnet/3ce9a6f9-6e60-4f43-b85f-2d87187146d5",
+          url: "https://dashboard.tenderly.co/explorer/vnet/4524cca9-5fd4-4050-8e54-76098f0196ca",
         },
       },
     },
@@ -66,12 +66,13 @@ export const WalletProvider = ({
   children: React.ReactNode;
 }>) => {
   const { theme } = useTheme();
-
+  const walletTheme = theme === "dark" ? darkTheme() : lightTheme();
+  walletTheme.colors.accentColor = "rgb(22 163 74)";
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
-          theme={theme === "dark" ? darkTheme() : lightTheme()}
+          theme={walletTheme}
         >
           {children}
         </RainbowKitProvider>
