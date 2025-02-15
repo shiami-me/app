@@ -20,12 +20,12 @@ const SendMessage: React.FC<Props> = ({
   const [input, setInput] = useState("");
 
   return (
-    <div className="relative flex items-center w-full rounded-lg bg-muted p-2">
+    <div className="relative flex items-center w-full rounded-3xl bg-muted px-4 py-3">
       <Input
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder="Ask Shiami..."
-        className="flex-1 bg-transparent border-none text-black dark:text-gray-200 outline-none focus:ring-0 focus:border-none focus-visible:ring-0 focus-visible:border-none"
+        className="flex-1 text-md bg-transparent border-none text-black dark:text-gray-200 outline-none focus:ring-0 focus:border-none focus-visible:ring-0 focus-visible:border-none"
         onKeyDown={(e) => {
           if (e.key === "Enter" && loading === false) {
             sendMessage(input);
@@ -45,7 +45,9 @@ const SendMessage: React.FC<Props> = ({
         }`}
       >
         <Globe className="w-4 h-4" />
-        Search
+        <span className="hidden md:inline">
+          Search
+        </span>
       </Button>
 
       <Button

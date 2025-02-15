@@ -51,7 +51,7 @@ const SendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3 border-b border-white/10 pb-3">
             <Wallet className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">Recipient</span>
+              <span className="text-white/80 text-md">Recipient</span>
               <span className="font-semibold truncate">{tx.to}</span>
             </div>
           </div>
@@ -59,7 +59,7 @@ const SendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3 border-b border-white/10 pb-3">
             <Send className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">Value</span>
+              <span className="text-white/80 text-md">Value</span>
               <span className="font-semibold">
                 {formatEther(BigInt(tx.value ? tx.value.toString() : "0"))} ETH
               </span>
@@ -69,7 +69,7 @@ const SendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3">
             <Globe className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">Chain ID</span>
+              <span className="text-white/80 text-md">Chain ID</span>
               <span className="font-semibold">{tx.chainId}</span>
             </div>
           </div>

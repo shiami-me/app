@@ -31,7 +31,7 @@ export default function Page() {
     <SidebarProvider className="font-[family-name:var(--font-roboto-sans)]">
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+        <header className="flex h-16 shrink-0 bg-transparent items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
           </div>
@@ -41,11 +41,11 @@ export default function Page() {
           </div>
         </header>
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0 items-center">
-            <div className="w-full md:w-1/2 h-[calc(100vh-8rem)] flex flex-col rounded-lg bg-background shadow-sm">
+        <div className="flex flex-1 flex-col gap-4 md:p-4 pt-0">
+          <div className="flex flex-1 flex-col gap-4 md:p-4 pt-0 items-center">
+            <div className="w-full md:w-4/5 h-[calc(100vh-8rem)] flex flex-col rounded-lg bg-background shadow-sm">
               <ScrollArea className="flex flex-1 justify-center items-center p-4">
-                <div className="w-full flex flex-col gap-4">
+                <div className="w-full flex flex-col gap-7">
                   <ChatMain
                     messages={messages}
                     setMessages={setMessages}

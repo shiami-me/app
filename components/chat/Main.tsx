@@ -24,7 +24,7 @@ const ChatMain: React.FC<Props> = ({
       {messages.length === 0 && (
         <div className="flex justify-center">
           <div className="max-w-[75%] rounded-lg bg-muted p-3 text-center">
-            <p className="text-sm">
+            <p className="text-md">
               Welcome! Type a message to start chatting.
             </p>
           </div>
@@ -48,9 +48,9 @@ const ChatMain: React.FC<Props> = ({
               className="flex justify-end"
             >
               <div
-                className={"max-w-[75%] rounded-3xl p-5 bg-primary text-primary-foreground"}
+                className={"max-w-[75%] rounded-3xl px-5 py-3 bg-primary text-primary-foreground"}
               >
-                <p className="text-sm break-words whitespace-pre-wrap">{message.text}</p>
+                <p className="text-md break-words whitespace-pre-wrap">{message.text}</p>
               </div>
             </div>
           )}

@@ -12,6 +12,7 @@ import {
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 import RenderImage from "./message/Image";
 import Transaction from "./message/Transaction";
+import { isApproveTransaction, isBaseTransaction } from "@/types/transaction";
 
 interface Props {
   client: ZerePyClient;
@@ -72,7 +73,7 @@ const RenderMessage: React.FC<Props> = ({
 
       return (
         <div key={message.id} className="flex justify-start">
-          <div className="max-w-[75%] rounded-lg p-3 bg-muted">
+          <div className="w-full">
             <RenderImage ipfsUrl={ipfsUrl} width={width} height={height} />;
           </div>
         </div>
@@ -86,7 +87,7 @@ const RenderMessage: React.FC<Props> = ({
         txMatch = match ? JSON.parse(match[0]) : false;
       }
 
-      if (txMatch) {
+      if (txMatch && (isBaseTransaction(txMatch) || isApproveTransaction(txMatch))) {
         return (
           <Transaction
             tx={txMatch}
@@ -102,7 +103,7 @@ const RenderMessage: React.FC<Props> = ({
 
         return (
           <div key={message.id} className="flex justify-start">
-            <div className="max-w-[75%] rounded-3xl p-5 bg-muted">
+            <div className="w-full md:p-5">
               <Sources
                 sources={sources}
                 components={components}
@@ -115,7 +116,7 @@ const RenderMessage: React.FC<Props> = ({
       }
     }
   } else {
-    return <div className="text-sm">Something went wrong</div>;
+    return <div className="text-md">Something went wrong</div>;
   }
 };
 

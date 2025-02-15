@@ -49,7 +49,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3 border-b border-white/10 pb-3">
             <Wallet className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">Amount In</span>
+              <span className="text-white/80 text-md">Amount In</span>
               <span className="font-semibold">
                 {formatEther(BigInt(tx.approve.amountIn))} ETH
               </span>
@@ -59,7 +59,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3 border-b border-white/10 pb-3">
             <Send className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">Amount Out</span>
+              <span className="text-white/80 text-md">Amount Out</span>
               <span className="font-semibold">
                 {formatEther(BigInt(tx.approve.amountOut))} ETH
               </span>
@@ -69,7 +69,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3 border-b border-white/10 pb-3">
             <DollarSign className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">USD Value In</span>
+              <span className="text-white/80 text-md">USD Value In</span>
               <span className="font-semibold">${tx.approve.amountInUsd}</span>
             </div>
           </div>
@@ -77,7 +77,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3 border-b border-white/10 pb-3">
             <DollarSign className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">USD Value Out</span>
+              <span className="text-white/80 text-md">USD Value Out</span>
               <span className="font-semibold">${tx.approve.amountOutUsd}</span>
             </div>
           </div>
@@ -85,7 +85,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3 border-b border-white/10 pb-3">
             <Flame className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">Gas (Est.)</span>
+              <span className="text-white/80 text-md">Gas (Est.)</span>
               <span className="font-semibold">{tx.approve.gas} units</span>
             </div>
           </div>
@@ -93,7 +93,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3 border-b border-white/10 pb-3">
             <Gauge className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">Gas Price</span>
+              <span className="text-white/80 text-md">Gas Price</span>
               <span className="font-semibold">
                 {Number(tx.approve.gasPrice) / 1e9} Gwei
               </span>
@@ -103,7 +103,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3">
             <DollarSign className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-sm">Gas USD</span>
+              <span className="text-white/80 text-md">Gas USD</span>
               <span className="font-semibold">${tx.approve.gasUsd}</span>
             </div>
           </div>
@@ -114,7 +114,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
               <div className="flex items-center gap-3 border-b border-white/10 pb-3">
                 <Store className="h-5 w-5 text-white/80" />
                 <div className="flex flex-col">
-                  <span className="text-white/80 text-sm">Exchange</span>
+                  <span className="text-white/80 text-md">Exchange</span>
                   <span className="font-semibold">
                     {tx.approve.route[0][0].exchange}
                   </span>
