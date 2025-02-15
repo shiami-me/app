@@ -84,7 +84,11 @@ const RenderMessage: React.FC<Props> = ({
         txMatch = JSON.parse(response);
       } catch {
         const match = response.match(/\{.*?\}/);
-        txMatch = match ? JSON.parse(match[0]) : false;
+        try {
+          txMatch = match ? JSON.parse(match[0]) : false;
+        } catch {
+          txMatch = false;
+        }
       }
 
       if (txMatch && (isBaseTransaction(txMatch) || isApproveTransaction(txMatch))) {
