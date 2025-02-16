@@ -1,12 +1,15 @@
+"use client"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send, Wallet, DollarSign, Flame, Gauge, Store } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useApproveTransaction } from "@/hooks/useApproveTransaction";
 import { ApproveTransaction } from "@/types/transaction";
 import { Message } from "@/types/messages";
 import { formatEther } from "viem";
 import { ZerePyClient } from "@/lib/ZerePyClient";
+import { useTransactionStatus } from '@/hooks/useTransactionStatus';
+import { StatusIndicator } from './StatusIndicator';
 
 interface Props {
   tx: ApproveTransaction;
@@ -27,6 +30,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
   client,
   closeModal,
 }: Props) => {
+  const { status, updateStatus } = useTransactionStatus();
   const handleApproveTransaction = useApproveTransaction({
     tx,
     account,
@@ -34,8 +38,13 @@ const ApproveSendTransaction: React.FC<Props> = ({
     setMessages,
     messages,
     client,
+    updateStatus,
   });
-
+  useEffect(() => {
+    if (status.state === "approved" || status.state === "failed") {
+      closeModal();
+    }
+  }, [status.state, closeModal]);
   return (
     <Card className="w-full sm:w-[420px] md:w-[540px] lg:w-[640px] shadow-xl bg-gradient-to-br from-green-600 to-green-800 dark:from-green-500 dark:to-green-700 text-white rounded-2xl overflow-hidden border-0">
       <CardHeader className="py-5 px-6 border-b border-white/10 text-center">
@@ -128,10 +137,13 @@ const ApproveSendTransaction: React.FC<Props> = ({
           variant="default"
           onClick={async () => {
             await handleApproveTransaction();
-            closeModal();
+            if (status.state === 'approved') {
+              closeModal();
+            }
           }}
+          disabled={status.state !== 'idle' && status.state !== 'failed'}
         >
-          Approve Swap
+          <StatusIndicator status={status} />
         </Button>
       </CardContent>
     </Card>

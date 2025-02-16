@@ -15,7 +15,7 @@ import SendMessage from "@/components/chat/message/Send";
 import ChatMain from "@/components/chat/Main";
 
 export default function Page() {
-  const { sendTransactionAsync, status } = useSendTransaction();
+  const { sendTransactionAsync } = useSendTransaction();
 
   const {
     messages,
@@ -49,7 +49,6 @@ export default function Page() {
                   <ChatMain
                     messages={messages}
                     setMessages={setMessages}
-                    status={status}
                     client={client}
                     sendTransactionAsync={sendTransactionAsync}
                   />

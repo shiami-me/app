@@ -4,7 +4,7 @@ import { waitForTransactionReceipt } from "@wagmi/core";
 import { usePublicClient } from "wagmi";
 import { Message } from "@/types/messages";
 import { ERC20_ABI } from "@/utils/abis";
-import { ApproveTransaction } from "@/types/transaction";
+import { ApproveTransaction, TransactionStatus } from "@/types/transaction";
 import { config } from "@/providers/WalletProvider";
 import { useCancelTransaction } from "@/hooks/useCancelTransaction";
 import { ZerePyClient } from "@/lib/ZerePyClient";
@@ -16,6 +16,7 @@ interface UseApproveTransactionProps {
   setMessages: (messages: Message[]) => void;
   messages: Message[];
   client: ZerePyClient;
+  updateStatus: (state: TransactionStatus['state'], message?: string) => void;
 }
 
 export const useApproveTransaction = ({
@@ -24,12 +25,13 @@ export const useApproveTransaction = ({
   sendTransaction,
   setMessages,
   messages,
-  client
+  client,
+  updateStatus,
 }: UseApproveTransactionProps) => {
   const publicClient = usePublicClient();
   const cancelTransaction = useCancelTransaction({
     txType: "approve",
-    client: client,
+    client,
     setMessages,
     messages,
     isUser: false
@@ -37,9 +39,10 @@ export const useApproveTransaction = ({
 
   return useCallback(async () => {
     const txApprove = tx["approve"];
-
-    if (txApprove.tokenIn !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
-      try {
+    try {
+      updateStatus('approving');
+      
+      if (txApprove.tokenIn !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
         const allowance = (await publicClient?.readContract({
           address: txApprove.tokenIn as `0x${string}`,
           abi: ERC20_ABI,
@@ -61,12 +64,15 @@ export const useApproveTransaction = ({
           const txApproveReceipt = await waitForTransactionReceipt(config, {
             hash: approveTx,
           });
+          
           if (txApproveReceipt.status === "reverted") {
+            updateStatus('failed', 'Approval reverted');
             await cancelTransaction();
             return;
           }
         }
 
+        updateStatus('approved');
         setMessages([
           ...messages,
           {
@@ -80,22 +86,23 @@ export const useApproveTransaction = ({
             ),
           },
         ]);
-      } catch (error) {
-        console.error("Error in allowance check or approval:", error);
-        await cancelTransaction();
+      } else {
+        setMessages([
+          ...messages,
+          {
+            id: messages.length + 1,
+            sender: "bot",
+            text: JSON.stringify({
+              ...tx["swap"],
+              type: "swap",
+            }),
+          },
+        ]);
       }
-    } else {
-      setMessages([
-        ...messages,
-        {
-          id: messages.length + 1,
-          sender: "bot",
-          text: JSON.stringify({
-            ...tx["swap"],
-            type: "swap",
-          }),
-        },
-      ]);
+    } catch (error: any) {
+      console.error("Error in allowance check or approval:", error);
+      updateStatus('failed', error.message);
+      await cancelTransaction();
     }
-  }, [tx, account, sendTransaction, setMessages, messages, publicClient, cancelTransaction]);
+  }, [tx, account, sendTransaction, setMessages, messages, publicClient, cancelTransaction, updateStatus]);
 };

@@ -1,18 +1,20 @@
+"use client"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Send, Wallet, Globe } from "lucide-react";
-import React from "react";
+import { Send, Wallet, Globe } from "lucide-react";
+import React, { useEffect } from "react";
 import { useSendTransaction } from "@/hooks/useSendTransaction";
 import { BaseTransaction } from "@/types/transaction";
 import { Message } from "@/types/messages";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { formatEther } from "viem";
+import { useTransactionStatus } from '@/hooks/useTransactionStatus';
+import { StatusIndicator } from './StatusIndicator';
 
 interface Props {
   tx: BaseTransaction;
   account: string;
   sendTransaction: any;
-  status: any;
   setMessages: (messages: Message[]) => void;
   messages: Message[];
   client: ZerePyClient;
@@ -24,11 +26,11 @@ const SendTransaction: React.FC<Props> = ({
   account,
   sendTransaction,
   setMessages,
-  status,
   messages,
   client,
   closeModal,
 }) => {
+  const { status, updateStatus } = useTransactionStatus();
   const handleSendTransaction = useSendTransaction({
     tx,
     account,
@@ -36,7 +38,14 @@ const SendTransaction: React.FC<Props> = ({
     setMessages,
     messages,
     client,
+    updateStatus,
   });
+
+  useEffect(() => {
+    if (status.state === 'confirmed' || status.state === 'failed') {
+      closeModal();
+    }
+  }, [status.state, closeModal]);
 
   return (
     <Card className="w-full sm:w-[420px] md:w-[540px] lg:w-[640px] shadow-xl bg-gradient-to-br from-green-600 to-green-800 dark:from-green-500 dark:to-green-700 text-white rounded-2xl overflow-hidden border-0">
@@ -80,22 +89,10 @@ const SendTransaction: React.FC<Props> = ({
           variant="default"
           onClick={async () => {
             await handleSendTransaction();
-            closeModal();
           }}
-          disabled={status === "success" || status === "pending"}
+          disabled={status.state !== 'idle' && status.state !== 'failed'}
         >
-          {status !== "idle" ? (
-            status !== "success" ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin text-green-800" />
-                <span>Confirming...</span>
-              </div>
-            ) : (
-              <span>Confirmed</span>
-            )
-          ) : (
-            <span>Confirm Transaction</span>
-          )}
+          <StatusIndicator status={status} />
         </Button>
       </CardContent>
     </Card>

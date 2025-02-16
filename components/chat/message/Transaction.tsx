@@ -14,7 +14,6 @@ interface Props {
   messages: Message[];
   setMessages: (messages: Message[]) => void;
   sendTransaction: SendTransactionMutateAsync<Config, unknown>;
-  status: "error" | "idle" | "pending" | "success";
   tx: Tx;
 }
 
@@ -23,7 +22,6 @@ const Transaction: React.FC<Props> = ({
   messages,
   setMessages,
   sendTransaction,
-  status,
   tx,
 }: Props) => {
   const account = useAccount();
@@ -49,7 +47,6 @@ const Transaction: React.FC<Props> = ({
           setMessages={setMessages}
           sendTransaction={sendTransaction}
           tx={tx}
-          status={status}
           account={account.address!}
           messages={messages}
           closeModal={() => setIsModalOpen(false)}

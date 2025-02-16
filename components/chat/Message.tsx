@@ -20,7 +20,6 @@ interface Props {
   messages: Message[];
   setMessages: (messages: Message[]) => void;
   sendTransaction: SendTransactionMutateAsync<Config, unknown>;
-  status: "error" | "idle" | "pending" | "success";
 }
 
 const RenderMessage: React.FC<Props> = ({
@@ -29,7 +28,6 @@ const RenderMessage: React.FC<Props> = ({
   messages,
   setMessages,
   sendTransaction,
-  status,
 }: Props) => {
   const response = message.text;
   const { theme } = useTheme();
@@ -97,7 +95,6 @@ const RenderMessage: React.FC<Props> = ({
             tx={txMatch}
             client={client}
             sendTransaction={sendTransaction}
-            status={status}
             messages={messages}
             setMessages={setMessages}
           />

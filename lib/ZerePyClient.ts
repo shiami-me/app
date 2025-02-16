@@ -38,8 +38,8 @@ export class ZerePyClient {
   private async _makeGenerateRequest(
     endpoint: string,
     body: any,
-    messages: Message[],
-    setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+    setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   ): Promise<void> {
     const url = `${this.baseUrl}/${endpoint.replace(/^\//, "")}`;
 
@@ -71,24 +71,25 @@ export class ZerePyClient {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-    
+
         const chunk = decoder.decode(value, { stream: true });
         try {
-            const parsed = JSON.parse(fullResponse);
-            if (parsed.tool) {
-                fullResponse = "";
-            }
+          const parsed = JSON.parse(fullResponse);
+          if (parsed.tool) {
+            fullResponse = "";
+          }
         } catch {
-            console.log("Not tool");
+          console.log("Not tool");
         }
         fullResponse += chunk;
-    
+
         setMessages((prev) =>
-            prev.map((msg) =>
-                msg.id === messageId ? { ...msg, text: fullResponse } : msg
-            )
+          prev.map((msg) =>
+            msg.id === messageId ? { ...msg, text: fullResponse } : msg
+          )
         );
-    }
+      }
+      setIsLoading(false);
     } catch (error) {
       throw new Error(`Streaming request failed: ${(error as Error).message}`);
     }
@@ -129,8 +130,8 @@ export class ZerePyClient {
     connection: string,
     action: string,
     params: string[] = [],
-    messages: Message[],
-    setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+    setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   ): Promise<void> {
     this._makeGenerateRequest(
       "/agent/chat",
@@ -139,8 +140,8 @@ export class ZerePyClient {
         action,
         params,
       },
-      messages,
-      setMessages
+      setMessages,
+      setIsLoading
     );
   }
 

@@ -3,11 +3,11 @@ import { Message } from "@/types/messages";
 import { Config } from "wagmi";
 import { SendTransactionMutateAsync } from "wagmi/query";
 import RenderMessage from "./Message";
+import React from "react";
 
 interface Props {
   messages: Message[];
   setMessages: (value: Message[]) => void;
-  status: "error" | "idle" | "pending" | "success";
   client: ZerePyClient;
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>;
 }
@@ -15,7 +15,6 @@ interface Props {
 const ChatMain: React.FC<Props> = ({
   messages,
   setMessages,
-  status,
   client,
   sendTransactionAsync,
 }: Props) => {
@@ -32,12 +31,11 @@ const ChatMain: React.FC<Props> = ({
       )}
 
       {messages.map((message) => (
-        <>
+        <React.Fragment key={message.id}>
           {message.sender === "bot" ? (
             <RenderMessage
               message={message}
               sendTransaction={sendTransactionAsync}
-              status={status}
               client={client}
               setMessages={setMessages}
               messages={messages}
@@ -54,7 +52,7 @@ const ChatMain: React.FC<Props> = ({
               </div>
             </div>
           )}
-        </>
+        </React.Fragment>
       ))}
     </>
   );

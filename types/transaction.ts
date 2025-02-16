@@ -47,3 +47,8 @@ export function isBaseTransaction(tx: Tx): tx is BaseTransaction {
 export function isApproveTransaction(tx: Tx): tx is ApproveTransaction {
   return "approve" in tx;
 }
+
+export type TransactionStatus = {
+  state: 'idle' | 'approving' | 'approved' | 'confirming' | 'confirmed' | 'failed';
+  message?: string;
+};
