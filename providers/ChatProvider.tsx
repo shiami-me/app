@@ -29,7 +29,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const account = useAccount();
   const client = new ZerePyClient("http://localhost:8000");
 
-  const sendMessage = useSendMessage(client, account, setMessages, setIsLoading, useBrowser);
+  const sendMessage = useSendMessage(client, account, messages, setMessages, setIsLoading, useBrowser);
 
   return (
     <ChatContext.Provider

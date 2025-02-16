@@ -1,7 +1,7 @@
 "use client";
 import { Message, Source } from "@/types/messages";
 import Link from "next/link";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import { BookOpen, ChevronDown } from "lucide-react";
@@ -19,6 +19,25 @@ interface Props {
 
 const Sources: React.FC<Props> = (props: Props) => {
   const [openSourceIndex, setOpenSourceIndex] = useState<number | null>(null);
+  const [toolMessage, setToolMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const parsedResponse = JSON.parse(props.response);
+      if (parsedResponse.tool) {
+        const formattedTool = parsedResponse.tool
+          .split("_")
+          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(" ");
+        
+        setToolMessage(formattedTool);
+      } else {
+        setToolMessage(null);
+      }
+    } catch {
+      setToolMessage(null);
+    }
+  }, [props.response]);
 
   return (
     <div className="flex space-x-4">
@@ -32,13 +51,20 @@ const Sources: React.FC<Props> = (props: Props) => {
         />
       </div>
 
-      <div className="space-y-4 w-full py-2">
+      <div className="space-y-4 w-[75%] py-2">
+        {toolMessage ? (
+          <div className="text-gray-500 dark:text-gray-300 font-thin text-lg animate-blink font-[family-name:var(--font-roboto-mono)]">
+          {toolMessage}
+        </div>
+        ) : (
         <ReactMarkdown
           components={props.components}
           className="text-md prose dark:prose-invert max-w-none break-words whitespace-pre-wrap"
         >
           {props.response}
         </ReactMarkdown>
+
+        )}
 
         {props.message.browserLogs && (
           <div className="mt-2">

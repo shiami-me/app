@@ -18,7 +18,7 @@ export const useCancelTransaction = ({
   isUser = false,
 }: UseCancelTransactionProps) => {
   return useCallback(async () => {
-    const cancelMessage = `${txType.toUpperCase()} ${isUser ? "cancelled by user" : "failed"}`;
+    const cancelMessage = `${txType.charAt(0).toUpperCase() + txType.slice(1)} ${isUser ? "cancelled by user" : "failed"}`;
     await client.performAction("gemini", "continue-execution", [
       cancelMessage,
     ]);

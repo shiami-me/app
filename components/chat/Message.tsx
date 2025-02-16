@@ -119,8 +119,6 @@ const RenderMessage: React.FC<Props> = ({
         );
       }
     }
-  } else {
-    return <div className="text-md">Something went wrong</div>;
   }
 };
 

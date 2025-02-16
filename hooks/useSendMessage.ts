@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 export const useSendMessage = (
   client: ZerePyClient,
   account: ReturnType<typeof useAccount>,
+  messages: Message[],
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
   useBrowser: boolean
@@ -56,14 +57,10 @@ export const useSendMessage = (
           ]);
         }
       } else {
-        const response = await client.performAction("gemini", "generate-text", [
+        const response = await client.agentChat("gemini", "generate-text", [
           userMessage,
           `You are a helpful AI assistant - Connected Wallet(sender for sonic transactions) - ${account.address}`,
-        ]);
-        setMessages((prev) => [
-          ...prev,
-          { id: prev.length + 1, sender: "bot", text: response.result },
-        ]);
+        ], messages, setMessages);
       }
     } catch (error) {
       console.error(error);
