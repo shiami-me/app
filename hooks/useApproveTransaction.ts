@@ -87,6 +87,7 @@ export const useApproveTransaction = ({
           },
         ]);
       } else {
+        updateStatus('approved');
         setMessages([
           ...messages,
           {
