@@ -25,7 +25,7 @@ const ChatMain: React.FC<Props> = ({
         <div className="flex justify-center">
           <div className="max-w-[75%] p-3 text-center">
             <p className="text-4xl font-bold font-[family-name:var(--font-roboto-mono)]">
-              Hi! I'm Shiami. Your personal DeFi assistant.
+              Hi! I&apos;m Shiami. Your personal DeFi assistant.
             </p>
           </div>
         </div>
