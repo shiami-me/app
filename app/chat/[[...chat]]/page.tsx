@@ -5,8 +5,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useEffect } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useRef } from "react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ModeToggle } from "@/components/theme-toggle";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useSendTransaction } from "wagmi";
@@ -17,7 +17,7 @@ import ChatMain from "@/components/chat/Main";
 export default function Page({
   params,
 }: {
-  params: Promise<{ chat?: string[] }>
+  params: Promise<{ chat?: string[] }>;
 }) {
   const { sendTransactionAsync } = useSendTransaction();
   const {
@@ -28,8 +28,18 @@ export default function Page({
     useBrowser,
     setUseBrowser,
     client,
-    setChatId
+    setChatId,
   } = useChat();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages]);
 
   useEffect(() => {
     const setChatFromParams = async () => {
@@ -60,17 +70,26 @@ export default function Page({
 
         <div className="flex flex-1 flex-col gap-4 md:p-4 pt-0">
           <div className="flex flex-1 flex-col gap-4 md:p-4 pt-0 items-center justify-center">
-            <div className={`w-full md:w-4/5${messages.length > 0 ? " h-[calc(100vh-8rem)]" : ""} flex flex-col rounded-lg bg-background shadow-sm`}>
-              <ScrollArea className="flex flex-1 justify-center items-center p-4">
-                <div className="w-full flex flex-col gap-7">
-                  <ChatMain
-                    messages={messages}
-                    setMessages={setMessages}
-                    client={client}
-                    sendTransactionAsync={sendTransactionAsync}
-                  />
-                </div>
-              </ScrollArea>
+            <div
+              className={`w-full md:w-4/5${
+                messages.length > 0 ? " h-[calc(100vh-8rem)]" : ""
+              } flex flex-col rounded-lg bg-background shadow-sm`}
+            >
+              <div
+                ref={scrollRef}
+                className="flex-1 overflow-auto custom-scrollbar"
+              >
+                <ScrollArea className="flex flex-1 justify-center items-center p-4">
+                  <div className="w-full flex flex-col gap-7">
+                    <ChatMain
+                      messages={messages}
+                      setMessages={setMessages}
+                      client={client}
+                      sendTransactionAsync={sendTransactionAsync}
+                    />
+                  </div>
+                </ScrollArea>
+              </div>
 
               <div className="border-t p-4 flex justify-center">
                 <div className="w-full">
