@@ -10,6 +10,7 @@ import { formatEther } from "viem";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { useTransactionStatus } from '@/hooks/useTransactionStatus';
 import { StatusIndicator } from './StatusIndicator';
+import { useChat } from "@/providers/ChatProvider";
 
 interface Props {
   tx: ApproveTransaction;
@@ -31,6 +32,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
   closeModal,
 }: Props) => {
   const { status, updateStatus } = useTransactionStatus();
+  const { chatId } = useChat()
   const handleApproveTransaction = useApproveTransaction({
     tx,
     account,
@@ -39,6 +41,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
     messages,
     client,
     updateStatus,
+    chat: chatId!
   });
   useEffect(() => {
     if (status.state === "approved" || status.state === "failed") {

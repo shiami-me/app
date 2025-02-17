@@ -5,7 +5,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-
+import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ModeToggle } from "@/components/theme-toggle";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -14,9 +14,12 @@ import { useChat } from "@/providers/ChatProvider";
 import SendMessage from "@/components/chat/message/Send";
 import ChatMain from "@/components/chat/Main";
 
-export default function Page() {
+export default function Page({
+  params,
+}: {
+  params: Promise<{ chat?: string[] }>
+}) {
   const { sendTransactionAsync } = useSendTransaction();
-
   const {
     messages,
     sendMessage,
@@ -25,7 +28,21 @@ export default function Page() {
     useBrowser,
     setUseBrowser,
     client,
+    setChatId
   } = useChat();
+
+  useEffect(() => {
+    const setChatFromParams = async () => {
+      const resolvedParams = await params;
+      const chatId = resolvedParams.chat?.[0];
+
+      if (chatId) {
+        setChatId(chatId);
+      }
+    };
+
+    setChatFromParams();
+  }, [params, setChatId]);
 
   return (
     <SidebarProvider className="font-[family-name:var(--font-roboto-sans)]">

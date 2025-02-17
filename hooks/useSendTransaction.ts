@@ -17,6 +17,7 @@ interface UseSendTransactionProps {
   messages: Message[];
   client: ZerePyClient;
   updateStatus: (state: TransactionStatus['state'], message?: string) => void;
+  chat: string;
 }
 
 export const useSendTransaction = ({
@@ -27,6 +28,7 @@ export const useSendTransaction = ({
   messages,
   client,
   updateStatus,
+  chat
 }: UseSendTransactionProps) => {
   const publicClient = usePublicClient();
   const cancelTransaction = useCancelTransaction({
@@ -73,13 +75,18 @@ export const useSendTransaction = ({
             }),
             chainId: tx.chainId,
           });
-
-          const txReceipt = await waitForTransactionReceipt(config, {
-            hash: approveTx,
-          });
-          if (txReceipt.status === "reverted") {
-            await cancelTransaction();
-            updateStatus('failed', 'Transaction reverted');
+          try {
+            const txReceipt = await waitForTransactionReceipt(config, {
+              hash: approveTx,
+            });
+            if (txReceipt.status === "reverted") {
+              await cancelTransaction(chat);
+              updateStatus('failed', 'Transaction reverted');
+              return;
+            }
+          } catch {
+            await cancelTransaction(chat);
+            updateStatus('failed', 'Transaction failed');
             return;
           }
         }
@@ -88,29 +95,34 @@ export const useSendTransaction = ({
       await sendTransaction(result, {
         onSuccess: async (data: any) => {
           const confirmMessage = `${tx.type} done - https://testnet.soniclabs.com/${data}`;
-          const txReceipt = await waitForTransactionReceipt(config, {
-            hash: data,
-          });
-          if (txReceipt.status === "reverted") {
-            await cancelTransaction();
-            updateStatus('failed', 'Transaction reverted');
-          } else {
-            updateStatus('confirmed');
-            await client.performAction("gemini", "continue-execution", [
-              confirmMessage,
-            ]);
-            setMessages([
-              ...messages,
-              {
-                id: messages.length + 1,
-                sender: "bot",
-                text: confirmMessage,
-              },
-            ]);
+          try {
+            const txReceipt = await waitForTransactionReceipt(config, {
+              hash: data,
+            });
+            if (txReceipt.status === "reverted") {
+              await cancelTransaction(chat);
+              updateStatus('failed', 'Transaction reverted');
+            } else {
+              updateStatus('confirmed');
+              await client.performAction("gemini", "continue-execution", [
+                confirmMessage,
+              ]);
+              setMessages([
+                ...messages,
+                {
+                  id: messages.length + 1,
+                  sender: "bot",
+                  text: confirmMessage,
+                },
+              ]);
+            }
+          } catch {
+            await cancelTransaction(chat);
+            updateStatus('failed', 'Transaction failed');
           }
         },
         onError: async () => {
-          await cancelTransaction();
+          await cancelTransaction(chat);
           updateStatus('failed', 'Transaction failed');
         },
       });

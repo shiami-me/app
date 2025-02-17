@@ -17,6 +17,7 @@ interface UseApproveTransactionProps {
   messages: Message[];
   client: ZerePyClient;
   updateStatus: (state: TransactionStatus['state'], message?: string) => void;
+  chat: string;
 }
 
 export const useApproveTransaction = ({
@@ -27,6 +28,7 @@ export const useApproveTransaction = ({
   messages,
   client,
   updateStatus,
+  chat
 }: UseApproveTransactionProps) => {
   const publicClient = usePublicClient();
   const cancelTransaction = useCancelTransaction({
@@ -60,14 +62,19 @@ export const useApproveTransaction = ({
             }),
             chainId: txApprove.chainId,
           });
-
-          const txApproveReceipt = await waitForTransactionReceipt(config, {
-            hash: approveTx,
-          });
-          
-          if (txApproveReceipt.status === "reverted") {
-            updateStatus('failed', 'Approval reverted');
-            await cancelTransaction();
+          try {
+            const txApproveReceipt = await waitForTransactionReceipt(config, {
+              hash: approveTx,
+            });
+            
+            if (txApproveReceipt.status === "reverted") {
+              updateStatus('failed', 'Approval reverted');
+              await cancelTransaction(chat);
+              return;
+            }
+          } catch {
+            updateStatus('failed', 'Approval failed');
+            await cancelTransaction(chat);
             return;
           }
         }
@@ -78,12 +85,10 @@ export const useApproveTransaction = ({
           {
             id: messages.length + 1,
             sender: "bot",
-            text: JSON.stringify(
-              JSON.stringify({
-                ...tx["swap"],
-                type: "swap",
-              })
-            ),
+            text: JSON.stringify({
+              ...tx["swap"],
+              type: "swap",
+            }),
           },
         ]);
       } else {
@@ -103,7 +108,7 @@ export const useApproveTransaction = ({
     } catch (error: any) {
       console.error("Error in allowance check or approval:", error);
       updateStatus('failed', error.message);
-      await cancelTransaction();
+      await cancelTransaction(chat);
     }
   }, [tx, account, sendTransaction, setMessages, messages, publicClient, cancelTransaction, updateStatus]);
 };

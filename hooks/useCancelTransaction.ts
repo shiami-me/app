@@ -17,10 +17,11 @@ export const useCancelTransaction = ({
   messages,
   isUser = false,
 }: UseCancelTransactionProps) => {
-  return useCallback(async () => {
+  return useCallback(async (chat: string) => {
     const cancelMessage = `${txType.charAt(0).toUpperCase() + txType.slice(1)} ${isUser ? "cancelled by user" : "failed"}`;
     await client.performAction("gemini", "continue-execution", [
       cancelMessage,
+      chat
     ]);
     setMessages([
       ...messages,

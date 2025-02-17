@@ -12,7 +12,7 @@ export const useSendMessage = (
   useBrowser: boolean
 ) => {
   return useCallback(
-    async (input: string) => {
+    async (input: string, chat: string) => {
       if (!input.trim()) return;
 
       const userMessage = `${input}`;
@@ -65,6 +65,7 @@ export const useSendMessage = (
             [
               userMessage,
               `You are a helpful AI assistant - Connected Wallet(sender for sonic transactions) - ${account.address}`,
+              chat
             ],
             setMessages,
             setIsLoading

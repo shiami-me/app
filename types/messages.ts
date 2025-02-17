@@ -10,6 +10,13 @@ export interface Message {
   browserLogs?: Array<{ memory: string; goal: string; url: string }>;
 }
 
+export interface MessageHistory {
+  [key: string]: {
+    title: string;
+    id: string;
+  }
+}
+
 export type BrowserAction =
   | { go_to_url: { url: string } }
   | { input_text: { index: number; text: string } }

@@ -10,6 +10,7 @@ import { ZerePyClient } from "@/lib/ZerePyClient";
 import { formatEther } from "viem";
 import { useTransactionStatus } from '@/hooks/useTransactionStatus';
 import { StatusIndicator } from './StatusIndicator';
+import { useChat } from "@/providers/ChatProvider";
 
 interface Props {
   tx: BaseTransaction;
@@ -31,6 +32,7 @@ const SendTransaction: React.FC<Props> = ({
   closeModal,
 }) => {
   const { status, updateStatus } = useTransactionStatus();
+  const { chatId } = useChat()
   const handleSendTransaction = useSendTransaction({
     tx,
     account,
@@ -39,6 +41,7 @@ const SendTransaction: React.FC<Props> = ({
     messages,
     client,
     updateStatus,
+    chat: chatId!
   });
 
   useEffect(() => {

@@ -8,6 +8,7 @@ import ApproveSendTransaction from "./transaction/Approval";
 import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { useCancelTransaction } from "@/hooks/useCancelTransaction";
+import { useChat } from "@/providers/ChatProvider";
 
 interface Props {
   client: ZerePyClient;
@@ -26,6 +27,7 @@ const Transaction: React.FC<Props> = ({
 }: Props) => {
   const account = useAccount();
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const { chatId } = useChat()
   const cancelTransaction = useCancelTransaction({
     txType: isBaseTransaction(tx) ? tx.type : "approve",
     client,
@@ -36,7 +38,7 @@ const Transaction: React.FC<Props> = ({
 
   const closeModal = async () => {
     setIsModalOpen(false);
-    await cancelTransaction();
+    await cancelTransaction(chatId!);
   };
 
   return (
