@@ -6,7 +6,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useEffect, useRef } from "react";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { ModeToggle } from "@/components/theme-toggle";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useSendTransaction } from "wagmi";
