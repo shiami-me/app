@@ -1,12 +1,17 @@
-"use client"
+"use client";
 
-import { ChevronRight, NotebookPen, Trash, type LucideIcon } from "lucide-react"
+import {
+  ChevronRight,
+  NotebookPen,
+  Trash,
+  type LucideIcon,
+} from "lucide-react";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -16,39 +21,48 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { useChat } from "@/providers/ChatProvider"
-import { Button } from "./ui/button"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { useChat } from "@/providers/ChatProvider";
+import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 export function NavMain({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon?: LucideIcon
-    isActive?: boolean
+    title: string;
+    url: string;
+    icon?: LucideIcon;
+    isActive?: boolean;
     items?: {
-      title: string
-      url: string
-      id: string
-      active: boolean
-    }[]
-  }[]
+      title: string;
+      url: string;
+      id: string;
+      active: boolean;
+    }[];
+  }[];
 }) {
-  const { deleteChatHistory } = useChat()
+  const { deleteChatHistory, setMessages, setChatId } = useChat();
+  const router = useRouter();
   return (
     <SidebarGroup>
-      <Button variant={"ghost"} className="py-2 px-3">
-        <Link href={"/chat"} className="w-full text-left flex flex-row justify-between items-center">
-          <span className="font-bold">New Chat</span>
-          <NotebookPen className="w-4 h-4"/>
-        </Link>
-
-      </Button>
       <SidebarGroupLabel>Manage</SidebarGroupLabel>
       <SidebarMenu>
+        <Button
+          variant={"ghost"}
+          onClick={() => {
+            setChatId(null)
+            setMessages([]);
+            router.push("/chat");
+          }}
+          className="p-2 group/collapsible w-full text-left flex flex-row items-center justify-start hover:bg-secondary"
+        >
+          <NotebookPen className="w-4 h-4" />
+          <span className="font-bold group-data-[collapsible=icon]:hidden text-left">
+            New Chat
+          </span>
+        </Button>
         {items.map((item) => (
           <Collapsible
             key={item.title}
@@ -65,9 +79,14 @@ export function NavMain({
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <SidebarMenuSub>
+                <SidebarMenuSub className="max-h-[200px] overflow-y-auto custom-scrollbar">
                   {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.id} className={`${subItem.active ? "bg-secondary": ""} px-2 py-1 rounded-lg flex justify-between items-center`}>
+                    <SidebarMenuSubItem
+                      key={subItem.id}
+                      className={`${
+                        subItem.active ? "bg-secondary" : ""
+                      } px-2 py-1 rounded-lg flex justify-between items-center`}
+                    >
                       <SidebarMenuSubButton asChild>
                         <Link href={subItem.url} className="w-full">
                           <span>{subItem.title}</span>
@@ -89,5 +108,5 @@ export function NavMain({
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

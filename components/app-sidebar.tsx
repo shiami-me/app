@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   Frame,
   Map,
+  MessageCircle,
   PieChart,
 } from "lucide-react";
 
@@ -64,6 +65,7 @@ const data: any = {
       url: "/chat",
       isActive: true,
       items: [],
+      icon: MessageCircle
     }
   ],
   projects: [

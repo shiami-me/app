@@ -23,7 +23,7 @@ interface ChatContextType {
   setUseBrowser: (useBrowser: boolean) => void;
   client: ZerePyClient;
   chatId: string | null;
-  setChatId: (chatId: string) => void;
+  setChatId: (chatId: string | null) => void;
   chatHistory: MessageHistory;
   setMessageHistory: (chatHistory: MessageHistory) => void;
   deleteChatHistory: (chatId: string) => void;
