@@ -5,9 +5,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ipfs.io',
-        pathname: '/ipfs/**',
-      },
+        hostname: '**',
+      }
     ],
   },
 };
