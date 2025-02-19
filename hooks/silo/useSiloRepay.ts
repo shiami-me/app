@@ -1,0 +1,65 @@
+import { useCallback } from 'react';
+import { useAccount, usePublicClient, useSendTransaction } from 'wagmi';
+import { useSiloTransaction } from './useSiloTransaction';
+import { getSiloConfigAddress, SILO_ABI } from '@/lib/silo';
+import { encodeFunctionData } from 'viem';
+import { waitForTransactionReceipt } from '@wagmi/core';
+import { config } from '@/providers/WalletProvider';
+import { SiloConnection } from '@/lib/silo';
+
+export const useSiloRepay = () => {
+  const { sendTransactionAsync } = useSendTransaction();
+  const { loading, error, setLoading, setError, checkAndApproveToken } = useSiloTransaction();
+  const account = useAccount()
+  const publicClient = usePublicClient()
+
+  const repay = useCallback(async (
+    token0: string,
+    token1: string,
+    amount: number,
+  ) => {
+    setLoading(true);
+    try {
+      const { configAddress, isToken0Silo0, tokenAddress, decimals } = 
+        await getSiloConfigAddress(token0, token1);
+
+      const siloConn = new SiloConnection(publicClient!);
+      const siloAddress = await siloConn.getSiloAddress(configAddress, isToken0Silo0 ? 0 : 1);
+
+      const amountWei = BigInt(Math.floor(amount * (10 ** decimals)));
+
+      const approvalTx = await checkAndApproveToken(
+        tokenAddress,
+        siloAddress,
+        amountWei,
+        sendTransactionAsync
+      );
+
+      if (approvalTx) {
+        await waitForTransactionReceipt(config, { hash: approvalTx });
+      }
+
+      const data = encodeFunctionData({
+        abi: SILO_ABI,
+        functionName: 'repay',
+        args: [amountWei, account.address]
+      });
+
+      const tx = await sendTransactionAsync({
+        to: siloAddress,
+        data
+      });
+
+      await waitForTransactionReceipt(config, { hash: tx });
+
+      return tx;
+    } catch (err: any) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [sendTransactionAsync]);
+
+  return { repay, loading, error };
+};

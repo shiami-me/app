@@ -9,51 +9,59 @@ import {
 import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { useTheme } from "next-themes";
+import { anvil } from "viem/chains";
 
 export const config = getDefaultConfig({
   appName: "shiami.me",
   projectId: process.env.NEXT_PUBLIC_PROJECT_ID || "",
   chains: [
+    // {
+    //   id: 57_054,
+    //   name: "Sonic Blaze Testnet",
+    //   nativeCurrency: {
+    //     decimals: 18,
+    //     name: "Sonic",
+    //     symbol: "S",
+    //   },
+    //   rpcUrls: {
+    //     default: {
+    //       http: ["https://rpc.blaze.soniclabs.com"],
+    //     },
+    //   },
+    //   blockExplorers: {
+    //     default: {
+    //       name: "Sonic Blaze Testnet Explorer",
+    //       url: "https://testnet.soniclabs.com/",
+    //     },
+    //   },
+    //   testnet: true,
+    // },
+    // {
+    //   id: 146,
+    //   name: "Sonic",
+    //   nativeCurrency: {
+    //     decimals: 18,
+    //     name: "Sonic",
+    //     symbol: "S",
+    //   },
+    //   rpcUrls: {
+    //     default: {
+    //       http: [
+    //         "https://virtual.sonic.rpc.tenderly.co/4524cca9-5fd4-4050-8e54-76098f0196ca",
+    //       ],
+    //     },
+    //   },
+    //   blockExplorers: {
+    //     default: {
+    //       name: "Sonic Explorer",
+    //       url: "https://dashboard.tenderly.co/explorer/vnet/4524cca9-5fd4-4050-8e54-76098f0196ca",
+    //     },
+    //   },
+    // },
     {
-      id: 57_054,
-      name: "Sonic Blaze Testnet",
-      nativeCurrency: {
-        decimals: 18,
-        name: "Sonic",
-        symbol: "S",
-      },
-      rpcUrls: {
-        default: {
-          http: ["https://rpc.blaze.soniclabs.com"],
-        },
-      },
-      blockExplorers: {
-        default: {
-          name: "Sonic Blaze Testnet Explorer",
-          url: "https://testnet.soniclabs.com/",
-        },
-      },
-      testnet: true,
-    },
-    {
+      ...anvil,
       id: 146,
-      name: "Sonic",
-      nativeCurrency: {
-        decimals: 18,
-        name: "Sonic",
-        symbol: "S",
-      },
-      rpcUrls: {
-        default: {
-          http: ["https://virtual.sonic.rpc.tenderly.co/4524cca9-5fd4-4050-8e54-76098f0196ca"],
-        },
-      },
-      blockExplorers: {
-        default: {
-          name: "Sonic Explorer",
-          url: "https://dashboard.tenderly.co/explorer/vnet/4524cca9-5fd4-4050-8e54-76098f0196ca",
-        },
-      },
+      nativeCurrency: { decimals: 18, name: "Sonic", symbol: "S" },
     },
   ],
   ssr: true, // If your dApp uses server side rendering (SSR)
@@ -71,11 +79,7 @@ export const WalletProvider = ({
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider
-          theme={walletTheme}
-        >
-          {children}
-        </RainbowKitProvider>
+        <RainbowKitProvider theme={walletTheme}>{children}</RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

@@ -70,8 +70,8 @@ const data: any = {
   ],
   projects: [
     {
-      name: "Design Engineering",
-      url: "#",
+      name: "Silo Board",
+      url: "/dashboard/silo",
       icon: Frame,
     },
     {
