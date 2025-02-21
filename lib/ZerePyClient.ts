@@ -81,7 +81,14 @@ export class ZerePyClient {
         } catch {
           console.log("Not tool");
         }
-        fullResponse += chunk;
+        try {
+          const parsed = JSON.parse(chunk);
+          if (parsed.type || parsed.tool || (parsed.approve && parsed.swap) || Array.isArray(parsed)) {
+            fullResponse += chunk;
+          }
+        } catch {
+          fullResponse += chunk;
+        }
 
         setMessages((prev) =>
           prev.map((msg) =>

@@ -51,7 +51,7 @@ const SendTransaction: React.FC<Props> = ({
   }, [status.state, closeModal]);
 
   return (
-    <Card className="w-full sm:w-[420px] md:w-[540px] lg:w-[640px] shadow-xl bg-gradient-to-br from-green-600 to-green-800 dark:from-green-500 dark:to-green-700 text-white rounded-2xl overflow-hidden border-0">
+    <Card className="w-full sm:w-[420px] md:w-[540px] lg:w-[640px] shadow-xl rounded-2xl overflow-hidden border-0">
       <CardHeader className="py-5 px-6 border-b border-white/10 text-center">
         <CardTitle className="text-2xl font-semibold tracking-wide font-[family-name:var(--font-roboto-mono)]">
           {tx.type}
@@ -63,7 +63,7 @@ const SendTransaction: React.FC<Props> = ({
           <div className="flex items-center gap-3 border-b border-white/10 pb-3">
             <Wallet className="h-5 w-5 text-white/80" />
             <div className="flex flex-col">
-              <span className="text-white/80 text-md">Recipient</span>
+              <span className="text-white/80 text-md">Recipient / Contract</span>
               <span className="font-semibold truncate">{tx.to}</span>
             </div>
           </div>
@@ -88,7 +88,7 @@ const SendTransaction: React.FC<Props> = ({
         </div>
 
         <Button
-          className="w-full mt-2 bg-white dark:bg-black text-green-800 dark:text-white hover:bg-green-100 dark:hover:bg-green-900 transition-all duration-300 font-semibold py-2 rounded-lg shadow-md"
+          className="w-full mt-2 bg-gradient-to-br from-green-600 to-green-800 dark:from-green-500 dark:to-green-700 transition-all duration-300 font-semibold py-2 rounded-lg shadow-md"
           variant="default"
           onClick={async () => {
             await handleSendTransaction();
