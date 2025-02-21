@@ -63,7 +63,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
             <div className="flex flex-col">
               <span className="text-white/80 text-md">Amount In</span>
               <span className="font-semibold">
-                {formatEther(BigInt(tx.approve.amountIn))} ETH
+                {formatEther(BigInt(tx.approve.amountIn))} Tokens
               </span>
             </div>
           </div>
@@ -73,7 +73,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
             <div className="flex flex-col">
               <span className="text-white/80 text-md">Amount Out</span>
               <span className="font-semibold">
-                {formatEther(BigInt(tx.approve.amountOut))} ETH
+                {formatEther(BigInt(tx.approve.amountOut))} Tokens
               </span>
             </div>
           </div>

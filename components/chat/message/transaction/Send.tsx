@@ -73,7 +73,7 @@ const SendTransaction: React.FC<Props> = ({
             <div className="flex flex-col">
               <span className="text-white/80 text-md">Value</span>
               <span className="font-semibold">
-                {formatEther(BigInt(tx.value ? tx.value.toString() : "0"))} ETH
+                {formatEther(BigInt(tx.value ? tx.value.toString() : "0"))} S
               </span>
             </div>
           </div>
