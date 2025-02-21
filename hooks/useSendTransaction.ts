@@ -16,7 +16,7 @@ interface UseSendTransactionProps {
   setMessages: (messages: Message[]) => void;
   messages: Message[];
   client: ZerePyClient;
-  updateStatus: (state: TransactionStatus['state'], message?: string) => void;
+  updateStatus: (state: TransactionStatus["state"], message?: string) => void;
   chat: string;
 }
 
@@ -28,7 +28,7 @@ export const useSendTransaction = ({
   messages,
   client,
   updateStatus,
-  chat
+  chat,
 }: UseSendTransactionProps) => {
   const publicClient = usePublicClient();
   const cancelTransaction = useCancelTransaction({
@@ -41,21 +41,26 @@ export const useSendTransaction = ({
 
   return useCallback(async () => {
     try {
-      updateStatus('confirming');
-      const result = {
+      updateStatus("confirming");
+      let result: any = {
         to: tx.to,
         value: BigInt(tx.value ? tx.value.toString() : "0"),
         chainId: tx.chainId,
         data: tx.data || undefined,
-        gas: tx.gas ? BigInt(tx.gas) : undefined,
-        maxFeePerGas: tx.maxFeePerGas ? BigInt(tx.maxFeePerGas) : undefined,
-        maxPriorityFeePerGas:
-          tx.maxFeePerGas && tx.maxPriorityFeePerGas
-            ? BigInt(tx.maxPriorityFeePerGas) > BigInt(tx.maxFeePerGas)
-              ? BigInt(tx.maxFeePerGas)
-              : BigInt(tx.maxPriorityFeePerGas)
-            : undefined,
       };
+      if (tx.type !== "bridge") {
+        result = {
+          ...result,
+          gas: tx.gas ? BigInt(tx.gas) : undefined,
+          maxFeePerGas: tx.maxFeePerGas ? BigInt(tx.maxFeePerGas) : undefined,
+          maxPriorityFeePerGas:
+            tx.maxFeePerGas && tx.maxPriorityFeePerGas
+              ? BigInt(tx.maxPriorityFeePerGas) > BigInt(tx.maxFeePerGas)
+                ? BigInt(tx.maxFeePerGas)
+                : BigInt(tx.maxPriorityFeePerGas)
+              : undefined,
+        };
+      }
 
       if (tx.type === "deposit" || tx.type === "repay") {
         const allowance = (await publicClient?.readContract({
@@ -81,12 +86,12 @@ export const useSendTransaction = ({
             });
             if (txReceipt.status === "reverted") {
               await cancelTransaction(chat);
-              updateStatus('failed', 'Transaction reverted');
+              updateStatus("failed", "Transaction reverted");
               return;
             }
           } catch {
             await cancelTransaction(chat);
-            updateStatus('failed', 'Transaction failed');
+            updateStatus("failed", "Transaction failed");
             return;
           }
         }
@@ -101,9 +106,9 @@ export const useSendTransaction = ({
             });
             if (txReceipt.status === "reverted") {
               await cancelTransaction(chat);
-              updateStatus('failed', 'Transaction reverted');
+              updateStatus("failed", "Transaction reverted");
             } else {
-              updateStatus('confirmed');
+              updateStatus("confirmed");
               await client.performAction("gemini", "continue-execution", [
                 confirmMessage,
               ]);
@@ -118,16 +123,16 @@ export const useSendTransaction = ({
             }
           } catch {
             await cancelTransaction(chat);
-            updateStatus('failed', 'Transaction failed');
+            updateStatus("failed", "Transaction failed");
           }
         },
         onError: async () => {
           await cancelTransaction(chat);
-          updateStatus('failed', 'Transaction failed');
+          updateStatus("failed", "Transaction failed");
         },
       });
     } catch (error: any) {
-      updateStatus('failed', error.message);
+      updateStatus("failed", error.message);
       console.error(error);
     }
   }, [

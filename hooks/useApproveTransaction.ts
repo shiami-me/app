@@ -44,7 +44,7 @@ export const useApproveTransaction = ({
     try {
       updateStatus('approving');
       
-      if (txApprove.tokenIn !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
+      if (txApprove.tokenIn !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && txApprove.tokenIn !== "0x0000000000000000000000000000000000000000") {
         const allowance = (await publicClient?.readContract({
           address: txApprove.tokenIn as `0x${string}`,
           abi: ERC20_ABI,
@@ -87,7 +87,7 @@ export const useApproveTransaction = ({
             sender: "bot",
             text: JSON.stringify({
               ...tx["swap"],
-              type: "swap",
+              type: tx.swap.type || "swap",
             }),
           },
         ]);
@@ -100,7 +100,7 @@ export const useApproveTransaction = ({
             sender: "bot",
             text: JSON.stringify({
               ...tx["swap"],
-              type: "swap",
+              type: tx.swap.type || "swap",
             }),
           },
         ]);

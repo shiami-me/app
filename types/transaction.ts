@@ -4,7 +4,8 @@ type TransactionType =
   | "deposit"
   | "borrow"
   | "repay"
-  | "withdraw";
+  | "withdraw"
+  | "bridge";
 
 export interface BaseTransaction {
   type: TransactionType;

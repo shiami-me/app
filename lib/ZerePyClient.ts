@@ -87,7 +87,9 @@ export class ZerePyClient {
             fullResponse += chunk;
           }
         } catch {
-          fullResponse += chunk;
+          if (!fullResponse.includes("type")){
+            fullResponse += chunk;
+          }
         }
 
         setMessages((prev) =>
