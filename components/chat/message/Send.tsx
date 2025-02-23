@@ -71,8 +71,8 @@ const SendMessage: React.FC<Props> = ({
         size="sm"
         className={`flex items-center gap-1 ${
           useBrowser
-            ? "border-green-500 text-green-400"
-            : "border-gray-500 text-gray-400"
+            ? "border-green-500 text-green-600 dark:text-green-400"
+            : "border-gray-500 text-gray-600 dark:text-gray-400"
         }`}
       >
         <Globe className="w-4 h-4" />
