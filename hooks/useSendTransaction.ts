@@ -111,6 +111,7 @@ export const useSendTransaction = ({
               updateStatus("confirmed");
               await client.performAction("gemini", "continue-execution", [
                 confirmMessage,
+                chat
               ]);
               setMessages([
                 ...messages,

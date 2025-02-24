@@ -6,7 +6,6 @@ import React, { useEffect } from "react";
 import { useApproveTransaction } from "@/hooks/useApproveTransaction";
 import { ApproveTransaction } from "@/types/transaction";
 import { Message } from "@/types/messages";
-import { formatEther } from "viem";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { useTransactionStatus } from '@/hooks/useTransactionStatus';
 import { StatusIndicator } from './StatusIndicator';
@@ -63,7 +62,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
             <div className="flex flex-col">
               <span className="text-white/80 text-md">Amount In</span>
               <span className="font-semibold">
-                {formatEther(BigInt(tx.approve.amountIn))} Tokens
+                {tx.approve.amountIn} Tokens
               </span>
             </div>
           </div>
@@ -73,7 +72,7 @@ const ApproveSendTransaction: React.FC<Props> = ({
             <div className="flex flex-col">
               <span className="text-white/80 text-md">Amount Out</span>
               <span className="font-semibold">
-                {formatEther(BigInt(tx.approve.amountOut))} Tokens
+                {tx.approve.amountOut} Tokens
               </span>
             </div>
           </div>
