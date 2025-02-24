@@ -73,21 +73,35 @@ export class ZerePyClient {
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true });
-        try {
-          const parsed = JSON.parse(fullResponse);
-          if (parsed.tool) {
-            fullResponse = "";
-          }
-        } catch {
-          console.log("Not tool");
-        }
+
         try {
           const parsed = JSON.parse(chunk);
-          if (parsed.type || parsed.tool || (parsed.approve && parsed.swap) || Array.isArray(parsed)) {
+          if (
+            parsed.type ||
+            parsed.tool ||
+            (parsed.approve && parsed.swap) ||
+            Array.isArray(parsed)
+          ) {
+            try {
+              const parsed = JSON.parse(fullResponse);
+              if (parsed.tool) {
+                fullResponse = "";
+              }
+            } catch {
+              console.log("Not tool");
+            }
             fullResponse += chunk;
           }
         } catch {
-          if (!fullResponse.includes("type")){
+          if (!fullResponse.includes("type")) {
+            try {
+              const parsed = JSON.parse(fullResponse);
+              if (parsed.tool) {
+                fullResponse = "";
+              }
+            } catch {
+              console.log("Not tool");
+            }
             fullResponse += chunk;
           }
         }
