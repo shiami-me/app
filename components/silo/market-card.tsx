@@ -12,7 +12,7 @@ interface MarketCardProps {
 export const MarketCard: React.FC<MarketCardProps> = ({ market, onInteract }) => {
   return (
     <Card
-      className="bg-secondary p-4 rounded-lg cursor-pointer transition-all hover:shadow-md hover:border-green-200 dark:hover:border-green-800"
+      className="border border-gray-100 dark:border-gray-800 p-4 rounded-lg cursor-pointer transition-all hover:shadow-md hover:border-green-200 dark:hover:border-green-800"
       onClick={() => onInteract(market)}
     >
       <div className="flex items-center space-x-3 mb-4">

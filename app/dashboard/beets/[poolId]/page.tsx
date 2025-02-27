@@ -341,7 +341,7 @@ export default function PoolDetailPage() {
       >
         <motion.div
           variants={fadeIn}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 flex items-center"
+          className="bg-card rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 flex items-center"
         >
           <div className="rounded-full bg-green-50 dark:bg-green-900/20 p-3 mr-4">
             <DollarSign className="h-6 w-6 text-green-600 dark:text-green-400" />
@@ -358,7 +358,7 @@ export default function PoolDetailPage() {
 
         <motion.div
           variants={fadeIn}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 flex items-center"
+          className="bg-card rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 flex items-center"
         >
           <div className="rounded-full bg-blue-50 dark:bg-blue-900/20 p-3 mr-4">
             <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -375,7 +375,7 @@ export default function PoolDetailPage() {
 
         <motion.div
           variants={fadeIn}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 flex items-center"
+          className="bg-card rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 flex items-center"
         >
           <div className="rounded-full bg-purple-50 dark:bg-purple-900/20 p-3 mr-4">
             <Percent className="h-6 w-6 text-purple-600 dark:text-purple-400" />
@@ -492,7 +492,7 @@ export default function PoolDetailPage() {
 
               <TabsContent value="overview" className="space-y-6 p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
+                  <div className="rounded-lg p-4">
                     <div className="flex items-center gap-2 text-muted-foreground mb-2">
                       <DollarSign className="h-4 w-4" />
                       <span>Total Liquidity</span>
@@ -502,7 +502,7 @@ export default function PoolDetailPage() {
                     </p>
                   </div>
 
-                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
+                  <div className="rounded-lg p-4">
                     <div className="flex items-center gap-2 text-muted-foreground mb-2">
                       <Clock className="h-4 w-4" />
                       <span>24h Volume</span>
@@ -512,7 +512,7 @@ export default function PoolDetailPage() {
                     </p>
                   </div>
 
-                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
+                  <div className="rounded-lg p-4">
                     <div className="flex items-center gap-2 text-muted-foreground mb-2">
                       <BarChart3 className="h-4 w-4" />
                       <span>24h Fees</span>
@@ -523,7 +523,7 @@ export default function PoolDetailPage() {
                   </div>
                 </div>
 
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-800">
+                <div className="p-6 rounded-xl border border-gray-100 dark:border-gray-800">
                   <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
                     APR Breakdown
                   </h3>
@@ -556,7 +556,7 @@ export default function PoolDetailPage() {
 
               <TabsContent value="composition" className="p-6 space-y-6">
                 <div className="flex flex-col md:flex-row gap-6">
-                  <div className="md:w-1/2 bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
+                  <div className="md:w-1/2 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
                     <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
                       Token Weights
                     </h3>
@@ -572,7 +572,7 @@ export default function PoolDetailPage() {
                       {pool.poolTokens.map((token) => (
                         <div
                           key={token.address}
-                          className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-green-200 dark:hover:border-green-800 transition-colors"
+                          className="flex items-center justify-between p-4 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-green-200 dark:hover:border-green-800 transition-colors"
                         >
                           <div className="flex items-center gap-3">
                             {token.logoURI ? (
@@ -731,7 +731,7 @@ export default function PoolDetailPage() {
                 {pool.poolTokens.map((token) => (
                   <div
                     key={token.address}
-                    className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                    className="flex items-start gap-3 p-4 border-b transition-colors"
                   >
                     <div className="mt-0.5 relative">
                       {token.logoURI ? (
