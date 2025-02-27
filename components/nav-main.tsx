@@ -1,35 +1,15 @@
 "use client";
 
-import {
-  ChevronRight,
-  NotebookPen,
-  Trash,
-  type LucideIcon,
-} from "lucide-react";
-
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
+import { ChevronRight, MessageCircle, Trash, type LucideIcon } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "./ui/button";
 import Link from "next/link";
 import { useChat } from "@/providers/ChatProvider";
-import { Button } from "./ui/button";
-import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useState } from "react";
 
-export function NavMain({
-  items,
-}: {
+interface NavMainProps {
   items: {
     title: string;
     url: string;
@@ -42,71 +22,89 @@ export function NavMain({
       active: boolean;
     }[];
   }[];
-}) {
-  const { deleteChatHistory, setMessages, setChatId } = useChat();
-  const router = useRouter();
+  collapsed?: boolean;
+}
+
+export function NavMain({ items, collapsed = false }: NavMainProps) {
+  const { deleteChatHistory } = useChat();
+  const [openSection, setOpenSection] = useState<string | null>(items[0]?.title || null);
+  
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Manage</SidebarGroupLabel>
-      <SidebarMenu>
-        <Button
-          variant={"ghost"}
-          onClick={() => {
-            setChatId(null)
-            setMessages([]);
-            router.push("/chat");
-          }}
-          className="p-2 group/collapsible w-full text-left flex flex-row items-center justify-start hover:bg-secondary"
-        >
-          <NotebookPen className="w-4 h-4" />
-          <span className="font-bold group-data-[collapsible=icon]:hidden text-left">
-            New Chat
-          </span>
-        </Button>
-        {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
+    <div className="space-y-1">
+      {items.map((item) => (
+        <div key={item.title}>
+          {collapsed ? (
+            // Collapsed mode - just show the icon with tooltip
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full flex justify-center h-8 px-2"
+                >
+                  {item.icon && <item.icon className="h-4 w-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">{item.title}</TooltipContent>
+            </Tooltip>
+          ) : (
+            // Expanded mode with collapsible chat history
+            <Collapsible
+              open={openSection === item.title}
+              onOpenChange={(open) => setOpenSection(open ? item.title : null)}
+            >
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full flex justify-between items-center h-8 px-3"
+                >
+                  <div className="flex items-center">
+                    {item.icon && <item.icon className="h-4 w-4 mr-2" />}
+                    <span className="text-sm">{item.title}</span>
+                  </div>
+                  <ChevronRight className={cn(
+                    "h-4 w-4 transition-transform", 
+                    openSection === item.title ? "rotate-90" : ""
+                  )} />
+                </Button>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <SidebarMenuSub className="max-h-[200px] overflow-y-auto custom-scrollbar">
+                <div className="pl-1 ml-4 border-l space-y-1 pt-1 pb-2 max-h-[200px] overflow-y-auto custom-scrollbar">
                   {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem
+                    <div
                       key={subItem.id}
-                      className={`${
-                        subItem.active ? "bg-secondary" : ""
-                      } px-2 py-1 rounded-lg flex justify-between items-center`}
+                      className={cn(
+                        "flex items-center group rounded-md",
+                        subItem.active ? "bg-muted" : "hover:bg-muted/50"
+                      )}
                     >
-                      <SidebarMenuSubButton asChild>
-                        <Link href={subItem.url} className="w-full">
-                          <span>{subItem.title}</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                      <Button
-                        variant={"ghost"}
-                        onClick={() => deleteChatHistory(subItem.id)}
-                        className="opacity-0 hover:opacity-100 ml-2 text-red-600 hover:text-red-800"
+                      <Link 
+                        href={subItem.url}
+                        className={cn(
+                          "flex items-center py-1.5 px-2 text-sm flex-1 truncate",
+                          subItem.active ? "font-medium" : ""
+                        )}
                       >
-                        <Trash className="w-4 h-4" />
+                        <MessageCircle className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
+                        <span className="truncate">{subItem.title}</span>
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteChatHistory(subItem.id)}
+                        className="opacity-0 group-hover:opacity-100 h-7 w-7 p-0 mr-1 text-muted-foreground hover:text-red-500"
+                      >
+                        <Trash className="h-3.5 w-3.5" />
                       </Button>
-                    </SidebarMenuSubItem>
+                    </div>
                   ))}
-                </SidebarMenuSub>
+                </div>
               </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
+            </Collapsible>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }

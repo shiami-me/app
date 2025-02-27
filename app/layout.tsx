@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { WalletProvider } from "@/providers/WalletProvider";
 import { ChatProvider } from "@/providers/ChatProvider";
+import { AppSidebar } from "@/components/app-sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -28,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.variable} ${robotoMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -37,7 +39,16 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <WalletProvider>
-            <ChatProvider>{children}</ChatProvider>
+            <ChatProvider>
+              <TooltipProvider>
+                <div className="flex h-screen">
+                  <AppSidebar />
+                  <main className="flex-1 overflow-auto w-full">
+                    {children}
+                  </main>
+                </div>
+              </TooltipProvider>
+            </ChatProvider>
           </WalletProvider>
         </ThemeProvider>
       </body>

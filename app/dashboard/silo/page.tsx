@@ -107,7 +107,7 @@ const MarketTable = () => {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2
-          className="animate-spin text-black dark:text-white"
+          className="animate-spin text-primary"
           size={32}
         />
       </div>
