@@ -76,6 +76,9 @@ export class ZerePyClient {
 
         try {
           const parsed = JSON.parse(chunk);
+          if (parsed.tool) {
+            fullResponse = "";
+          }
           if (
             parsed.type ||
             parsed.tool ||
@@ -83,8 +86,8 @@ export class ZerePyClient {
             Array.isArray(parsed)
           ) {
             try {
-              const parsed = JSON.parse(fullResponse);
-              if (parsed.tool) {
+              const fullParsed = JSON.parse(fullResponse);
+              if (fullParsed.tool) {
                 fullResponse = "";
               }
             } catch {
@@ -95,8 +98,8 @@ export class ZerePyClient {
         } catch {
           if (!fullResponse.includes("type")) {
             try {
-              const parsed = JSON.parse(fullResponse);
-              if (parsed.tool) {
+              const fullParsed = JSON.parse(fullResponse);
+              if (fullParsed.tool) {
                 fullResponse = "";
               }
             } catch {
