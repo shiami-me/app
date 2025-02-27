@@ -197,10 +197,10 @@ const BeetsPoolsTable = () => {
         {pools.length === 0 && !loading && (
           <motion.div 
             variants={fadeIn}
-            className="flex flex-col items-center justify-center p-12 bg-white/80 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm"
+            className="flex flex-col items-center justify-center p-12 bg-card rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm"
           >
             <div className="text-center space-y-3">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 mb-2">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-secondary mb-2">
                 <RefreshCw className="h-6 w-6 text-gray-500 dark:text-gray-400" />
               </div>
               <h3 className="text-lg font-medium">No pools found</h3>
