@@ -9,6 +9,7 @@ import {
   Menu,
   History,
   X,
+  Wallet,
 } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavDashboards } from "@/components/nav-dashboards";
@@ -41,6 +42,13 @@ const data: any = {
       name: "Beets on Sonic",
       url: "/dashboard/beets",
       icon: PieChart,
+    },
+  ],
+  account: [
+    {
+      name: "Transactions",
+      url: "/transactions",
+      icon: History,
     },
   ],
 };
@@ -200,6 +208,26 @@ export function AppSidebar() {
             </div>
             <NavDashboards
               dashboards={data.dashboards}
+              collapsed={collapsed && !mobileOpen}
+            />
+          </div>
+          
+          {/* Account Section */}
+          <div className="mb-6">
+            <div
+              className={cn(
+                "px-3 mb-2 flex items-center text-sm font-medium text-muted-foreground",
+                collapsed && !mobileOpen ? "justify-center" : ""
+              )}
+            >
+              {collapsed && !mobileOpen ? (
+                <Wallet className="h-4 w-4" />
+              ) : (
+                "Account"
+              )}
+            </div>
+            <NavDashboards
+              dashboards={data.account}
               collapsed={collapsed && !mobileOpen}
             />
           </div>
