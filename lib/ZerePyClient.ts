@@ -141,7 +141,7 @@ export class ZerePyClient {
   async performAction(
     connection: string,
     action: string,
-    params: string[] = []
+    params: any[] = []
   ): Promise<JsonResponse> {
     return this._makeRequest("POST", "/agent/action", {
       body: {
