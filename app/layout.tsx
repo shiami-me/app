@@ -9,13 +9,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["100", "300", "400", "500", "700", "900"],
   variable: "--font-roboto",
 });
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["100", "300", "400", "500", "700"],
   variable: "--font-roboto-mono",
 });
 

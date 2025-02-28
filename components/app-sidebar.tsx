@@ -158,7 +158,7 @@ export function AppSidebar() {
               >
                 <MessageCircle className="h-4 w-4" />
                 {(!collapsed || mobileOpen) && (
-                  <span className="ml-2 font-medium">New Chat</span>
+                  <span className="ml-2 font-bold">New Chat</span>
                 )}
               </Button>
             </Link>
