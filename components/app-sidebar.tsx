@@ -10,6 +10,7 @@ import {
   History,
   X,
   Wallet,
+  BarChart3,
 } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavDashboards } from "@/components/nav-dashboards";
@@ -45,6 +46,11 @@ const data: any = {
     },
   ],
   account: [
+    {
+      name: "Portfolio",
+      url: "/portfolio",
+      icon: BarChart3,
+    },
     {
       name: "Transactions",
       url: "/transactions",
