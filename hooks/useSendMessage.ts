@@ -64,7 +64,7 @@ export const useSendMessage = (
             "generate-text",
             [
               userMessage,
-              `You are a helpful AI assistant - Connected Wallet(sender for sonic transactions) - ${account.address}`,
+              `\n - Connected Wallet(sender for sonic transactions) - ${account.address}`,
               chat
             ],
             setMessages,
