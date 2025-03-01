@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, MessageCircle, Trash, type LucideIcon } from "lucide-react";
+import { ChevronRight, Trash, type LucideIcon } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -86,7 +86,6 @@ export function NavMain({ items, collapsed = false }: NavMainProps) {
                           subItem.active ? "font-medium" : ""
                         )}
                       >
-                        <MessageCircle className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
                         <span className="truncate">{subItem.title}</span>
                       </Link>
                       <Button
