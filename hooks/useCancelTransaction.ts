@@ -24,9 +24,9 @@ export const useCancelTransaction = ({
       chat
     ]);
     setMessages([
-      ...messages,
+      ...messages.slice(0, -1),
       {
-        id: messages.length + 1,
+        id: messages.length,
         sender: "bot",
         text: cancelMessage,
       },

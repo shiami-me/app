@@ -81,9 +81,9 @@ export const useApproveTransaction = ({
 
         updateStatus('approved');
         setMessages([
-          ...messages,
+          ...messages.slice(0, -1),
           {
-            id: messages.length + 1,
+            id: messages.length,
             sender: "bot",
             text: JSON.stringify({
               ...tx["swap"],
@@ -94,9 +94,9 @@ export const useApproveTransaction = ({
       } else {
         updateStatus('approved');
         setMessages([
-          ...messages,
+          ...messages.slice(0, -1),
           {
-            id: messages.length + 1,
+            id: messages.length,
             sender: "bot",
             text: JSON.stringify({
               ...tx["swap"],
