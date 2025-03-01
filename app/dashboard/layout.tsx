@@ -3,6 +3,7 @@ import { ModeToggle } from "@/components/theme-toggle";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function DashboardLayout({
   children,
@@ -26,6 +27,7 @@ export default function DashboardLayout({
               {children}
             </SidebarInset>
           </SidebarProvider>
+          <Toaster />
         </main>
       </div>
     </TooltipProvider>

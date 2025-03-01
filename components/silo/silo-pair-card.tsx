@@ -4,13 +4,14 @@ import { Card } from "@/components/ui/card";
 import { MarketData } from "@/components/silo/types";
 import { MarketCard } from "@/components/silo/market-card";
 import { BadgeCheck } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface SiloPairCardProps {
   markets: MarketData[];
-  onInteract: (market: MarketData) => void;
 }
 
-export const SiloPairCard: React.FC<SiloPairCardProps> = ({ markets, onInteract }) => {
+export const SiloPairCard: React.FC<SiloPairCardProps> = ({ markets }) => {
   return (
     <Card className="border-gray-200 dark:border-gray-800 shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
       <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-800">
@@ -63,22 +64,17 @@ export const SiloPairCard: React.FC<SiloPairCardProps> = ({ markets, onInteract 
             </div>
           </div>
           
-          <div className="flex items-center h-6 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded text-blue-800 dark:text-blue-300 text-xs font-medium">
-            <Image
-              src="https://s2.coinmarketcap.com/static/img/coins/64x64/34753.png"
-              alt="Sonic"
-              width={14}
-              height={14}
-              className="rounded-full mr-1"
-            />
-            <span>Sonic</span>
-          </div>
+          <Link href={`/dashboard/silo/${markets[0].id}`} passHref>
+            <Button variant="outline" className="px-4 py-2 hover:bg-primary hover:text-white">
+              View Details
+            </Button>
+          </Link>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
         {markets.map((market, index) => (
-          <MarketCard key={index} market={market} onInteract={onInteract} />
+          <MarketCard key={index} market={market} />
         ))}
       </div>
     </Card>

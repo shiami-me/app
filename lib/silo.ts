@@ -1,4 +1,13 @@
 import { Address, PublicClient } from "viem";
+import { siloMarketData } from "./siloMarketData";
+/*
+silo lens - 0xB6AdBb29f2D8ae731C7C72036A7FD5A7E970B198
+1. getRawLiquidity (liquidity)
+2. getDepositAPR (collateralBaseApr)
+3. getBorrowAPR (debtBaseApr)
+4. getMaxLtv (maxLtv)
+5. getLt (lt)
+*/
 
 interface SiloConfig {
   configAddress: Address;
@@ -8,7 +17,8 @@ interface SiloConfig {
 }
 
 export class SiloConnection {
-  private publicClient: PublicClient;
+  public publicClient: PublicClient;
+  public siloLensAddress: Address = '0xB6AdBb29f2D8ae731C7C72036A7FD5A7E970B198';
 
   constructor(publicClient: PublicClient) {
     this.publicClient = publicClient;
@@ -40,40 +50,278 @@ export class SiloConnection {
       throw new Error(`Failed to get Silo address: ${error.message}`);
     }
   }
+
+  async getSiloData(siloAddress: Address): Promise<{
+    liquidity: string;
+    collateralBaseApr: string;
+    debtBaseApr: string;
+    maxLtv: string;
+    lt: string;
+  }> {
+    if (!this.publicClient) {
+      throw new Error("Silo connection not properly configured");
+    }
+
+    try {
+      const [liquidity, collateralBaseApr, debtBaseApr, maxLtv, lt]: any = await Promise.all([
+        this.publicClient.readContract({
+          address: this.siloLensAddress,
+          abi: SILO_LENS_ABI,
+          functionName: "getRawLiquidity",
+          args: [siloAddress]
+        }),
+        this.publicClient.readContract({
+          address: this.siloLensAddress,
+          abi: SILO_LENS_ABI,
+          functionName: "getDepositAPR",
+          args: [siloAddress]
+        }),
+        this.publicClient.readContract({
+          address: this.siloLensAddress,
+          abi: SILO_LENS_ABI,
+          functionName: "getBorrowAPR",
+          args: [siloAddress]
+        }),
+        this.publicClient.readContract({
+          address: this.siloLensAddress,
+          abi: SILO_LENS_ABI,
+          functionName: "getMaxLtv",
+          args: [siloAddress]
+        }),
+        this.publicClient.readContract({
+          address: this.siloLensAddress,
+          abi: SILO_LENS_ABI,
+          functionName: "getLt",
+          args: [siloAddress]
+        })
+      ]);
+
+      return {
+        liquidity: liquidity.toString(),
+        collateralBaseApr: collateralBaseApr.toString(),
+        debtBaseApr: debtBaseApr.toString(),
+        maxLtv: maxLtv.toString(),
+        lt: lt.toString(),
+      };
+    } catch (error: any) {
+      throw new Error(`Failed to fetch silo data: ${error.message}`);
+    }
+  }
+
+  async updateSiloMarketData(market: any, siloIndex: 0 | 1): Promise<any> {
+    const siloKey = siloIndex === 0 ? 'silo0' : 'silo1';
+    const siloAddress = await this.getSiloAddress(market.configAddress as Address, siloIndex);
+    const siloData = await this.getSiloData(siloAddress);
+    
+    // Update the market data with the fetched values
+    return {
+      ...market,
+      [siloKey]: {
+        ...market[siloKey],
+        siloAddress,
+        liquidity: siloData.liquidity,
+        collateralBaseApr: siloData.collateralBaseApr,
+        debtBaseApr: siloData.debtBaseApr,
+        maxLtv: siloData.maxLtv,
+        lt: siloData.lt,
+      }
+    };
+  }
+
+  // New functions for user position data
+
+  // Check if user is solvent (not liquidatable)
+  async isSolvent(siloAddress: Address, userAddress: Address): Promise<boolean> {
+    if (!this.publicClient) {
+      throw new Error("Silo connection not properly configured");
+    }
+
+    try {
+      const isSolvent = await this.publicClient.readContract({
+        address: siloAddress,
+        abi: SILO_ABI,
+        functionName: "isSolvent",
+        args: [userAddress]
+      });
+
+      return isSolvent as boolean;
+    } catch (error: any) {
+      throw new Error(`Failed to check solvency: ${error.message}`);
+    }
+  }
+
+  // Get user's loan-to-value ratio
+  async getLoanToValue(siloAddress: Address, userAddress: Address): Promise<string> {
+    if (!this.publicClient) {
+      throw new Error("Silo connection not properly configured");
+    }
+
+    try {
+      const ltv: any = await this.publicClient.readContract({
+        address: this.siloLensAddress,
+        abi: SILO_LENS_ABI,
+        functionName: "getLtv",
+        args: [siloAddress, userAddress]
+      });
+
+      return ltv.toString();
+    } catch (error: any) {
+      throw new Error(`Failed to get loan-to-value ratio: ${error.message}`);
+    }
+  }
+
+  // Get user's regular deposit amount
+  async getRegularDeposit(siloAddress: Address, userAddress: Address): Promise<string> {
+    if (!this.publicClient) {
+      throw new Error("Silo connection not properly configured");
+    }
+
+    try {
+      const userShares = await this.publicClient.readContract({
+        address: siloAddress,
+        abi: SILO_ABI,
+        functionName: "balanceOf",
+        args: [userAddress]
+      });
+
+      const userAssets: any = await this.publicClient.readContract({
+        address: siloAddress,
+        abi: SILO_ABI,
+        functionName: "previewRedeem",
+        args: [userShares]
+      });
+
+      return userAssets.toString();
+    } catch (error: any) {
+      throw new Error(`Failed to get regular deposit amount: ${error.message}`);
+    }
+  }
+
+  // Get user's protected deposit amount
+  async getProtectedDeposit(siloAddress: Address, userAddress: Address): Promise<string> {
+    if (!this.publicClient) {
+      throw new Error("Silo connection not properly configured");
+    }
+
+    try {
+      // Get silo config for this silo
+      const config = await this.publicClient.readContract({
+        address: siloAddress,
+        abi: SILO_ABI,
+        functionName: "config",
+      });
+
+      // Get protected share token from the config
+      const [protectedShareToken] = await this.publicClient.readContract({
+        address: config as Address,
+        abi: SILO_CONFIG,
+        functionName: "getShareTokens",
+        args: [siloAddress]
+      }) as [Address, Address, Address];
+
+      // Get user's protected shares balance
+      const userProtectedShares = await this.publicClient.readContract({
+        address: protectedShareToken,
+        abi: [
+          {
+            inputs: [{ name: "account", type: "address", internalType: "address" }],
+            name: "balanceOf",
+            outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+            stateMutability: "view",
+            type: "function"
+          }
+        ],
+        functionName: "balanceOf",
+        args: [userAddress]
+      });
+
+      // Convert shares to assets
+      const userProtectedAssets: any = await this.publicClient.readContract({
+        address: siloAddress,
+        abi: SILO_ABI,
+        functionName: "previewRedeem",
+        args: [userProtectedShares, 0] // 0 for Protected type
+      });
+
+      return userProtectedAssets.toString();
+    } catch (error: any) {
+      throw new Error(`Failed to get protected deposit amount: ${error.message}`);
+    }
+  }
+
+  // Get user's total collateral balance (regular + protected deposits)
+  async getTotalCollateralBalance(siloAddress: Address, userAddress: Address): Promise<string> {
+    if (!this.publicClient) {
+      throw new Error("Silo connection not properly configured");
+    }
+
+    try {
+      const totalCollateral: any = await this.publicClient.readContract({
+        address: this.siloLensAddress,
+        abi: SILO_LENS_ABI,
+        functionName: "collateralBalanceOfUnderlying",
+        args: [siloAddress, userAddress]
+      });
+
+      return totalCollateral.toString();
+    } catch (error: any) {
+      throw new Error(`Failed to get total collateral balance: ${error.message}`);
+    }
+  }
+
+  // Get user's borrowed amount
+  async getBorrowedAmount(siloAddress: Address, userAddress: Address): Promise<string> {
+    if (!this.publicClient) {
+      throw new Error("Silo connection not properly configured");
+    }
+
+    try {
+      const borrowedAmount: any = await this.publicClient.readContract({
+        address: this.siloLensAddress,
+        abi: SILO_LENS_ABI,
+        functionName: "debtBalanceOfUnderlying",
+        args: [siloAddress, userAddress]
+      });
+
+      return borrowedAmount.toString();
+    } catch (error: any) {
+      throw new Error(`Failed to get borrowed amount: ${error.message}`);
+    }
+  }
+
+  // Get maximum amount user can borrow
+  async getMaxBorrowAmount(siloAddress: Address, userAddress: Address): Promise<string> {
+    if (!this.publicClient) {
+      throw new Error("Silo connection not properly configured");
+    }
+
+    try {
+      const maxBorrow: any = await this.publicClient.readContract({
+        address: siloAddress,
+        abi: SILO_ABI,
+        functionName: "maxBorrow",
+        args: [userAddress]
+      });
+
+      return maxBorrow.toString();
+    } catch (error: any) {
+      throw new Error(`Failed to get max borrow amount: ${error.message}`);
+    }
+  }
 }
 
 export const getSiloConfigAddress = async (
   token0: string,
   token1: string
 ): Promise<SiloConfig> => {
-  const response = await fetch("https://v2.silo.finance/api/display-markets", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      isApeMode: false,
-      isCurated: true,
-      protocolKey: "sonic",
-      search: null,
-      sort: null,
-    }),
-  });
+  // This data is still hardcoded, but the dynamic values will be fetched using SiloLens
+  const siloData = siloMarketData
 
-  const data = await response.json();
-
-  for (const market of data) {
+  for (const market of siloData) {
     if (
       (market.silo0.symbol === token0 && market.silo1.symbol === token1) ||
       (market.silo0.symbol === token1 && market.silo1.symbol === token0)
     ) {
-      console.log(market);
-      console.log(
-        "configAddress",
-        market.configAddress,
-        market.silo0.symbol,
-        market.silo1.symbol
-      );
       return {
         configAddress: market.configAddress as Address,
         isToken0Silo0: market.silo0.symbol === token0,
@@ -90,6 +338,74 @@ export const getSiloConfigAddress = async (
   }
 
   throw new Error(`No silo found for token pair ${token0}/${token1}`);
+};
+
+// Helper function to get updated market data with dynamic values from SiloLens
+export const getUpdatedSiloMarketData = async (publicClient: PublicClient, marketData: any[]): Promise<any[]> => {
+  const siloConnection = new SiloConnection(publicClient);
+  const updatedMarkets = [];
+
+  for (const market of marketData) {
+    try {
+      // Update silo0 data
+      let updatedMarket = await siloConnection.updateSiloMarketData(market, 0);
+      // Update silo1 data
+      updatedMarket = await siloConnection.updateSiloMarketData(updatedMarket, 1);
+      updatedMarkets.push(updatedMarket);
+    } catch (error) {
+      console.error(`Error updating market ${market.id}:`, error);
+      // Keep the original market data if there's an error
+      updatedMarkets.push(market);
+    }
+  }
+
+  return updatedMarkets;
+};
+
+// Get complete user position data
+export const getUserPositionData = async (
+  publicClient: PublicClient,
+  siloAddress: Address,
+  userAddress: Address
+): Promise<{
+  regularDeposit: string;
+  protectedDeposit: string;
+  totalCollateral: string;
+  borrowedAmount: string;
+  maxBorrowAmount: string;
+  loanToValue: string;
+  isSolvent: boolean;
+}> => {
+  const siloConnection = new SiloConnection(publicClient);
+
+  // Fetch all position data in parallel
+  const [
+    regularDeposit,
+    protectedDeposit,
+    totalCollateral,
+    borrowedAmount,
+    maxBorrowAmount,
+    loanToValue,
+    isSolvent
+  ] = await Promise.all([
+    siloConnection.getRegularDeposit(siloAddress, userAddress),
+    siloConnection.getProtectedDeposit(siloAddress, userAddress),
+    siloConnection.getTotalCollateralBalance(siloAddress, userAddress),
+    siloConnection.getBorrowedAmount(siloAddress, userAddress),
+    siloConnection.getMaxBorrowAmount(siloAddress, userAddress),
+    siloConnection.getLoanToValue(siloAddress, userAddress),
+    siloConnection.isSolvent(siloAddress, userAddress)
+  ]);
+
+  return {
+    regularDeposit,
+    protectedDeposit,
+    totalCollateral,
+    borrowedAmount,
+    maxBorrowAmount,
+    loanToValue,
+    isSolvent
+  };
 };
 
 export const SILO_ABI = [

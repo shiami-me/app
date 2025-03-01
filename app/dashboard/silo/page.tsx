@@ -3,7 +3,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import SiloInteractionModal from "@/components/SiloInteractionModal";
 import { MarketData } from "@/components/silo/types";
 import { SiloPairCard } from "@/components/silo/silo-pair-card";
 import { motion } from "framer-motion";
@@ -11,9 +10,8 @@ import { motion } from "framer-motion";
 const MarketTable = () => {
   const [data, setData] = useState<MarketData[][]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMarket, setSelectedMarket] = useState<MarketData | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
   // Animation configurations
   const fadeIn = {
@@ -33,24 +31,15 @@ const MarketTable = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        "https://v2.silo.finance/api/display-markets",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            isApeMode: false,
-            isCurated: true,
-            protocolKey: "sonic",
-            search: null,
-            sort: null,
-          }),
-        }
-      );
+      const response = await fetch("/api/silo/markets");
+      if (!response.ok) {
+        throw new Error(`API returned status: ${response.status}`);
+      }
+      
       const result = await response.json();
-      const formattedData: MarketData[][] = result.map((item: any) => [
+      setLastUpdated(result.timestamp);
+      
+      const formattedData: MarketData[][] = result.markets.map((item: any) => [
         {
           id: item.id,
           reviewed: item.isVerified,
@@ -66,9 +55,9 @@ const MarketTable = () => {
             ) + "%",
           isBorrowable: !item.silo0.isNonBorrowable,
           logo:
-            item.silo0.logos.coinMarketCap?.large ||
             item.silo0.logos.coinGecko?.large ||
-            "https://s2.coinmarketcap.com/static/img/coins/128x128/34753.png",
+            item.silo0.logos.coinMarketCap?.large ||
+            "https://coin-images.coingecko.com/coins/images/52857/large/wrapped_sonic.png?1734536585",
           token0: item.silo0.symbol,
           token1: item.silo1.symbol,
         },
@@ -87,9 +76,9 @@ const MarketTable = () => {
             ) + "%",
           isBorrowable: !item.silo1.isNonBorrowable,
           logo:
-            item.silo1.logos.coinMarketCap?.large ||
             item.silo1.logos.coinGecko?.large ||
-            "https://s2.coinmarketcap.com/static/img/coins/128x128/34753.png",
+            item.silo1.logos.coinMarketCap?.large ||
+            "https://coin-images.coingecko.com/coins/images/52857/large/wrapped_sonic.png?1734536585",
           token0: item.silo1.symbol,
           token1: item.silo0.symbol,
         },
@@ -107,20 +96,21 @@ const MarketTable = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleInteract = (market: MarketData) => {
-    setSelectedMarket(market);
-    setIsModalOpen(true);
-  };
-
   const handleRefresh = () => {
     setIsRefreshing(true);
     fetchData();
   };
 
+  const formatDateTime = (dateString: string | null) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleString();
+  };
+
   if (loading && data.length === 0) {
     return (
       <div className="flex justify-center items-center h-screen">
-                    <Loader2 className="animate-spin text-primary" size={32} />
+        <Loader2 className="animate-spin text-primary" size={32} />
       </div>
     );
   }
@@ -146,6 +136,11 @@ const MarketTable = () => {
                 </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Explore lending and borrowing markets on Silo Finance.
+                  {lastUpdated && (
+                    <span className="ml-1 text-xs">
+                      Last updated: {formatDateTime(lastUpdated)}
+                    </span>
+                  )}
                 </p>
               </div>
 
@@ -181,7 +176,6 @@ const MarketTable = () => {
           >
             <SiloPairCard 
               markets={marketPair} 
-              onInteract={handleInteract} 
             />
           </motion.div>
         ))}
@@ -214,16 +208,6 @@ const MarketTable = () => {
         <div className="flex justify-center items-center h-40 mt-4">
           <Loader2 className="animate-spin text-primary" size={32} />
         </div>
-      )}
-
-      {selectedMarket && (
-        <SiloInteractionModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          market={selectedMarket.market}
-          token0={selectedMarket.token0}
-          token1={selectedMarket.token1}
-        />
       )}
     </motion.div>
   );

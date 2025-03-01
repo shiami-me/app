@@ -6,14 +6,12 @@ import { DollarSign, LineChart, Check, AlertCircle } from "lucide-react";
 
 interface MarketCardProps {
   market: MarketData;
-  onInteract: (market: MarketData) => void;
 }
 
-export const MarketCard: React.FC<MarketCardProps> = ({ market, onInteract }) => {
+export const MarketCard: React.FC<MarketCardProps> = ({ market }) => {
   return (
     <Card
-      className="border border-gray-100 dark:border-gray-800 p-4 rounded-lg cursor-pointer transition-all hover:shadow-md hover:border-green-200 dark:hover:border-green-800"
-      onClick={() => onInteract(market)}
+      className="border border-gray-100 dark:border-gray-800 p-4 rounded-lg transition-all hover:shadow-md hover:border-green-200 dark:hover:border-green-800"
     >
       <div className="flex items-center space-x-3 mb-4">
         <div className="relative">
