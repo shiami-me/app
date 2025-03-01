@@ -108,7 +108,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({ marketData, userData }
           </div>
           
           {!isConnected ? (
-            <div className="px-4 py-6 text-center">
+            <div className="px-4 py-6 text-center flex items-center flex-col">
               <Wallet className="h-10 w-10 mx-auto mb-2 text-gray-400" />
               <h3 className="text-lg font-medium mb-2">Connect Wallet</h3>
               <p className="text-sm text-gray-500 mb-4">Connect your wallet to interact with Silo Finance markets</p>
