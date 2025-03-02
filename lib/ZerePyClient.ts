@@ -82,7 +82,7 @@ export class ZerePyClient {
           if (
             parsed.type ||
             parsed.tool ||
-            (parsed.approve && parsed.swap) ||
+            (parsed.approve && parsed.swap) || (parsed.transaction) ||
             Array.isArray(parsed)
           ) {
             try {
@@ -96,7 +96,7 @@ export class ZerePyClient {
             fullResponse += chunk;
           }
         } catch {
-          if (!fullResponse.includes("type")) {
+          if (!fullResponse.includes("type") && !fullResponse.includes("transaction")) {
             try {
               const fullParsed = JSON.parse(fullResponse);
               if (fullParsed.tool) {

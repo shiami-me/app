@@ -12,7 +12,7 @@ import {
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 import RenderImage from "./message/Image";
 import Transaction from "./message/Transaction";
-import { isApproveTransaction, isBaseTransaction } from "@/types/transaction";
+import { isAddLiquidity, isApproveTransaction, isBaseTransaction, isRemoveLiquidity } from "@/types/transaction";
 
 interface Props {
   client: ZerePyClient;
@@ -88,8 +88,8 @@ const RenderMessage: React.FC<Props> = ({
           txMatch = false;
         }
       }
-
-      if (txMatch && (isBaseTransaction(txMatch) || isApproveTransaction(txMatch))) {
+      console.log(txMatch)
+      if (txMatch && (isBaseTransaction(txMatch) || isApproveTransaction(txMatch) || isAddLiquidity(txMatch) || isRemoveLiquidity(txMatch))) {
         return (
           <Transaction
             tx={txMatch}

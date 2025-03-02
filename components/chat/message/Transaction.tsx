@@ -1,10 +1,18 @@
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { Message } from "@/types/messages";
-import { Tx, isBaseTransaction } from "@/types/transaction";
+import { 
+  Tx, 
+  isBaseTransaction, 
+  isApproveTransaction,
+  isAddLiquidity,
+  isRemoveLiquidity
+} from "@/types/transaction";
 import { Config, useAccount } from "wagmi";
 import { SendTransactionMutateAsync } from "wagmi/query";
 import SendTransaction from "./transaction/Send";
 import ApproveSendTransaction from "./transaction/Approval";
+import AddLiquidityTransaction from "./transaction/AddLiquidity";
+import RemoveLiquidityTransaction from "./transaction/RemoveLiquidity";
 import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { useCancelTransaction } from "@/hooks/useCancelTransaction";
@@ -27,9 +35,21 @@ const Transaction: React.FC<Props> = ({
 }: Props) => {
   const account = useAccount();
   const [isModalOpen, setIsModalOpen] = useState(true);
-  const { chatId } = useChat()
+  const { chatId } = useChat();
+  
+  let txType = "transaction";
+  if (isBaseTransaction(tx)) {
+    txType = tx.type;
+  } else if (isApproveTransaction(tx)) {
+    txType = "approve";
+  } else if (isAddLiquidity(tx)) {
+    txType = "deposit";
+  } else if (isRemoveLiquidity(tx)) {
+    txType = "withdraw";
+  }
+  
   const cancelTransaction = useCancelTransaction({
-    txType: isBaseTransaction(tx) ? tx.type : "approve",
+    txType: txType,
     client,
     setMessages,
     messages,
@@ -53,19 +73,37 @@ const Transaction: React.FC<Props> = ({
           messages={messages}
           closeModal={() => setIsModalOpen(false)}
         />
-      ) : (
-        "approve" in tx && (
-          <ApproveSendTransaction
-            tx={tx}
-            account={account.address!}
-            sendTransaction={sendTransaction}
-            setMessages={setMessages}
-            messages={messages}
-            client={client}
-            closeModal={() => setIsModalOpen(false)}
-          />
-        )
-      )}
+      ) : isApproveTransaction(tx) ? (
+        <ApproveSendTransaction
+          tx={tx}
+          account={account.address!}
+          sendTransaction={sendTransaction}
+          setMessages={setMessages}
+          messages={messages}
+          client={client}
+          closeModal={() => setIsModalOpen(false)}
+        />
+      ) : isAddLiquidity(tx) ? (
+        <AddLiquidityTransaction
+          tx={tx}
+          account={account.address!}
+          sendTransaction={sendTransaction}
+          setMessages={setMessages}
+          messages={messages}
+          client={client}
+          closeModal={() => setIsModalOpen(false)}
+        />
+      ) : isRemoveLiquidity(tx) ? (
+        <RemoveLiquidityTransaction
+          tx={tx}
+          account={account.address!}
+          sendTransaction={sendTransaction}
+          setMessages={setMessages}
+          messages={messages}
+          client={client}
+          closeModal={() => setIsModalOpen(false)}
+        />
+      ) : null}
     </Modal>
   );
 };
