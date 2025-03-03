@@ -72,7 +72,7 @@ const RenderMessage: React.FC<Props> = ({
       return (
         <div key={message.id} className="flex justify-start">
           <div className="w-full">
-            <RenderImage ipfsUrl={ipfsUrl} width={width} height={height} />;
+            <RenderImage ipfsUrl={ipfsUrl} width={width} height={height} />
           </div>
         </div>
       );
