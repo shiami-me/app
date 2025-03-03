@@ -21,33 +21,15 @@ const TransactionsPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
-
-  const account = useAccount();
-  const { client } = useChat();
-  const router = useRouter();
-
-  // Redirect if wallet is not connected
-  useEffect(() => {
-    if (!account.isConnected) {
-      router.push('/chat');
-    }
-  }, [account.isConnected, router]);
-
-  // If wallet is not connected, show nothing while redirecting
-  if (!account.isConnected) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="animate-spin text-primary" size={32} />
-      </div>
-    );
-  }
-
-  // Using same pagination structure as Beets page
   const [filters, setFilters] = useState({
     first: 10,
     skip: 0,
     sort: "desc",
   });
+
+  const account = useAccount();
+  const { client } = useChat();
+  const router = useRouter();
 
   // Animation configurations
   const fadeIn = {
@@ -117,8 +99,16 @@ const TransactionsPage = () => {
   }, [account.address, client, filters, isRefreshing, transactions.length]);
 
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    if (!account.isConnected) {
+      router.push('/chat');
+    }
+  }, [account.isConnected, router]);
+  
+  useEffect(() => {
+    if (account.isConnected) {
+      fetchTransactions();
+    }
+  }, [fetchTransactions, account.isConnected]);
 
   const handleSortChange = (newSort: string) => {
     setFilters((prev) => ({ ...prev, sort: newSort, skip: 0 }));
@@ -134,6 +124,14 @@ const TransactionsPage = () => {
     const newSkip = (page - 1) * filters.first;
     setFilters((prev) => ({ ...prev, skip: newSkip }));
   };
+
+  if (!account.isConnected) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
 
   if (loading && transactions.length === 0) {
     return (

@@ -63,21 +63,25 @@ const data: any = {
 export function AppSidebar() {
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { chatHistory, chatId: chat, setChatId } = useChat();
+  const { chatHistory = {}, chatId: chat, setChatId } = useChat();
   const pathname = usePathname();
   const sidebarRef = React.useRef<HTMLDivElement>(null);
   const { isConnected } = useAccount();
+  const [navItems, setNavItems] = React.useState<any>([]);
 
-  // Update chat history when it changes
-  React.useEffect(() => {
-    data["navMain"][0].items = Object.keys(chatHistory).map((chatId) => ({
+React.useEffect(() => {
+  setNavItems(
+    Object.keys(chatHistory).map((chatId) => ({
       title: chatHistory[chatId].title,
       url: `/chat/${chatId}`,
       id: chatId,
       active: chatId === chat,
       onClick: () => setChatId(chatId),
-    }));
-  }, [chatHistory, chat, setChatId]);
+    }))
+  );
+}, [chatHistory, chat, setChatId]);
+
+data["navMain"][0].items = navItems;
 
   // Handle outside click for mobile
   React.useEffect(() => {

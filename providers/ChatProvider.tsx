@@ -44,7 +44,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const account = useAccount();
   const client = new ZerePyClient("http://localhost:8000");
   const router = useRouter();
-  const prevChatIdRef = useRef<string | null>(null);
 
   const sendMessage = useSendMessage(
     client,
@@ -60,17 +59,19 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     if (Object.keys(chats).length > 0 && Object.keys(chatHistory).length === 0) {
       setChatHistory(chats);
     }
-
-    if (!chatId || chatId === prevChatIdRef.current) {
+  
+    if (!window.location.pathname.includes("/chat")) return;
+    if (!chatId) {
+      setMessages([]);
       return;
     }
-
-    if (chatId && chats[chatId]) {
+  
+    if (chats[chatId]) {
+      if (loading) return;
       client
         .performAction("gemini", "get-message-history", [chatId])
         .then((response) => {
           setMessages(response.result);
-          prevChatIdRef.current = chatId;
         })
         .catch((error) => {
           console.error("Error fetching message history:", error);
@@ -82,7 +83,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       setMessages([]);
       router.replace("/chat");
     }
-  }, [chatId, setChatHistory, setMessages, router, client]);
+  }, [chatId, chatHistory, setChatHistory, setMessages, router]);
+  
 
   const deleteChatHistory = (chatIdInput: string) => {
     client

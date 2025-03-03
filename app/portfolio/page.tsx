@@ -34,22 +34,6 @@ const PortfolioPage = () => {
   const { client } = useChat();
   const router = useRouter();
 
-  // Redirect if wallet is not connected
-  useEffect(() => {
-    if (!account.isConnected) {
-      router.push('/chat');
-    }
-  }, [account.isConnected, router]);
-
-  // If wallet is not connected, show nothing while redirecting
-  if (!account.isConnected) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="animate-spin text-primary" size={32} />
-      </div>
-    );
-  }
-
   // Animation configurations
   const fadeIn = {
     initial: { opacity: 0, y: 10 },
@@ -101,8 +85,16 @@ const PortfolioPage = () => {
   ]);
 
   useEffect(() => {
-    fetchTokenBalances();
-  }, [fetchTokenBalances]);
+    if (!account.isConnected) {
+      router.push('/chat');
+    }
+  }, [account.isConnected, router]);
+
+  useEffect(() => {
+    if (account.isConnected) {
+      fetchTokenBalances();
+    }
+  }, [fetchTokenBalances, account.isConnected]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -114,6 +106,14 @@ const PortfolioPage = () => {
     // by multiplying each token balance by its current price
     return tokens.length > 0 ? `${tokens.length} tokens` : "No tokens";
   };
+
+  if (!account.isConnected) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
 
   if (loading && tokens.length === 0) {
     return (

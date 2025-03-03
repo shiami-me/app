@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSendTransaction } from "wagmi";
 import { useChat } from "@/providers/ChatProvider";
@@ -33,18 +33,25 @@ export default function Page({
     }
   }, [messages]);
 
+  const [resolvedParams, setResolvedParams] = useState<{ chat?: string[] } | null>(null);
+
   useEffect(() => {
-    const setChatFromParams = async () => {
-      const resolvedParams = await params;
-      const chatId = resolvedParams.chat?.[0];
+    params.then((resolved) => {
+      setResolvedParams(resolved);
+    });
 
-      if (chatId) {
-        setChatId(chatId);
+  }, [params]);
+
+  useEffect(() => {
+    if (resolvedParams) {
+      if (resolvedParams?.chat?.[0]) {
+        setChatId(resolvedParams.chat[0]);
+      } else {
+        setChatId(null);
       }
-    };
+    }
+  }, [resolvedParams, setChatId]);
 
-    setChatFromParams();
-  }, [params, setChatId]);
 
   return (
 
