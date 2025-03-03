@@ -13,6 +13,7 @@ import { useAccount } from "wagmi";
 import { motion } from "framer-motion";
 import { useChat } from "@/providers/ChatProvider";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface TokenBalance {
   token: string;
@@ -31,6 +32,23 @@ const PortfolioPage = () => {
 
   const account = useAccount();
   const { client } = useChat();
+  const router = useRouter();
+
+  // Redirect if wallet is not connected
+  useEffect(() => {
+    if (!account.isConnected) {
+      router.push('/chat');
+    }
+  }, [account.isConnected, router]);
+
+  // If wallet is not connected, show nothing while redirecting
+  if (!account.isConnected) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
 
   // Animation configurations
   const fadeIn = {

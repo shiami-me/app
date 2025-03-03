@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ModeToggle } from "./theme-toggle";
 import { usePathname } from "next/navigation";
+import { useAccount } from "wagmi";
 
 const data: any = {
   navMain: [
@@ -65,6 +66,7 @@ export function AppSidebar() {
   const { chatHistory, chatId: chat, setChatId } = useChat();
   const pathname = usePathname();
   const sidebarRef = React.useRef<HTMLDivElement>(null);
+  const { isConnected } = useAccount();
 
   // Update chat history when it changes
   React.useEffect(() => {
@@ -218,25 +220,27 @@ export function AppSidebar() {
             />
           </div>
           
-          {/* Account Section */}
-          <div className="mb-6">
-            <div
-              className={cn(
-                "px-3 mb-2 flex items-center text-sm font-medium text-muted-foreground",
-                collapsed && !mobileOpen ? "justify-center" : ""
-              )}
-            >
-              {collapsed && !mobileOpen ? (
-                <Wallet className="h-4 w-4" />
-              ) : (
-                "Account"
-              )}
+          {/* Account Section - only show when wallet is connected */}
+          {isConnected && (
+            <div className="mb-6">
+              <div
+                className={cn(
+                  "px-3 mb-2 flex items-center text-sm font-medium text-muted-foreground",
+                  collapsed && !mobileOpen ? "justify-center" : ""
+                )}
+              >
+                {collapsed && !mobileOpen ? (
+                  <Wallet className="h-4 w-4" />
+                ) : (
+                  "Account"
+                )}
+              </div>
+              <NavDashboards
+                dashboards={data.account}
+                collapsed={collapsed && !mobileOpen}
+              />
             </div>
-            <NavDashboards
-              dashboards={data.account}
-              collapsed={collapsed && !mobileOpen}
-            />
-          </div>
+          )}
         </div>
       </ScrollArea>
 

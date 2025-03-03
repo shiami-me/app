@@ -12,6 +12,7 @@ import {
 } from "@/components/transactions/transaction-card";
 import { TransactionFilter } from "@/components/transactions/transaction-filter";
 import { Pagination } from "@/components/beets/pagination";
+import { useRouter } from "next/navigation";
 
 const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -23,6 +24,23 @@ const TransactionsPage = () => {
 
   const account = useAccount();
   const { client } = useChat();
+  const router = useRouter();
+
+  // Redirect if wallet is not connected
+  useEffect(() => {
+    if (!account.isConnected) {
+      router.push('/chat');
+    }
+  }, [account.isConnected, router]);
+
+  // If wallet is not connected, show nothing while redirecting
+  if (!account.isConnected) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
 
   // Using same pagination structure as Beets page
   const [filters, setFilters] = useState({
