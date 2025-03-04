@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { BrowserResponse, Message } from "@/types/messages";
 import { useAccount } from "wagmi";
+import { ContextItem } from "@/providers/ChatProvider";
 
 export const useSendMessage = (
   client: ZerePyClient,
@@ -9,7 +10,8 @@ export const useSendMessage = (
   messages: Message[],
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  useBrowser: boolean
+  useBrowser: boolean,
+  contextData: ContextItem[] = []
 ) => {
   return useCallback(
     async (input: string, chat: string) => {
@@ -59,12 +61,24 @@ export const useSendMessage = (
           }
           setIsLoading(false);
         } else {
+          // Format context data to send
+          const contextString = contextData.length > 0
+            ? `\n--- Context Information ---\n${contextData.map(item => {
+                // Format JSON data in a readable way
+                const formattedData = typeof item.data === 'object'
+                  ? JSON.stringify(item.data, null, 2)
+                  : item.data;
+                
+                return `Type: ${item.type}\nTitle: ${item.title}\nData: ${formattedData}`;
+              }).join('\n\n')}\n---`
+            : '';
+            
           const response = await client.agentChat(
             "gemini",
             "generate-text",
             [
               userMessage,
-              `\n - Connected Wallet(sender for sonic transactions) - ${account.address}`,
+              `\n - Connected Wallet(sender for sonic transactions) - ${account.address}${contextString}`,
               chat
             ],
             setMessages,
@@ -84,6 +98,6 @@ export const useSendMessage = (
         setIsLoading(false);
       }
     },
-    [client, account, setMessages, setIsLoading, useBrowser]
+    [client, account, setMessages, setIsLoading, useBrowser, contextData]
   );
 };

@@ -1,10 +1,13 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowUpRight, ArrowDownLeft, CheckCircle2, XCircle } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, CheckCircle2, XCircle, PlusCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { truncateAddress, formatEther } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useChat } from "@/providers/ChatProvider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export interface Transaction {
   hash: string;
@@ -28,6 +31,8 @@ interface TransactionCardProps {
 }
 
 export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction, userAddress }) => {
+  const { addToContext } = useChat();
+  
   // Format timestamp
   const date = new Date(parseInt(transaction.timeStamp) * 1000);
   const timeAgo = formatDistanceToNow(date, { addSuffix: true });
@@ -47,6 +52,29 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction, u
     parseInt(transaction.gasPrice) /
     1e18
   ).toFixed(8);
+
+  const handleAddToContext = () => {
+    addToContext({
+      id: `tx-${transaction.hash.substring(0, 8)}`,
+      type: "transaction",
+      title: `${isIncoming ? 'Received' : 'Sent'} ${transaction.tokenSymbol || 'ETH'}`,
+      data: {
+        hash: transaction.hash,
+        timestamp: date.toISOString(),
+        timeAgo: timeAgo,
+        from: transaction.from,
+        to: transaction.to,
+        value: amount,
+        tokenSymbol: transaction.tokenSymbol || "ETH",
+        gasUsed: transaction.gasUsed,
+        gasPrice: transaction.gasPrice,
+        gasFee: gasFee,
+        isSuccess: isSuccess,
+        isIncoming: isIncoming,
+        functionName: transaction.functionName || null
+      }
+    });
+  };
 
   return (
     <Card className="p-4 hover:shadow-md transition-shadow border-gray-200 dark:border-gray-800">
@@ -102,15 +130,35 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction, u
               {timeAgo}
             </span>
             
-            <a 
-              href={`https://sonicscan.org/tx/${transaction.hash}`} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-xs text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              <ExternalLink className="h-3 w-3 mr-1" />
-              View
-            </a>
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                      onClick={handleAddToContext}
+                    >
+                      <PlusCircle className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p className="text-xs">Add to context</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <a 
+                href={`https://sonicscan.org/tx/${transaction.hash}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                <ExternalLink className="h-3 w-3 mr-1" />
+                View
+              </a>
+            </div>
           </div>
         </div>
       </div>

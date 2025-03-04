@@ -1,10 +1,12 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Loader2, RefreshCw, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "wagmi";
 import { motion } from "framer-motion";
+import { useChat } from "@/providers/ChatProvider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { FilterOptions, PoolData } from "@/components/beets/types";
 import { PoolCard } from "@/components/beets/pool-card";
@@ -29,6 +31,7 @@ const BeetsPoolsTable = () => {
   const [isSorting, setIsSorting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const account = useAccount();
+  const { addToContext } = useChat();
 
   // Add animation configurations
   const fadeIn = {
@@ -116,6 +119,30 @@ const BeetsPoolsTable = () => {
     setFilters(prev => ({ ...prev, skip: newSkip }));
   };
 
+  const handleAddAllToContext = () => {
+    addToContext({
+      id: "beets-all-pools",
+      type: "beets-summary",
+      title: "Beets Pools Overview",
+      data: {
+        poolCount: pools.length,
+        totalLiquidity: pools.reduce((sum, pool) => sum + pool.dynamicData.totalLiquidity, 0),
+        totalVolume24h: pools.reduce((sum, pool) => sum + pool.dynamicData.volume24h, 0),
+        pools: pools.slice(0, 5).map(pool => ({
+          id: pool.id,
+          name: pool.name,
+          totalLiquidity: pool.dynamicData.totalLiquidity
+        })),
+        userPositions: pools
+          .filter(pool => pool.userBalance && pool.userBalance.totalBalanceUsd > 0)
+          .map(pool => ({
+            pool: pool.name,
+            balance: pool.userBalance?.totalBalanceUsd
+          }))
+      }
+    });
+  };
+
   // Enhanced loading state
   if (loading && pools.length === 0) {
       return (
@@ -148,6 +175,25 @@ const BeetsPoolsTable = () => {
                 <SearchBar onSearch={handleSearch} isSearching={isSearching} />
 
                 <div className="flex gap-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleAddAllToContext}
+                          className="border-gray-200 dark:border-gray-800 shadow-sm"
+                        >
+                          <PlusCircle className="h-4 w-4 mr-1" />
+                          Add to Context
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-xs">Add Beets pools overview to chat context</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  
                   <SortDropdown 
                     currentOrderBy={filters.orderBy} 
                     currentDirection={filters.orderDirection}

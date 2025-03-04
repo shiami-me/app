@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, RefreshCw, History, ArrowUpDown } from "lucide-react";
+import { Loader2, RefreshCw, History, ArrowUpDown, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "wagmi";
 import { motion } from "framer-motion";
@@ -13,6 +13,7 @@ import {
 import { TransactionFilter } from "@/components/transactions/transaction-filter";
 import { Pagination } from "@/components/beets/pagination";
 import { useRouter } from "next/navigation";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -28,7 +29,7 @@ const TransactionsPage = () => {
   });
 
   const account = useAccount();
-  const { client } = useChat();
+  const { client, addToContext } = useChat();
   const router = useRouter();
 
   // Animation configurations
@@ -119,6 +120,28 @@ const TransactionsPage = () => {
     fetchTransactions();
   };
 
+  const handleAddToContext = () => {
+    addToContext({
+      id: `tx-history-${account.address?.substring(0, 8)}`,
+      type: "transactions",
+      title: "Transaction History",
+      data: {
+        address: account.address,
+        transactionCount: transactions.length,
+        transactions: transactions.slice(0, 5).map(tx => ({
+          hash: tx.hash,
+          timestamp: tx.timeStamp,
+          from: tx.from,
+          to: tx.to,
+          value: tx.value,
+          isError: tx.isError === "0" ? false : true,
+          functionName: tx.functionName || "",
+          tokenSymbol: tx.tokenSymbol || "ETH"
+        }))
+      }
+    });
+  };
+
   // Use the same pagination handler as Beets page
   const goToPage = (page: number) => {
     const newSkip = (page - 1) * filters.first;
@@ -170,6 +193,28 @@ const TransactionsPage = () => {
                 {transactions.length} Transaction
                 {transactions.length !== 1 ? "s" : ""}
               </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 mb-4">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddToContext}
+                      className="border-gray-200 dark:border-gray-800 shadow-sm"
+                      disabled={transactions.length === 0}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-1" />
+                      Add to Context
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">Add transaction history to chat context</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
 
             <TransactionFilter

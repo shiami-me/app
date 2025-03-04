@@ -3,15 +3,42 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { MarketData } from "@/components/silo/types";
 import { MarketCard } from "@/components/silo/market-card";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useChat } from "@/providers/ChatProvider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SiloPairCardProps {
   markets: MarketData[];
 }
 
 export const SiloPairCard: React.FC<SiloPairCardProps> = ({ markets }) => {
+  const { addToContext } = useChat();
+
+  const handleAddToContext = () => {
+    addToContext({
+      id: `silo-${markets[0].id}`,
+      type: "silo",
+      title: `${markets[0].market}/${markets[1].market}`,
+      data: {
+        id: markets[0].id,
+        token0: {
+          symbol: markets[0].market,
+          depositAPR: markets[0].deposit_apr,
+          borrowAPR: markets[0].borrow_apr,
+          isBorrowable: markets[0].isBorrowable
+        },
+        token1: {
+          symbol: markets[1].market,
+          depositAPR: markets[1].deposit_apr,
+          borrowAPR: markets[1].borrow_apr,
+          isBorrowable: markets[1].isBorrowable
+        }
+      }
+    });
+  };
+
   return (
     <Card className="border-gray-200 dark:border-gray-800 shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
       <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-800">
@@ -64,11 +91,32 @@ export const SiloPairCard: React.FC<SiloPairCardProps> = ({ markets }) => {
             </div>
           </div>
           
-          <Link href={`/dashboard/silo/${markets[0].id}`} passHref>
-            <Button variant="outline" className="px-4 py-2 hover:bg-primary hover:text-white">
-              View Details
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    onClick={handleAddToContext}
+                  >
+                    <PlusCircle className="h-4 w-4 text-slate-700 dark:text-slate-300" />
+                    <span className="sr-only">Add to context</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Add to chat context</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <Link href={`/dashboard/silo/${markets[0].id}`} passHref>
+              <Button variant="outline" className="px-4 py-2 hover:bg-primary hover:text-white">
+                View Details
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 

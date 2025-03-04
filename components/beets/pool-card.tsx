@@ -4,8 +4,10 @@ import { Card } from "@/components/ui/card";
 import { formatNumber, truncateAddress } from "@/lib/utils";
 import { PoolData } from "@/components/beets/types";
 import Link from "next/link";
-import { DollarSign, TrendingUp, Percent } from "lucide-react";
+import { DollarSign, TrendingUp, Percent, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useChat } from "@/providers/ChatProvider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PoolCardProps {
   pool: PoolData;
@@ -17,6 +19,33 @@ const hasBoostedTokens = (pool: PoolData) => {
 };
 
 export const PoolCard: React.FC<PoolCardProps> = ({ pool }) => {
+  const { addToContext } = useChat();
+
+  const handleAddToContext = () => {
+    addToContext({
+      id: `beets-pool-${pool.id}`,
+      type: "beets-pool",
+      title: pool.name,
+      data: {
+        id: pool.id,
+        name: pool.name,
+        symbol: pool.symbol,
+        address: pool.address,
+        type: pool.type,
+        protocolVersion: pool.protocolVersion,
+        totalLiquidity: pool.dynamicData.totalLiquidity,
+        volume24h: pool.dynamicData.volume24h,
+        yieldCapture24h: pool.dynamicData.yieldCapture24h,
+        tokens: pool.poolTokens.map(token => ({
+          symbol: token.symbol,
+          address: token.address,
+          boosted: !!token.underlyingToken
+        })),
+        userBalance: pool.userBalance ? pool.userBalance.totalBalanceUsd : 0
+      }
+    });
+  };
+
   return (
     <Card className="border-gray-200 dark:border-gray-800 shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-green-200 dark:hover:border-green-800">
       <div className="p-5 sm:p-6">
@@ -72,7 +101,26 @@ export const PoolCard: React.FC<PoolCardProps> = ({ pool }) => {
             </div>
           </div>
 
-          <div>
+          <div className="flex gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    onClick={handleAddToContext}
+                  >
+                    <PlusCircle className="h-4 w-4 text-slate-700 dark:text-slate-300" />
+                    <span className="sr-only">Add to context</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Add to chat context</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             <Link href={`/dashboard/beets/${pool.id}`}>
               <Button 
                 variant="outline" 

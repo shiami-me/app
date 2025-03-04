@@ -35,6 +35,7 @@ interface Props {
   setMessages: (value: Message[]) => void;
   client: ZerePyClient;
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>;
+  caller?: string;
 }
 
 const ChatMain: React.FC<Props> = ({
@@ -42,6 +43,7 @@ const ChatMain: React.FC<Props> = ({
   setMessages,
   client,
   sendTransactionAsync,
+  caller,
 }: Props) => {
   const handleSuggestionClick = (suggestion: string) => {
     setMessages([
@@ -49,7 +51,7 @@ const ChatMain: React.FC<Props> = ({
       {
         id: messages.length,
         text: suggestion,
-        sender: "user"
+        sender: "user",
       },
     ]);
   };
@@ -59,34 +61,37 @@ const ChatMain: React.FC<Props> = ({
       {messages.length === 0 ? (
         <div className="flex flex-col items-center space-y-8">
           <div className="text-center">
-            <p className="text-4xl font-bold font-[family-name:var(--font-roboto-mono)]">
+            <p className={`${caller ? "text-lg pt-8" : " text-4xl"} font-bold font-[family-name:var(--font-roboto-mono)]`}>
               Hi! I&apos;m Shiami. Your personal DeFi assistant.
             </p>
           </div>
-
-          <div className="w-full max-w-2xl mx-auto px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {chatSuggestions.map((suggestion, index) => (
-                <motion.button
-                  key={index}
-                  onClick={() => handleSuggestionClick(suggestion.text)}
-                  className={`group px-4 py-3 rounded-lg border ${suggestion.color} 
+          {!caller && (
+            <div className="w-full max-w-2xl mx-auto px-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {chatSuggestions.map((suggestion, index) => (
+                  <motion.button
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion.text)}
+                    className={`group px-4 py-3 rounded-lg border ${suggestion.color} 
                     text-left transition-all duration-200
                     hover:scale-[1.02] active:scale-[0.98]
                     bg-background/50 backdrop-blur-sm
                     flex items-center gap-3`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <div className={`${suggestion.color.split(" ")[0]} shrink-0`}>
-                    {suggestion.icon}
-                  </div>
-                  <p className="text-sm font-medium">{suggestion.text}</p>
-                </motion.button>
-              ))}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <div
+                      className={`${suggestion.color.split(" ")[0]} shrink-0`}
+                    >
+                      {suggestion.icon}
+                    </div>
+                    <p className="text-sm font-medium">{suggestion.text}</p>
+                  </motion.button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       ) : (
         <>

@@ -13,6 +13,13 @@ import { useAccount } from "wagmi";
 import { useSendMessage } from "@/hooks/useSendMessage";
 import { useRouter } from "next/navigation";
 
+export interface ContextItem {
+  id: string;
+  type: string;
+  title: string;
+  data: any;
+}
+
 interface ChatContextType {
   messages: Message[];
   setMessages: (messages: Message[]) => void;
@@ -27,6 +34,10 @@ interface ChatContextType {
   chatHistory: MessageHistory;
   setMessageHistory: (chatHistory: MessageHistory) => void;
   deleteChatHistory: (chatId: string) => void;
+  contextData: ContextItem[];
+  addToContext: (item: ContextItem) => void;
+  removeFromContext: (id: string) => void;
+  clearContext: () => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -41,6 +52,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [useBrowser, setUseBrowser] = useState(false);
   const [chatId, setChatId] = useState<string | null>(null);
   const [chatHistory, setChatHistory] = useState<MessageHistory>({});
+  const [contextData, setContextData] = useState<ContextItem[]>([]);
   const account = useAccount();
   const client = new ZerePyClient("http://localhost:8000");
   const router = useRouter();
@@ -51,7 +63,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     messages,
     setMessages,
     setIsLoading,
-    useBrowser
+    useBrowser,
+    contextData
   );
 
   useEffect(() => {
@@ -60,7 +73,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       setChatHistory(chats);
     }
   
-    if (!window.location.pathname.includes("/chat")) return;
     if (!chatId) {
       setMessages([]);
       return;
@@ -81,10 +93,28 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     } else {
       setChatId(null);
       setMessages([]);
+      if (!window.location.pathname.includes("/chat")) return;
       router.replace("/chat");
     }
   }, [chatId, chatHistory, setChatHistory, setMessages, router]);
   
+  const addToContext = (item: ContextItem) => {
+    // Prevent duplicate items
+    setContextData(prev => {
+      if (prev.some(i => i.id === item.id)) {
+        return prev;
+      }
+      return [...prev, item];
+    });
+  };
+
+  const removeFromContext = (id: string) => {
+    setContextData(prev => prev.filter(item => item.id !== id));
+  };
+
+  const clearContext = () => {
+    setContextData([]);
+  };
 
   const deleteChatHistory = (chatIdInput: string) => {
     client
@@ -121,6 +151,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         chatHistory,
         setMessageHistory: setChatHistory,
         deleteChatHistory,
+        contextData,
+        addToContext,
+        removeFromContext,
+        clearContext,
       }}
     >
       {children}

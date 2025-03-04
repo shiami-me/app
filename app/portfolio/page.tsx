@@ -7,6 +7,7 @@ import {
   Wallet,
   ExternalLink,
   BarChart3,
+  PlusCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "wagmi";
@@ -14,6 +15,7 @@ import { motion } from "framer-motion";
 import { useChat } from "@/providers/ChatProvider";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface TokenBalance {
   token: string;
@@ -31,7 +33,7 @@ const PortfolioPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   const account = useAccount();
-  const { client } = useChat();
+  const { client, addToContext } = useChat();
   const router = useRouter();
 
   // Animation configurations
@@ -101,6 +103,24 @@ const PortfolioPage = () => {
     fetchTokenBalances();
   };
 
+  const handleAddToContext = () => {
+    addToContext({
+      id: `portfolio-${account.address?.substring(0, 8)}`,
+      type: "portfolio",
+      title: "Token Portfolio",
+      data: {
+        address: account.address,
+        tokenCount: tokens.length,
+        tokens: tokens.map(token => ({
+          symbol: token.symbol,
+          name: token.name,
+          balance: token.balance,
+          address: token.token
+        }))
+      }
+    });
+  };
+
   const getTotalValue = () => {
     // This is a placeholder - in a real app you'd calculate total portfolio value
     // by multiplying each token balance by its current price
@@ -154,6 +174,25 @@ const PortfolioPage = () => {
             </div>
 
             <div className="flex flex-wrap justify-between items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddToContext}
+                      className="border-gray-200 dark:border-gray-800 shadow-sm"
+                      disabled={tokens.length === 0}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-1" />
+                      Add to Context
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">Add portfolio to chat context</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
               <Button
                 variant="outline"

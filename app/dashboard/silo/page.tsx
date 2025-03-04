@@ -1,17 +1,20 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Loader2, RefreshCw, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketData } from "@/components/silo/types";
 import { SiloPairCard } from "@/components/silo/silo-pair-card";
 import { motion } from "framer-motion";
+import { useChat } from "@/providers/ChatProvider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const MarketTable = () => {
   const [data, setData] = useState<MarketData[][]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const { addToContext } = useChat();
 
   // Animation configurations
   const fadeIn = {
@@ -101,6 +104,23 @@ const MarketTable = () => {
     fetchData();
   };
 
+  const handleAddAllToContext = () => {
+    // Add a summary of all markets to context
+    addToContext({
+      id: "silo-all-markets",
+      type: "silo-summary",
+      title: "Silo Finance Markets",
+      data: {
+        marketCount: data.length,
+        timestamp: lastUpdated,
+        markets: data.map(pair => ({
+          id: pair[0].id,
+          pair: `${pair[0].market}/${pair[1].market}`,
+        }))
+      }
+    });
+  };
+
   const formatDateTime = (dateString: string | null) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -145,6 +165,24 @@ const MarketTable = () => {
               </div>
 
               <div className="flex items-center gap-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleAddAllToContext}
+                        className="border-gray-200 dark:border-gray-800 shadow-sm"
+                      >
+                        <PlusCircle className="h-4 w-4 mr-1" />
+                        Add to Context
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Add Silo markets overview to chat context</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <Button 
                   variant="outline" 
                   size="sm" 

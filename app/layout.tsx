@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { WalletProvider } from "@/providers/WalletProvider";
 import { ChatProvider } from "@/providers/ChatProvider";
+import FloatingChatWrapper from "@/components/chat/FloatingChatWrapper";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -37,7 +38,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <WalletProvider>
-            <ChatProvider>{children}</ChatProvider>
+            <ChatProvider>
+              {children}
+              <FloatingChatWrapper />
+            </ChatProvider>
           </WalletProvider>
         </ThemeProvider>
       </body>

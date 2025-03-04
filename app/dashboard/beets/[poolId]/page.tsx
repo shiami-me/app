@@ -18,6 +18,7 @@ import {
   Percent,
   Layers,
   ChevronLeft,
+  PlusCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,9 +30,11 @@ import { PoolTokenChart } from "@/components/beets/pool-token-chart";
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
+import { useChat } from "@/providers/ChatProvider";
 
 interface PoolDetailProps {
   id: string;
@@ -83,6 +86,7 @@ export default function PoolDetailPage() {
   const [pool, setPool] = useState<PoolDetailProps | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { addToContext } = useChat();
 
   const fetchPoolData = useCallback(async () => {
     setLoading(true);
@@ -161,6 +165,43 @@ export default function PoolDetailPage() {
       });
     }
   }, [pool]);
+
+  const handleAddToContext = () => {
+    if (!pool) return;
+    
+    addToContext({
+      id: `beets-pool-detail-${pool.id}`,
+      type: "beets-pool-detail",
+      title: `${pool.name} Pool`,
+      data: {
+        id: pool.id,
+        name: pool.name,
+        address: pool.address,
+        type: pool.type,
+        protocolVersion: pool.protocolVersion,
+        metrics: {
+          totalLiquidity: pool.dynamicData.totalLiquidity,
+          volume24h: pool.dynamicData.volume24h,
+          totalApr: totalApr,
+          yieldCapture24h: pool.dynamicData.yieldCapture24h,
+          fees24h: pool.dynamicData.fees24h
+        },
+        tokens: pool.poolTokens.map(token => ({
+          symbol: token.symbol,
+          weight: tokenWeights.find(t => t.symbol === token.symbol)?.weight || 0,
+          balanceUSD: token.balanceUSD,
+          boosted: !!token.underlyingToken
+        })),
+        userPosition: pool.userBalance ? {
+          totalBalance: pool.userBalance.totalBalanceUsd,
+          walletBalance: pool.userBalance.walletBalanceUsd,
+          stakedBalance: pool.userBalance.stakedBalances.reduce(
+            (sum, item) => sum + item.balanceUsd, 0
+          )
+        } : null
+      }
+    });
+  };
 
   // Visual animations config
   const fadeIn = {
@@ -258,6 +299,25 @@ export default function PoolDetailPage() {
             </div>
 
             <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddToContext}
+                      className="border-gray-200 dark:border-gray-800 shadow-sm"
+                    >
+                      <PlusCircle className="h-4 w-4 mr-1" />
+                      Add to Context
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">Add this pool to chat context</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
               <Button
                 variant="ghost"
                 size="sm"
