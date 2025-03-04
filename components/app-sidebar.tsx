@@ -11,6 +11,8 @@ import {
   X,
   Wallet,
   BarChart3,
+  Bot,
+  Plus,
 } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavDashboards } from "@/components/nav-dashboards";
@@ -44,6 +46,19 @@ const data: any = {
       name: "Beets on Sonic",
       url: "/dashboard/beets",
       icon: PieChart,
+    },
+  ],
+  // Add agents section
+  agents: [
+    {
+      name: "Agent Workflows",
+      url: "/dashboard/agents",
+      icon: Bot,
+    },
+    {
+      name: "Create Agent",
+      url: "/dashboard/create-agent",
+      icon: Plus,
     },
   ],
   account: [
@@ -220,6 +235,26 @@ data["navMain"][0].items = navItems;
             </div>
             <NavDashboards
               dashboards={data.dashboards}
+              collapsed={collapsed && !mobileOpen}
+            />
+          </div>
+          
+          {/* Agents Section - new section */}
+          <div className="mb-6">
+            <div
+              className={cn(
+                "px-3 mb-2 flex items-center text-sm font-medium text-muted-foreground",
+                collapsed && !mobileOpen ? "justify-center" : ""
+              )}
+            >
+              {collapsed && !mobileOpen ? (
+                <Bot className="h-4 w-4" />
+              ) : (
+                "Agents"
+              )}
+            </div>
+            <NavDashboards
+              dashboards={data.agents}
               collapsed={collapsed && !mobileOpen}
             />
           </div>

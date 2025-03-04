@@ -125,8 +125,9 @@ export class ZerePyClient {
     return this._makeRequest("GET", "/");
   }
 
-  async listAgents(): Promise<string[]> {
-    const response = await this._makeRequest("GET", "/agents");
+  async listAgents(userAddress?: string): Promise<any[]> {
+    const endpoint = userAddress ? `/agents?user_address=${userAddress}` : "/agents";
+    const response = await this._makeRequest("GET", endpoint);
     return response.agents || [];
   }
 
@@ -177,5 +178,31 @@ export class ZerePyClient {
 
   async stopAgent(): Promise<JsonResponse> {
     return this._makeRequest("POST", "/agent/stop");
+  }
+
+  async createAgent(
+    agents: string[],
+    prompts: Record<string, string>,
+    data: Record<string, Record<string, any>>,
+    task: string,
+    user_address?: string,
+    name?: string,
+    is_one_time: boolean = true
+  ): Promise<JsonResponse> {
+    return this._makeRequest("POST", "/agent/create", {
+      body: {
+        agents,
+        prompts,
+        data,
+        task,
+        user_address,
+        name,
+        is_one_time,
+      },
+    });
+  }
+
+  async getAgentLogs(agentId: string): Promise<any> {
+    return this._makeRequest("GET", `/agent/${agentId}/logs`);
   }
 }

@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { WalletProvider } from "@/providers/WalletProvider";
 import { ChatProvider } from "@/providers/ChatProvider";
 import FloatingChatWrapper from "@/components/chat/FloatingChatWrapper";
+import { Toaster } from "sonner";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({
               <FloatingChatWrapper />
             </ChatProvider>
           </WalletProvider>
+          <Toaster position="top-center" />
         </ThemeProvider>
       </body>
     </html>
