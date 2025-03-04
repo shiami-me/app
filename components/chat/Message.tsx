@@ -43,13 +43,13 @@ const RenderMessage: React.FC<Props> = ({
           style={theme === "dark" ? vscDarkPlus : vs}
           language={language}
           PreTag="div"
-          className="rounded-md my-2"
+          className="rounded-md my-2 max-w-[75%]"
           {...props}
         >
           {String(children).replace(/\n$/, "")}
         </SyntaxHighlighter>
       ) : (
-        <code className="bg-muted px-1 py-0.5 rounded" {...props}>
+        <code className="bg-muted px-1 py-0.5 rounded max-w-[75%]" {...props}>
           {children}
         </code>
       );

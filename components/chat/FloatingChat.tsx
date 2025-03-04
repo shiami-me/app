@@ -135,7 +135,7 @@ export default function FloatingChat({
                 className="flex-1 overflow-auto custom-scrollbar"
               >
                 <ScrollArea className="flex flex-1 justify-center items-center p-4">
-                  <div className="w-full flex flex-col gap-7">
+                  <div className="max-w-[80%] flex flex-col gap-7">
                     <ChatMain
                       messages={messages}
                       setMessages={setMessages}
