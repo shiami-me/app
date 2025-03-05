@@ -60,6 +60,11 @@ export const config = getDefaultConfig({
     // },
     {
       ...anvil,
+      rpcUrls: {
+        default: {
+          http: ["https://anvil.shiami.me"],
+        },
+      },
       id: 146,
       nativeCurrency: { decimals: 18, name: "Sonic", symbol: "S" },
     },

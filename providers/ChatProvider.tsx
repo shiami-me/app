@@ -54,7 +54,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [chatHistory, setChatHistory] = useState<MessageHistory>({});
   const [contextData, setContextData] = useState<ContextItem[]>([]);
   const account = useAccount();
-  const client = new ZerePyClient("http://localhost:8000");
+  const client = new ZerePyClient("https://api.shiami.me");
   const router = useRouter();
 
   const sendMessage = useSendMessage(

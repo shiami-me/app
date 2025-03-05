@@ -63,7 +63,7 @@ const BeetsPoolsTable = () => {
         textSearch: filters.textSearch,
       });
 
-      const response = await fetch(`http://localhost:3000/api/queries/pools?${params}`);
+      const response = await fetch(`https://balancer-utils.onrender.com/api/queries/pools?${params}`);
       if (!response.ok) throw new Error('Failed to fetch pools');
 
       const data = await response.json();

@@ -94,7 +94,7 @@ export default function PoolDetailPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/queries/pool/${poolId}?userAddress=${
+        `https://balancer-utils.onrender.com/api/queries/pool/${poolId}?userAddress=${
           address || ""
         }`
       );
