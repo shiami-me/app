@@ -99,7 +99,7 @@ export const useSendTransaction = ({
 
       await sendTransaction(result, {
         onSuccess: async (data: any) => {
-          const confirmMessage = `${tx.type} done - https://testnet.soniclabs.com/${data}`;
+          const confirmMessage = `${tx.type} done - https://sonicscan.org/tx/${data}`;
           try {
             const txReceipt = await waitForTransactionReceipt(config, {
               hash: data,

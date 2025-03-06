@@ -91,7 +91,7 @@ export const useAddLiquidity = ({
       
       await sendTransaction(result, {
         onSuccess: async (data: any) => {
-          const confirmMessage = `Add liquidity transaction done - https://testnet.soniclabs.com/${data}`;
+          const confirmMessage = `Add liquidity transaction done - https://sonicscan.org/tx/${data}`;
           try {
             const txReceipt = await waitForTransactionReceipt(config, {
               hash: data,
