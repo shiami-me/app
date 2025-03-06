@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface DashboardItem {
   name: string;
@@ -23,7 +24,7 @@ export function NavDashboards({ dashboards, collapsed = false }: NavDashboardsPr
   return (
     <div className="space-y-1">
       {dashboards.map((dashboard) => {
-        const isActive = pathname === dashboard.url;
+        const isActive = pathname === dashboard.url || pathname.startsWith(`${dashboard.url}/`);
         
         return collapsed ? (
           <Tooltip key={dashboard.name}>
@@ -31,7 +32,10 @@ export function NavDashboards({ dashboards, collapsed = false }: NavDashboardsPr
               <Button
                 variant={isActive ? "secondary" : "ghost"}
                 size="sm"
-                className="w-full flex justify-center h-8 px-2"
+                className={cn(
+                  "w-full flex justify-center h-8 px-2 rounded-lg",
+                  isActive ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                )}
                 asChild
               >
                 <Link href={dashboard.url}>
@@ -46,12 +50,17 @@ export function NavDashboards({ dashboards, collapsed = false }: NavDashboardsPr
             key={dashboard.name}
             variant={isActive ? "secondary" : "ghost"}
             size="sm"
-            className="w-full flex justify-start h-8 px-3"
+            className={cn(
+              "w-full flex justify-start h-8 px-3 rounded-lg transition-colors duration-200 font-medium",
+              isActive 
+                ? "bg-primary/10 text-primary" 
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+            )}
             asChild
           >
             <Link href={dashboard.url}>
-              <dashboard.icon className="h-4 w-4 mr-2" />
-              <span className="text-sm">{dashboard.name}</span>
+              <dashboard.icon className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="text-sm truncate">{dashboard.name}</span>
             </Link>
           </Button>
         );
