@@ -4,9 +4,11 @@ type JsonResponse = Record<string, any>;
 
 export class ZerePyClient {
   private baseUrl: string;
+  private wsBaseUrl: string;
 
   constructor(baseUrl: string = "http://localhost:8000") {
     this.baseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+    this.wsBaseUrl = this.baseUrl.replace(/^http/, 'ws');
   }
 
   private async _makeRequest(
@@ -36,89 +38,111 @@ export class ZerePyClient {
   }
 
   private async _makeGenerateRequest(
-    endpoint: string,
     body: any,
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   ): Promise<void> {
-    const url = `${this.baseUrl}/${endpoint.replace(/^\//, "")}`;
+    this._makeWebSocketGenerateRequest(body, setMessages, setIsLoading);
 
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+  }
 
-      if (!response.ok) {
-        throw new Error(`Request failed: ${response.statusText}`);
-      }
+  private _makeWebSocketGenerateRequest(
+    body: any,
+    setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  ): void {
+    // Create WebSocket connection
+    const ws = new WebSocket(`${this.wsBaseUrl}/ws/agent/chat`);
+    let fullResponse = "";
+    let messageId: number;
 
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error("Readable stream not supported");
-
-      const decoder = new TextDecoder();
-      let fullResponse = "";
-      let messageId: number;
+    ws.onopen = () => {
+      ws.send(JSON.stringify(body));
+      
       setMessages((prev) => {
         messageId = prev.length + 1;
         return [
           ...prev,
-          { id: prev.length + 1, sender: "bot", text: "" }, // Initialize message
+          { id: prev.length + 1, sender: "bot", text: "" },
         ];
       });
+    };
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-
-        try {
-          const parsed = JSON.parse(chunk);
-          if (parsed.tool) {
-            fullResponse = "";
-          }
-          if (
-            parsed.type ||
-            parsed.tool ||
-            (parsed.approve && parsed.swap) || (parsed.transaction) ||
-            Array.isArray(parsed)
-          ) {
-            try {
-              const fullParsed = JSON.parse(fullResponse);
-              if (fullParsed.tool) {
-                fullResponse = "";
-              }
-            } catch {
-              console.log("Not tool");
-            }
-            fullResponse += chunk;
-          }
-        } catch {
-          if (!fullResponse.includes("type") && !fullResponse.includes("transaction")) {
-            try {
-              const fullParsed = JSON.parse(fullResponse);
-              if (fullParsed.tool) {
-                fullResponse = "";
-              }
-            } catch {
-              console.log("Not tool");
-            }
-            fullResponse += chunk;
-          }
+    // Process incoming messages
+    ws.onmessage = (event) => {
+      const chunk = event.data;
+      
+      try {
+        const parsed = JSON.parse(chunk);
+        
+        if (parsed.status === "complete") {
+          ws.close();
+          setIsLoading(false);
+          return;
+        } else if (parsed.status === "error") {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === messageId ? { ...msg, text: `Error: ${parsed.message}` } : msg
+            )
+          );
+          ws.close();
+          setIsLoading(false);
+          return;
         }
-
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === messageId ? { ...msg, text: fullResponse } : msg
-          )
-        );
+        if (parsed.tool) {
+          fullResponse = "";
+        }
+        if (
+          parsed.type ||
+          parsed.tool ||
+          (parsed.approve && parsed.swap) || 
+          (parsed.transaction) ||
+          Array.isArray(parsed)
+        ) {
+          try {
+            const fullParsed = JSON.parse(fullResponse);
+            if (fullParsed.tool) {
+              fullResponse = "";
+            }
+          } catch {
+            console.log("Not tool");
+          }
+          fullResponse += chunk;
+        }
+      } catch {
+        if (!fullResponse.includes("type") && !fullResponse.includes("transaction")) {
+          try {
+            const fullParsed = JSON.parse(fullResponse);
+            if (fullParsed.tool) {
+              fullResponse = "";
+            }
+          } catch {
+            console.log("Not tool");
+          }
+          fullResponse += chunk;
+        }
       }
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId ? { ...msg, text: fullResponse } : msg
+        )
+      );
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket Error:', error);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId ? { ...msg, text: "Error: Connection failed" } : msg
+        )
+      );
       setIsLoading(false);
-    } catch (error) {
-      throw new Error(`Streaming request failed: ${(error as Error).message}`);
-    }
+    };
+
+    ws.onclose = () => {
+      setIsLoading(false);
+    };
   }
 
   async getStatus(): Promise<JsonResponse> {
@@ -161,7 +185,6 @@ export class ZerePyClient {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   ): Promise<void> {
     this._makeGenerateRequest(
-      "/agent/chat",
       {
         connection,
         action,
