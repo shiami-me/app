@@ -55,7 +55,7 @@ const BeetsPoolsTable = () => {
 
     try {
       const params = new URLSearchParams({
-        userAddress: account.address || "",
+        userAddress: "",
         first: filters.first.toString(),
         orderBy: filters.orderBy,
         orderDirection: filters.orderDirection,
