@@ -99,7 +99,7 @@ export const useSendTransaction = ({
 
       await sendTransaction(result, {
         onSuccess: async (data: any) => {
-          const confirmMessage = `${tx.type} done - https://sonicscan.org/tx/${data}`;
+          const confirmMessage = `## ${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)} Transaction Successful ✅\n\n**Transaction Hash:** [${data.slice(0,10)}...${data.slice(-8)}](https://sonicscan.org/tx/${data})\n\nView complete details on [Sonic Explorer](https://sonicscan.org/tx/${data})`;
           try {
             const txReceipt = await waitForTransactionReceipt(config, {
               hash: data,

@@ -47,7 +47,7 @@ export const useRemoveLiquidity = ({
       
       await sendTransaction(result, {
         onSuccess: async (data: any) => {
-          const confirmMessage = `Remove liquidity transaction done - https://sonicscan.org/tx/${data}`;
+          const confirmMessage = `## Liquidity Removed Successfully 🎉\n\n**Transaction Details:**\n- **Status:** Confirmed ✅\n- **Hash:** [${data.slice(0,10)}...${data.slice(-8)}](https://sonicscan.org/tx/${data})\n\nView complete transaction on [Sonic Explorer](https://sonicscan.org/tx/${data})`;
           try {
             const txReceipt = await waitForTransactionReceipt(config, {
               hash: data,
