@@ -21,6 +21,7 @@ export default function Page({
     setUseBrowser,
     client,
     setChatId,
+    chatId,
   } = useChat();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -73,6 +74,8 @@ export default function Page({
                       setMessages={setMessages}
                       client={client}
                       sendTransactionAsync={sendTransactionAsync}
+                      sendMessage={sendMessage}
+                      chatId={chatId}
                     />
                   </div>
                 </ScrollArea>

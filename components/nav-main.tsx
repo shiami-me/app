@@ -73,7 +73,7 @@ export function NavMain({ items, collapsed = false }: NavMainProps) {
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="pl-1 ml-4 border-l border-muted/70 space-y-1 pt-1 pb-2 max-h-[200px] overflow-y-auto custom-scrollbar">
-                  {item.items?.length ? item.items.map((subItem) => (
+                  {item.items?.length ? [...item.items].reverse().map((subItem) => (
                     <div
                       key={subItem.id}
                       className={cn(

@@ -6,6 +6,9 @@ import RenderMessage from "./Message";
 import React from "react";
 import { motion } from "framer-motion";
 import { Gauge, Sprout, Database, TrendingUp } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/navigation";
+import { useChat } from "@/providers/ChatProvider";
 
 const chatSuggestions = [
   {
@@ -36,7 +39,18 @@ interface Props {
   client: ZerePyClient;
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>;
   caller?: string;
+  sendMessage: (message: string, chat: string) => void; // Update to match SendMessage
+  chatId: string | null;
 }
+
+const toTitleCase = (str: string) => {
+  return str
+    .split(" ")
+    .map((word) => {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(" ");
+};
 
 const ChatMain: React.FC<Props> = ({
   messages,
@@ -44,16 +58,37 @@ const ChatMain: React.FC<Props> = ({
   client,
   sendTransactionAsync,
   caller,
+  sendMessage,
+  chatId,
 }: Props) => {
+  const { setChatId, setMessageHistory } = useChat();
+  const router = useRouter();
+  
   const handleSuggestionClick = (suggestion: string) => {
-    setMessages([
-      ...messages,
-      {
-        id: messages.length,
-        text: suggestion,
-        sender: "user",
-      },
-    ]);
+    if (!chatId) {
+      let newChatId;
+      if (!caller) {
+        newChatId = uuidv4();
+        const title = toTitleCase(suggestion.split(" ").slice(0, 3).join(" "));
+        const chats = JSON.parse(localStorage.getItem("chats") || "{}");
+        chats[newChatId] = { id: newChatId, title };
+        setMessageHistory(chats);
+        localStorage.setItem("chats", JSON.stringify(chats));
+        setChatId(newChatId);  // Update the `chatId` for the first time
+        router.replace(`/chat/${newChatId}`);  // Update the route with the new chatId
+      } else {
+        newChatId = caller;
+        const chats = JSON.parse(localStorage.getItem("chats") || "{}");
+        chats[newChatId] = { id: newChatId, title: caller.split("/").map(toTitleCase).join(" ") };
+        setMessageHistory(chats);
+        localStorage.setItem("chats", JSON.stringify(chats));
+        setChatId(newChatId);
+      }
+
+      sendMessage(suggestion, newChatId);
+    } else {
+      sendMessage(suggestion, chatId);  // Send message to existing chatId
+    }
   };
 
   return (

@@ -142,6 +142,8 @@ export default function FloatingChat({
                       client={client}
                       sendTransactionAsync={sendTransactionAsync}
                       caller={caller}
+                      sendMessage={sendMessage}
+                      chatId={chatId}
                     />
                   </div>
                 </ScrollArea>
