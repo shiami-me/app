@@ -17,7 +17,7 @@ const chatSuggestions = [
     icon: <Gauge className="w-5 h-5" />,
   },
   {
-    text: "Show me the best yield farming opportunities",
+    text: "Find the highest liquidity pools on Beets",
     color: "text-purple-500/90 border-purple-200/50 dark:border-purple-500/20",
     icon: <Sprout className="w-5 h-5" />,
   },
@@ -27,7 +27,7 @@ const chatSuggestions = [
     icon: <Database className="w-5 h-5" />,
   },
   {
-    text: "Compare APY between different Silo pairs",
+    text: "How can I stake on Sonic?",
     color: "text-orange-500/90 border-orange-200/50 dark:border-orange-500/20",
     icon: <TrendingUp className="w-5 h-5" />,
   },
