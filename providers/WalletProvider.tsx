@@ -1,75 +1,17 @@
 "use client";
-import "@rainbow-me/rainbowkit/styles.css";
-import {
-  darkTheme,
-  getDefaultConfig,
-  lightTheme,
-  RainbowKitProvider,
-} from "@rainbow-me/rainbowkit";
-import { WagmiProvider } from "wagmi";
+import { WagmiProvider, createConfig } from "@privy-io/wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { PrivyProvider } from "@privy-io/react-auth";
 import { useTheme } from "next-themes";
-import { anvil } from "viem/chains";
+import { anvilSonic } from "@/lib/chain";
+import { http } from "viem";
 
-export const config = getDefaultConfig({
-  appName: "shiami.me",
-  projectId: process.env.NEXT_PUBLIC_PROJECT_ID || "",
-  chains: [
-    // {
-    //   id: 57_054,
-    //   name: "Sonic Blaze Testnet",
-    //   nativeCurrency: {
-    //     decimals: 18,
-    //     name: "Sonic",
-    //     symbol: "S",
-    //   },
-    //   rpcUrls: {
-    //     default: {
-    //       http: ["https://rpc.blaze.soniclabs.com"],
-    //     },
-    //   },
-    //   blockExplorers: {
-    //     default: {
-    //       name: "Sonic Blaze Testnet Explorer",
-    //       url: "https://testnet.soniclabs.com/",
-    //     },
-    //   },
-    //   testnet: true,
-    // },
-    // {
-    //   id: 146,
-    //   name: "Sonic",
-    //   nativeCurrency: {
-    //     decimals: 18,
-    //     name: "Sonic",
-    //     symbol: "S",
-    //   },
-    //   rpcUrls: {
-    //     default: {
-    //       http: [
-    //         "https://virtual.sonic.rpc.tenderly.co/4524cca9-5fd4-4050-8e54-76098f0196ca",
-    //       ],
-    //     },
-    //   },
-    //   blockExplorers: {
-    //     default: {
-    //       name: "Sonic Explorer",
-    //       url: "https://dashboard.tenderly.co/explorer/vnet/4524cca9-5fd4-4050-8e54-76098f0196ca",
-    //     },
-    //   },
-    // },
-    {
-      ...anvil,
-      rpcUrls: {
-        default: {
-          http: ["https://anvil.shiami.me"],
-        },
-      },
-      id: 146,
-      nativeCurrency: { decimals: 18, name: "Sonic", symbol: "S" },
-    },
-  ],
-  ssr: true, // If your dApp uses server side rendering (SSR)
+export const config = createConfig({
+  chains: [anvilSonic],
+  transports: {
+    [anvilSonic.id]: http(""),
+  },
+  ssr: true,
 });
 
 const queryClient = new QueryClient();
@@ -79,13 +21,27 @@ export const WalletProvider = ({
   children: React.ReactNode;
 }>) => {
   const { theme } = useTheme();
-  const walletTheme = theme === "dark" ? darkTheme() : lightTheme();
-  walletTheme.colors.accentColor = "rgb(22 163 74)";
   return (
-    <WagmiProvider config={config}>
+    <PrivyProvider
+      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
+      config={{
+        appearance: {
+          theme: theme === "dark" ? "dark" : "light",
+          accentColor: "#16a34a",
+        },
+        supportedChains: [anvilSonic],
+        defaultChain: anvilSonic,
+        embeddedWallets: {
+          showWalletUIs: true,
+          ethereum: {
+            createOnLogin: "all-users",
+          },
+        },
+      }}
+    >
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={walletTheme}>{children}</RainbowKitProvider>
+        <WagmiProvider config={config}>{children}</WagmiProvider>
       </QueryClientProvider>
-    </WagmiProvider>
+    </PrivyProvider>
   );
 };

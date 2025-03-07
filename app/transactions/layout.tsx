@@ -1,8 +1,8 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import ConnectButton from "@/components/connect-button";
 import { ModeToggle } from "@/components/theme-toggle";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function DashboardLayout({
   children,

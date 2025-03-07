@@ -14,9 +14,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 import Image from "next/image";
 import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useSiloDeposit, useSiloWithdraw, useSiloBorrow, useSiloRepay } from '@/hooks/silo';
 import { toast } from "sonner"
+import ConnectButton from "../connect-button";
 
 interface ActionPanelProps {
   marketData: any;
