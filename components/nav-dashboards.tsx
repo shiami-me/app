@@ -24,7 +24,7 @@ export function NavDashboards({ dashboards, collapsed = false }: NavDashboardsPr
   return (
     <div className="space-y-1">
       {dashboards.map((dashboard) => {
-        const isActive = pathname === dashboard.url || pathname.startsWith(`${dashboard.url}/`);
+        const isActive = pathname === dashboard.url;
         
         return collapsed ? (
           <Tooltip key={dashboard.name}>

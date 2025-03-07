@@ -14,6 +14,7 @@ import {
   Bot,
   Plus,
   ChevronRight,
+  CreditCard,
 } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavDashboards } from "@/components/nav-dashboards";
@@ -50,7 +51,7 @@ const data: any = {
       icon: PieChart,
     },
   ],
-  // Add agents section
+  // Update agents section with wallet
   agents: [
     {
       name: "Agent Workflows",
@@ -61,6 +62,11 @@ const data: any = {
       name: "Create Agent",
       url: "/dashboard/create-agent",
       icon: Plus,
+    },
+    {
+      name: "Embedded Wallet",
+      url: "/dashboard/agents/wallet",
+      icon: CreditCard,
     },
   ],
   account: [
