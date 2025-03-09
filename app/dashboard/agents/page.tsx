@@ -85,7 +85,7 @@ const AgentsPage = () => {
   const router = useRouter();
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
-  const client = new ZerePyClient();
+  const client = new ZerePyClient("https://api.shiami.me");
   const { wallets, ready: walletsReady } = useWallets();
   const { setActiveWallet } = useSetActiveWallet();
 

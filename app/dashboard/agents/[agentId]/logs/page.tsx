@@ -60,7 +60,7 @@ const AgentLogsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
   const router = useRouter();
-  const client = new ZerePyClient();
+  const client = new ZerePyClient("https://api.shiami.me");
   const agentId = params?.agentId as string;
 
   const fetchLogs = async () => {

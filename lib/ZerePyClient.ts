@@ -6,7 +6,7 @@ export class ZerePyClient {
   private baseUrl: string;
   private wsBaseUrl: string;
 
-  constructor(baseUrl: string = "http://localhost:8000") {
+  constructor(baseUrl: string) {
     this.baseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
     this.wsBaseUrl = this.baseUrl.replace(/^http/, 'ws');
   }

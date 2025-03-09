@@ -17,6 +17,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+const MAX_AGENTS = 5;
+
 const CreateAgentPage = () => {
   const [task, setTask] = useState("");
   const [name, setName] = useState("");
@@ -25,7 +27,7 @@ const CreateAgentPage = () => {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSettingWallet, setIsSettingWallet] = useState(false);
-  const client = new ZerePyClient();
+  const client = new ZerePyClient("https://api.shiami.me");
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { wallets, ready: walletsReady } = useWallets();
@@ -69,6 +71,13 @@ const CreateAgentPage = () => {
   }
 
   const handleAddAgent = (agent: Agent) => {
+    if (agents.length >= MAX_AGENTS) {
+      toast.error("Maximum agent limit reached", {
+        description: `You can add up to ${MAX_AGENTS} agents to a workflow`
+      });
+      return;
+    }
+    
     setAgents((prev) => {
       const newAgents = [...prev, agent];
       // Update the "next" property for the previous agent
@@ -248,12 +257,18 @@ const CreateAgentPage = () => {
                 className="h-12"
               />
             </div>
-            <Button 
-              onClick={() => setIsModalOpen(true)} 
-              className="gap-1"
-            >
-              <PlusCircle size={18} /> Add Agent
-            </Button>
+            <div className="flex flex-col items-end">
+              <Button 
+                onClick={() => setIsModalOpen(true)} 
+                className="gap-1"
+                disabled={agents.length >= MAX_AGENTS}
+              >
+                <PlusCircle size={18} /> Add Agent
+              </Button>
+              <span className="text-xs text-muted-foreground mt-1">
+                {agents.length}/{MAX_AGENTS} agents
+              </span>
+            </div>
           </div>
 
           {/* Additional inputs for name and is_one_time */}
