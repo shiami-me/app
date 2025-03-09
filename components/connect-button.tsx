@@ -89,8 +89,8 @@ const ConnectButton = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            disconnect();
             logout();
+            disconnect();
             setIsOpen(false);
           }}
           className="text-red-500 flex items-center gap-2 cursor-pointer"

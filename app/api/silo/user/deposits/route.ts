@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPublicClient, http, PublicClient, publicActions } from "viem";
-import { anvilSonic } from "@/lib/chain";
 import { SiloConnection } from "@/lib/silo";
+import { sonic } from "viem/chains";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     
     // Create a public client for the configured chain
     const publicClient: PublicClient = createPublicClient({
-      chain: anvilSonic,
+      chain: sonic,
       transport: http(),
     }).extend(publicActions);
     

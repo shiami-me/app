@@ -3,13 +3,13 @@ import { WagmiProvider, createConfig } from "@privy-io/wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { useTheme } from "next-themes";
-import { anvilSonic } from "@/lib/chain";
 import { http } from "viem";
+import { sonic } from "viem/chains";
 
 export const config = createConfig({
-  chains: [anvilSonic],
+  chains: [sonic],
   transports: {
-    [anvilSonic.id]: http(""),
+    [sonic.id]: http(""),
   },
   ssr: true,
 });
@@ -29,8 +29,8 @@ export const WalletProvider = ({
           theme: theme === "dark" ? "dark" : "light",
           accentColor: "#16a34a",
         },
-        supportedChains: [anvilSonic],
-        defaultChain: anvilSonic,
+        supportedChains: [sonic],
+        defaultChain: sonic,
         embeddedWallets: {
           showWalletUIs: true,
           ethereum: {

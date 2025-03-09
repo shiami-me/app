@@ -57,7 +57,7 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction, u
     addToContext({
       id: `tx-${transaction.hash.substring(0, 8)}`,
       type: "transaction",
-      title: `${isIncoming ? 'Received' : 'Sent'} ${transaction.tokenSymbol || 'ETH'}`,
+      title: `${isIncoming ? 'Received' : 'Sent'} ${transaction.tokenSymbol || 'S'}`,
       data: {
         hash: transaction.hash,
         timestamp: date.toISOString(),
@@ -65,7 +65,7 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction, u
         from: transaction.from,
         to: transaction.to,
         value: amount,
-        tokenSymbol: transaction.tokenSymbol || "ETH",
+        tokenSymbol: transaction.tokenSymbol || "S",
         gasUsed: transaction.gasUsed,
         gasPrice: transaction.gasPrice,
         gasFee: gasFee,
@@ -118,12 +118,12 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction, u
         
         <div className="text-right">
           <div className="font-semibold text-gray-900 dark:text-gray-100">
-            {amount} {transaction.tokenSymbol || "ETH"}
+            {amount} {transaction.tokenSymbol || "S"}
           </div>
           
           <div className="mt-1 flex flex-col items-end gap-1">
             <Badge variant="outline" className="text-xs">
-              Gas Fee: {gasFee} ETH
+              Gas Fee: {gasFee} S
             </Badge>
             
             <span className="text-xs text-gray-500 dark:text-gray-400">

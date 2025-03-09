@@ -62,7 +62,7 @@ const TransactionsPage = () => {
 
       // Call the client to get transactions
       const result = await client.performAction("tx", "get_tx_list", [
-        "0xE65fEE2099934CdCFD451D303f9eF928315FA1A8", // Fallback address for development
+        account.address,
         "0",
         "99999999",
         page.toString(),
@@ -136,7 +136,7 @@ const TransactionsPage = () => {
           value: tx.value,
           isError: tx.isError === "0" ? false : true,
           functionName: tx.functionName || "",
-          tokenSymbol: tx.tokenSymbol || "ETH"
+          tokenSymbol: tx.tokenSymbol || "S"
         }))
       }
     });
