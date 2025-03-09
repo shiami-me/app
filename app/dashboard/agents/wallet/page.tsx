@@ -14,7 +14,6 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAccount } from "wagmi";
 import { motion } from "framer-motion";
 import { useChat } from "@/providers/ChatProvider";
 import { cn } from "@/lib/utils";
@@ -43,7 +42,6 @@ const WalletPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const account = useAccount();
   const { client, addToContext } = useChat();
   const router = useRouter();
   const { wallets, ready: walletsReady } = useWallets();
@@ -224,7 +222,7 @@ const WalletPage = () => {
                   Embedded Wallet
                 </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Your agent's wallet for autonomous transactions
+                  Your agent&apos;s wallet for autonomous transactions
                 </p>
               </div>
 
@@ -346,8 +344,8 @@ const WalletPage = () => {
               <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm border border-blue-100 dark:border-blue-800/30">
                 <p className="text-blue-800 dark:text-blue-300 font-medium mb-1">About Wallet Delegation</p>
                 <p className="text-blue-700/80 dark:text-blue-400/80 text-xs">
-                  Wallet delegation allows Shiami's autonomous agents to initiate transactions on your behalf without prompting for approval each time.
-                  You can revoke this permission at any time. All transactions will still use your funds and follow your agent's configuration.
+                  Wallet delegation allows Shiami&apos;s autonomous agents to initiate transactions on your behalf without prompting for approval each time.
+                  You can revoke this permission at any time. All transactions will still use your funds and follow your agent&apos;s configuration.
                 </p>
               </div>
             )}
@@ -392,7 +390,7 @@ const WalletPage = () => {
                 <>
                   <h3 className="text-lg font-medium">No tokens found</h3>
                   <p className="text-muted-foreground">
-                    Your embedded wallet doesn't have any tokens yet.
+                    Your embedded wallet doesn&apos;t have any tokens yet.
                   </p>
                 </>
               )}
