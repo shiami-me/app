@@ -23,12 +23,14 @@ interface AddAgentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddAgent: (agent: Agent) => void;
+  disabled: string[];
 }
 
 const AddAgentModal: React.FC<AddAgentModalProps> = ({
   isOpen,
   onClose,
   onAddAgent,
+  disabled
 }) => {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
@@ -71,6 +73,9 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">Add Agent</DialogTitle>
+          <p className="text-sm text-muted-foreground">
+            Note - Scheduler is not available on one-time agents
+          </p>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
@@ -95,7 +100,7 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {AGENT_TYPES.map((agentType) => (
-                  <SelectItem key={agentType} value={agentType}>
+                  <SelectItem key={agentType} value={agentType} disabled={disabled.includes(agentType)}>
                     {agentType}
                   </SelectItem>
                 ))}

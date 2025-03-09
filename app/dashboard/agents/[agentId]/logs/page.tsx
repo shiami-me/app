@@ -18,19 +18,40 @@ import {
   ChevronLeft, 
   Clock, 
   AlertCircle,
-  FileText
+  FileText,
+  PlayCircle,
+  MessageCircle
 } from "lucide-react";
 import { format } from "date-fns";
 
-interface LogEntry {
+interface BaseLogEntry {
   timestamp: string;
-  task: string;
 }
+
+interface TaskLogEntry extends BaseLogEntry {
+  task: string;
+  type?: string;
+}
+
+interface ContentLogEntry extends BaseLogEntry {
+  content: string;
+}
+
+type LogEntry = TaskLogEntry | ContentLogEntry;
 
 interface AgentLogs {
   agent_id: string;
   name: string;
   logs: LogEntry[];
+}
+
+// Type guard to distinguish between log entry types
+function isTaskLog(log: LogEntry): log is TaskLogEntry {
+  return 'task' in log;
+}
+
+function isContentLog(log: LogEntry): log is ContentLogEntry {
+  return 'content' in log;
 }
 
 const AgentLogsPage = () => {
@@ -66,6 +87,27 @@ const AgentLogsPage = () => {
 
   const handleBack = () => {
     router.push("/dashboard/agents");
+  };
+
+  // Helper function to get appropriate icon based on log type
+  const getLogIcon = (log: LogEntry) => {
+    if (isTaskLog(log) && log.type === 'task_start') {
+      return <PlayCircle className="h-4 w-4 text-primary" />;
+    } else if (isContentLog(log)) {
+      return <MessageCircle className="h-4 w-4 text-primary" />;
+    } else {
+      return <FileText className="h-4 w-4 text-primary" />;
+    }
+  };
+
+  // Helper function to get log message content
+  const getLogContent = (log: LogEntry) => {
+    if (isTaskLog(log)) {
+      return log.task;
+    } else if (isContentLog(log)) {
+      return log.content;
+    }
+    return "Unknown log format";
   };
 
   return (
@@ -150,7 +192,7 @@ const AgentLogsPage = () => {
                   <div className="flex items-start gap-4">
                     <div className="min-w-[40px] mt-1">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                        <FileText className="h-4 w-4 text-primary" />
+                        {getLogIcon(log)}
                       </div>
                     </div>
                     <div className="space-y-1.5">
@@ -159,9 +201,14 @@ const AgentLogsPage = () => {
                         <span className="text-sm text-muted-foreground">
                           {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
                         </span>
+                        {isTaskLog(log) && log.type && (
+                          <span className="text-xs px-2 py-0.5 bg-secondary rounded-full">
+                            {log.type}
+                          </span>
+                        )}
                       </div>
                       <div className="bg-muted p-3 rounded-lg">
-                        <p className="text-sm whitespace-pre-wrap">{log.task}</p>
+                        <p className="text-sm whitespace-pre-wrap">{getLogContent(log)}</p>
                       </div>
                     </div>
                   </div>

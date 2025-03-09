@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { toast } from "sonner";
 import { 
@@ -29,16 +29,34 @@ import {
   RefreshCw, 
   FileText, 
   Calendar, 
-  Users 
+  Users,
+  Trash2,
+  AlertTriangle,
+  MessageCircle
 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { useWallets } from "@privy-io/react-auth";
+import { useSetActiveWallet } from "@privy-io/wagmi";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Agent {
   id: string;
@@ -54,9 +72,22 @@ const AgentsPage = () => {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [agentToDelete, setAgentToDelete] = useState<Agent | null>(null);
+  const [isSettingWallet, setIsSettingWallet] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  // New state variables for chat functionality
+  const [chatDialogOpen, setChatDialogOpen] = useState(false);
+  const [agentToChat, setAgentToChat] = useState<Agent | null>(null);
+  const [chatTask, setChatTask] = useState("");
+  const [isInteracting, setIsInteracting] = useState(false);
+  
   const router = useRouter();
   const { address } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const client = new ZerePyClient();
+  const { wallets, ready: walletsReady } = useWallets();
+  const { setActiveWallet } = useSetActiveWallet();
 
   const fetchAgents = async () => {
     if (!address) return;
@@ -91,9 +122,158 @@ const AgentsPage = () => {
     router.push(`/dashboard/agents/${agentId}/logs`);
   };
 
+  const handleDeleteClick = (agent: Agent) => {
+    setAgentToDelete(agent);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteAgent = async () => {
+    if (!agentToDelete || !address) return;
+    
+    setIsDeleting(true);
+    
+    try {
+      // Find and set the embedded wallet as active
+      if (walletsReady) {
+        const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+        
+        if (embeddedWallet) {
+          setIsSettingWallet(true);
+          
+          try {
+            await setActiveWallet(embeddedWallet);
+          } catch (error) {
+            console.error("Failed to set active wallet:", error);
+            toast.error("Failed to set embedded wallet as active", {
+              description: "Continuing with currently active wallet"
+            });
+          } finally {
+            setIsSettingWallet(false);
+          }
+        }
+      }
+      
+      // Sign the delete authorization message
+      const messageToSign = `I authorize deleting agent with ID: ${agentToDelete.id}`;
+      let signature;
+      
+      try {
+        signature = await signMessageAsync({ message: messageToSign });
+        
+        // Call the delete API
+        await client.deleteAgent(agentToDelete.id, address, signature);
+        
+        // Remove the deleted agent from the state - create a new array, don't mutate
+        const updatedAgents = agents.filter(agent => agent.id !== agentToDelete.id);
+        setAgents(updatedAgents);
+        
+        toast.success("Agent deleted successfully");
+        
+        // Force close the dialog and reset states
+        setDeleteDialogOpen(false);
+        setAgentToDelete(null);
+      } catch (error) {
+        toast.error("Failed to delete agent", {
+          description: (error as Error).message || "Signature rejected or API error"
+        });
+      }
+    } catch (error) {
+      toast.error("Failed to delete agent", {
+        description: (error as Error).message
+      });
+    } finally {
+      // Always ensure we clean up state even if there was an error
+      setIsDeleting(false);
+      
+      // Add a small delay before resetting dialog state to ensure UI updates properly
+      setTimeout(() => {
+        if (deleteDialogOpen) {
+          setDeleteDialogOpen(false);
+          setAgentToDelete(null);
+        }
+      }, 100);
+    }
+  };
+
+  // Add useEffect to monitor frozen state and auto-reset if needed
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+    
+    if (isDeleting) {
+      // Set a safety timeout to reset frozen state after 10 seconds
+      timeoutId = setTimeout(() => {
+        if (isDeleting) {
+          setIsDeleting(false);
+          setIsSettingWallet(false);
+          setDeleteDialogOpen(false);
+          setAgentToDelete(null);
+          toast.info("Operation timed out, resetting state");
+        }
+      }, 10000);
+    }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [isDeleting]);
+
   const countAgentTypes = (agent: Agent) => {
     const types = new Set(Object.values(agent.data || {}).map(item => item.name));
     return Array.from(types);
+  };
+
+  const handleChatClick = (agent: Agent) => {
+    setAgentToChat(agent);
+    setChatTask("");
+    setChatDialogOpen(true);
+  };
+
+  const handleInteractAgent = async () => {
+    if (!agentToChat || !address || !chatTask.trim()) return;
+    
+    setIsInteracting(true);
+    
+    try {
+      // Find and set the embedded wallet as active
+      if (walletsReady) {
+        const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+        
+        if (embeddedWallet) {
+          try {
+            await setActiveWallet(embeddedWallet);
+          } catch (error) {
+            console.error("Failed to set active wallet:", error);
+            toast.error("Failed to set embedded wallet as active", {
+              description: "Continuing with currently active wallet"
+            });
+          }
+        }
+      }
+      
+      // Send the interaction request
+      await client.interactAgent(agentToChat.id, chatTask, address);
+      
+      toast.success("Task submitted successfully", {
+        description: "Check the logs for updates on the task progress"
+      });
+      
+      // Close the dialog and reset states
+      setChatDialogOpen(false);
+      setAgentToChat(null);
+      setChatTask("");
+      
+      // Refresh the agent logs
+      setTimeout(() => {
+        router.push(`/dashboard/agents/${agentToChat.id}/logs`);
+      }, 500);
+      
+    } catch (error) {
+      toast.error("Failed to interact with agent", {
+        description: (error as Error).message
+      });
+    } finally {
+      setIsInteracting(false);
+    }
   };
 
   return (
@@ -235,9 +415,18 @@ const AgentsPage = () => {
                             <FileText className="h-4 w-4 mr-1" />
                             <span className="hidden sm:inline">Logs</span>
                           </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleChatClick(agent)}
+                            className="ml-1"
+                          >
+                            <MessageCircle className="h-4 w-4 mr-1" />
+                            <span className="hidden sm:inline">Chat</span>
+                          </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="ml-2 h-8 w-8 p-0">
+                              <Button variant="ghost" size="sm" className="ml-1 h-8 w-8 p-0">
                                 <span className="sr-only">Open menu</span>
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
@@ -246,6 +435,18 @@ const AgentsPage = () => {
                               <DropdownMenuItem onClick={() => handleViewLogs(agent.id)}>
                                 <FileText className="mr-2 h-4 w-4" />
                                 View Logs
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleChatClick(agent)}>
+                                <MessageCircle className="mr-2 h-4 w-4" />
+                                Send Task
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteClick(agent)}
+                                className="text-red-500 focus:text-red-500"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete Agent
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -259,6 +460,138 @@ const AgentsPage = () => {
           </Card>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog 
+        open={deleteDialogOpen} 
+        onOpenChange={(open) => {
+          // Only allow closing if we're not in the middle of deleting
+          if (!isDeleting) {
+            setDeleteDialogOpen(open);
+            if (!open) setAgentToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Confirm Deletion
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this agent workflow?
+              {agentToDelete && (
+                <div className="mt-2 font-medium">
+                  {agentToDelete.name || "Unnamed workflow"}
+                </div>
+              )}
+              <div className="mt-2 text-amber-600 dark:text-amber-500">
+                This action requires signature verification and cannot be undone.
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e: any) => {
+                e.preventDefault();
+                handleDeleteAgent();
+              }}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {isSettingWallet ? "Setting wallet..." : "Deleting..."}
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Chat Interaction Dialog */}
+      <Dialog open={chatDialogOpen} onOpenChange={(open) => {
+        if (!isInteracting) {
+          setChatDialogOpen(open);
+          if (!open) setAgentToChat(null);
+        }
+      }}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-primary" />
+              Send Task to Agent
+            </DialogTitle>
+            {agentToChat && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {agentToChat.name || "Unnamed agent"} will process your task asynchronously
+              </p>
+            )}
+          </DialogHeader>
+          
+          <div className="py-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="task" className="text-sm font-medium">
+                  Task Description
+                </label>
+                <Textarea
+                  id="task"
+                  placeholder="Describe what you want the agent to do..."
+                  rows={4}
+                  className="resize-none"
+                  value={chatTask}
+                  onChange={(e) => setChatTask(e.target.value)}
+                />
+              </div>
+              {agentToChat && (
+                <div className="bg-muted p-3 rounded-lg space-y-2">
+                  <h4 className="text-sm font-medium">Agent Details</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {countAgentTypes(agentToChat).map((type, i) => (
+                      <Badge key={i} variant="outline" className="text-xs">
+                        {type}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setChatDialogOpen(false)}
+              disabled={isInteracting}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleInteractAgent}
+              disabled={isInteracting || !chatTask.trim()}
+              className="gap-2"
+            >
+              {isInteracting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Sending...
+                </>
+              ) : (
+                <>
+                  <MessageCircle className="h-4 w-4" /> Send Task
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

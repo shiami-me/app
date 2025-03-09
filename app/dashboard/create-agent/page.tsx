@@ -1,28 +1,72 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Save, Loader2 } from "lucide-react";
+import { PlusCircle, Save, Loader2, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import AgentsList from "@/components/agent-creation/agents-list";
 import AddAgentModal from "@/components/agent-creation/add-agent-modal";
 import { Agent } from "@/components/agent-creation/types";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
+import { useWallets } from "@privy-io/react-auth";
+import { useSetActiveWallet } from "@privy-io/wagmi";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const CreateAgentPage = () => {
   const [task, setTask] = useState("");
   const [name, setName] = useState("");
-  const [isOneTime, setIsOneTime] = useState(true);
+  const [isOneTime, setIsOne] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSettingWallet, setIsSettingWallet] = useState(false);
   const client = new ZerePyClient();
   const { address } = useAccount();
+  const { signMessageAsync } = useSignMessage();
+  const { wallets, ready: walletsReady } = useWallets();
+  const { setActiveWallet } = useSetActiveWallet();
+  const [ disabled, setDisabled ] = useState(["transactions", "silo"])
+
+  useEffect(() => {
+    (async () => {
+      // Find the Privy embedded wallet
+      if (walletsReady) {
+        const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+        
+        // Set the embedded wallet as active if available
+        if (embeddedWallet) {
+          setIsSettingWallet(true);
+          toast.info("Setting active wallet to embedded wallet...");
+          
+          try {
+            await setActiveWallet(embeddedWallet);
+          } catch (error) {
+            console.error("Failed to set active wallet:", error);
+            toast.error("Failed to set embedded wallet as active", {
+              description: "Continuing with currently active wallet"
+            });
+          } finally {
+            setIsSettingWallet(false);
+          }
+        }
+      }
+
+    })();
+  }, [walletsReady, wallets]);
+
+  const setIsOneTime = (value: boolean) => {
+    setIsOne(value);
+    if (value) {
+      setDisabled(["transactions", "silo", "scheduler"])
+    } else {
+      setDisabled(["transactions", "silo"])
+    }
+  }
 
   const handleAddAgent = (agent: Agent) => {
     setAgents((prev) => {
@@ -91,46 +135,77 @@ const CreateAgentPage = () => {
       return;
     }
 
-    setIsSubmitting(true);
-    
-    // Format data for the API
-    const agentNames = agents.map((agent) => agent.title);
-    
-    const prompts: Record<string, string> = {};
-    agents.forEach((agent) => {
-      prompts[agent.title] = agent.prompt;
-    });
-    
-    const data: Record<string, Record<string, any>> = {};
-    agents.forEach((agent) => {
-      data[agent.title] = {
-        name: agent.type,
-        next: agent.next,
-      };
-    });
+    if (!address) {
+      toast.error("Wallet not connected", {
+        description: "Please connect your wallet to create an agent"
+      });
+      return;
+    }
 
-    toast.promise(
-      client.createAgent(
-        agentNames, 
-        prompts, 
-        data, 
-        task, 
-        address, 
-        name.trim() || undefined, 
-        isOneTime
-      ),
-      {
-        loading: "Creating agent workflow...",
-        success: () => {
-          setIsSubmitting(false);
-          return "Agent workflow created successfully!";
-        },
-        error: (err) => {
-          setIsSubmitting(false);
-          return `Error: ${err.message || "Failed to create agent workflow"}`;
-        },
+    setIsSubmitting(true);
+
+    try {
+      
+      // Format data for the API
+      const agentNames = agents.map((agent) => agent.title);
+      
+      const prompts: Record<string, string> = {};
+      agents.forEach((agent) => {
+        prompts[agent.title] = agent.prompt;
+      });
+      
+      const data: Record<string, Record<string, any>> = {};
+      agents.forEach((agent) => {
+        data[agent.title] = {
+          name: agent.type,
+          next: agent.next,
+        };
+      });
+
+      // Sign the authorization message
+      const messageToSign = `I authorize creating an agent with my address: ${address}`;
+      let signature;
+
+      try {
+        // Get the current active wallet address after potential switch
+        const currentAddress = address;
+        signature = await signMessageAsync({ message: messageToSign });
+        
+        toast.promise(
+          client.createAgent(
+            agentNames, 
+            prompts, 
+            data, 
+            task,
+            currentAddress, // Use the current address which should be the embedded wallet
+            name.trim() || undefined, 
+            isOneTime,
+            signature
+          ),
+          {
+            loading: "Creating agent workflow...",
+            success: () => {
+              setIsSubmitting(false);
+              return "Agent workflow created successfully!";
+            },
+            error: (err) => {
+              setIsSubmitting(false);
+              return `Error: ${err.message || "Failed to create agent workflow"}`;
+            },
+          }
+        );
+      } catch {
+        toast.error("Signature rejected", {
+          description: "You need to sign the message to create an agent"
+        });
+        setIsSubmitting(false);
       }
-    );
+    } catch (error) {
+      setIsSubmitting(false);
+      toast.error("Error creating agent", {
+        description: (error as Error).message
+      });
+    }
   };
 
   return (
@@ -213,11 +288,20 @@ const CreateAgentPage = () => {
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-3">Agent Workflow</h2>
           {agents.length > 0 ? (
-            <AgentsList 
-              agents={agents} 
-              onDelete={handleDeleteAgent} 
-              onReorder={handleReorderAgents} 
-            />
+            <>
+              <AgentsList 
+                agents={agents} 
+                onDelete={handleDeleteAgent} 
+                onReorder={handleReorderAgents} 
+              />
+              
+              <Alert className="mt-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50">
+                <KeyRound className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <AlertDescription className="text-sm text-blue-800 dark:text-blue-300">
+                  Creating an agent requires your signature using the embedded wallet. You&apos;ll be prompted to sign a message.
+                </AlertDescription>
+              </Alert>
+            </>
           ) : (
             <div className="text-center py-12 border border-dashed rounded-lg">
               <p className="text-muted-foreground">
@@ -230,12 +314,13 @@ const CreateAgentPage = () => {
             <div className="mt-6 flex justify-end">
               <Button 
                 onClick={handleSubmit} 
-                disabled={isSubmitting || (!isOneTime && !name.trim())} 
+                disabled={isSubmitting || isSettingWallet || (!isOneTime && !name.trim())} 
                 className="gap-2"
               >
-                {isSubmitting ? (
+                {isSubmitting || isSettingWallet ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Creating...
+                    <Loader2 className="h-4 w-4 animate-spin" /> 
+                    {isSettingWallet ? "Setting wallet..." : "Creating..."}
                   </>
                 ) : (
                   <>
@@ -250,6 +335,7 @@ const CreateAgentPage = () => {
 
       <AddAgentModal 
         isOpen={isModalOpen} 
+        disabled={disabled}
         onClose={() => setIsModalOpen(false)} 
         onAddAgent={handleAddAgent} 
       />

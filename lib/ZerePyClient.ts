@@ -210,7 +210,8 @@ export class ZerePyClient {
     task: string,
     user_address?: string,
     name?: string,
-    is_one_time: boolean = true
+    is_one_time: boolean = true,
+    signature?: string
   ): Promise<JsonResponse> {
     return this._makeRequest("POST", "/agent/create", {
       body: {
@@ -221,11 +222,38 @@ export class ZerePyClient {
         user_address,
         name,
         is_one_time,
+        signature, // Add the signature field
+      },
+    });
+  }
+
+  async deleteAgent(
+    agentId: string,
+    user_address: string,
+    signature: string
+  ): Promise<JsonResponse> {
+    return this._makeRequest("DELETE", `/agent/${agentId}`, {
+      body: {
+        user_address,
+        signature,
       },
     });
   }
 
   async getAgentLogs(agentId: string): Promise<any> {
     return this._makeRequest("GET", `/agent/${agentId}/logs`);
+  }
+
+  async interactAgent(
+    agentId: string,
+    task: string,
+    user_address: string
+  ): Promise<JsonResponse> {
+    return this._makeRequest("POST", `/agent/${agentId}/interact`, {
+      body: {
+        task,
+        user_address,
+      },
+    });
   }
 }
