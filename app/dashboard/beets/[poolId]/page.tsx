@@ -458,8 +458,6 @@ export default function PoolDetailPage() {
           className="mb-6"
         >
           <Card className="border-green-200 dark:border-green-800 overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-emerald-500"></div>
-            <div className="absolute inset-0 bg-green-50/50 dark:bg-green-900/10"></div>
             <CardContent className="pt-6 relative">
               <h2 className="text-xl font-bold mb-4 flex items-center text-green-700 dark:text-green-400">
                 <Layers className="h-5 w-5 mr-2" />
