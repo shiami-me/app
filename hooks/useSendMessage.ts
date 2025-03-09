@@ -26,6 +26,14 @@ export const useSendMessage = (
       setIsLoading(true);
       try {
         if (useBrowser) {
+          setMessages(prev => [
+            ...prev,
+            {
+              id: prev.length + 1,
+              text: '{"tool": "search_web"}',
+              sender: "bot",
+            },
+          ]);
           const response = await client.performAction("browser_use", "browse", [
             userMessage,
           ]);
@@ -59,6 +67,7 @@ export const useSendMessage = (
               },
             ]);
           }
+          setMessages((prev) => prev.filter((msg) => msg.text !== '{"tool": "search_web"}'));
           setIsLoading(false);
         } else {
           // Format context data to send
