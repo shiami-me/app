@@ -22,7 +22,7 @@ const MAX_AGENTS = 5;
 const CreateAgentPage = () => {
   const [task, setTask] = useState("");
   const [name, setName] = useState("");
-  const [isOneTime, setIsOne] = useState(true);
+  const [isOneTime, setIsOne] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
