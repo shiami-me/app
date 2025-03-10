@@ -8,7 +8,7 @@ import { XIcon } from "@/components/x-icon";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight,Sparkles, CircleDollarSign, Wallet, Globe, Shield, MessageSquare, Bot, Zap, History, Gauge } from "lucide-react";
+import { ArrowRight,Sparkles, CircleDollarSign, Wallet, Globe, Shield, MessageSquare, Bot, Zap, User2, Users2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { ParticleBackground } from "@/components/effects/particle-background"
 import { MagneticButton } from "@/components/effects/magnetic-button"
@@ -198,7 +198,7 @@ export default function Home() {
 
               <h1 className="text-5xl md:text-7xl font-extrabold mb-6">
                 <span className="bg-gradient-to-r from-green-600 to-green-800 dark:from-green-400 dark:to-green-600 bg-clip-text text-transparent">
-                  Web3 Interactions
+                  DeFi on Sonic
                 </span>
                 <br />
                 <span className="text-gray-700 dark:text-gray-300">
@@ -206,7 +206,7 @@ export default function Home() {
                 </span>
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl">
-                Your AI-powered companion for DeFi. Execute trades, track prices, and research protocols - all through natural conversation.
+                Your AI-powered companion for DeFi. Execute swaps, track prices, and research protocols on Sonic - all through natural conversation.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                 <MagneticButton>
@@ -248,29 +248,29 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <motion.div {...fadeInAnimation}>
               <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-green-600 to-green-800 dark:from-green-400 dark:to-green-600 bg-clip-text text-transparent">
-                AI-Powered DeFi Assistant
+              Access Sonic&apos;s Top Protocols with $500M+ TVL on One Platform
               </h2>
               <div className="space-y-4">
                 <FeatureItem
                   icon={<Wallet className="w-6 h-6" />}
                   title="Smart DeFi Transactions"
-                  description="Execute swaps and interact with Silo Finance seamlessly through natural language commands."
+                  description="Execute swaps and interact with various Sonic DeFi protocols seamlessly through natural language commands."
                 />
                 <FeatureItem
                   icon={<Globe className="w-6 h-6" />}
-                  title="Web3 Research Mode"
-                  description="Let AI browse and analyze DeFi protocols and market data for you in real-time."
+                  title="Query through the Sonic Network"
+                  description="Manage your holdings, track prices and transactions on the Sonic Network"
                 />
                 <FeatureItem
                   icon={<Shield className="w-6 h-6" />}
-                  title="Secure Approvals"
-                  description="Built-in transaction verification and approval system for safe DeFi interactions."
+                  title="Secured and Easy"
+                  description="Built-in safety checks and transaction verification for secure DeFi operations."
                 />
               </div>
             </motion.div>
             <motion.div {...fadeInAnimation}>
               <Image
-                src="/features/ai.png"
+                src="/arch.png"
                 alt="AI Features"
                 width={600}
                 height={400}
@@ -333,23 +333,23 @@ export default function Home() {
             {[
               {
                 icon: <Wallet />,
-                title: "Silo Integration",
-                description: "Direct integration with Silo Finance for DeFi operations"
+                title: "Silo & Beets Integration",
+                description: "Direct integration with Silo Finance and Beets on Sonic for profit maximization"
               },
               {
-                icon: <History />,
-                title: "Chat History",
-                description: "Track and manage your conversation history"
+                icon: <User2 />,
+                title: "Made for Everyone",
+                description: "In case you are new to DeFi, Just add a component to the context and ask questions from Shiami"
               },
               {
-                icon: <Gauge />,
-                title: "Gas Tracking",
-                description: "Real-time gas price monitoring and optimization"
+                icon: <Users2 />,
+                title: "Agent Workflows",
+                description: "Create highly customizable agent workflows supervised by Shiami"
               },
               {
                 icon: <Shield />,
-                title: "Transaction Safety",
-                description: "Built-in transaction verification system"
+                title: "Complete Transparency",
+                description: "Never lose the custody of your funds even when you are automating your trades"
               }
             ].map((feature, index) => (
               <AdvancedFeatureCard key={index} {...feature} />
@@ -373,14 +373,14 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-8">
             {[
               {
-                title: "DeFi Traders",
-                description: "Execute trades, monitor positions, and analyze market opportunities with AI-powered insights.",
-                features: ["Real-time market analysis", "One-click trading", "Position management"]
+                title: "Advanced DeFi Traders",
+                description: "Execute trades, monitor positions, and create agentic workflows that manage your portfolio with ease.",
+                features: ["Real-time market analysis", "Specialized Dashboards for Beets and Silo", "Position management"]
               },
               {
-                title: "Protocol Users",
+                title: "Beginners in DeFi",
                 description: "Interact with DeFi protocols through simple conversations, no technical knowledge required.",
-                features: ["Natural language interface", "Automated transactions", "Risk assessment"]
+                features: ["Natural language interface", "Learn as you trade", "Risk assessment"]
               }
             ].map((useCase, index) => (
               <UseCaseCard key={index} {...useCase} />
@@ -402,7 +402,7 @@ export default function Home() {
             Ready to Transform Your DeFi Experience?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-            Join thousands of users who have already simplified their DeFi journey with Shiami.
+            Join Shiami today and start trading, monitoring, and managing your DeFi portfolio on Sonic with ease.
           </p>
           <Link href="/chat">
             <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white">
