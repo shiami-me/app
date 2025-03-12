@@ -21,7 +21,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "467240",
+            "priceUsd": "443019",
             "maxLtv": "950000000000000000",
             "lt": "970000000000000000",
             "solvencyOracle": {
@@ -38,13 +38,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "20641231959055680",
+            "collateralBaseApr": "18422904628964207",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "38522849586192000",
+            "debtBaseApr": "36393990461712000",
             "debtPrograms": [],
-            "liquidity": "49549818601542492720335253",
-            "tvl": "134080430889949540666467631",
+            "liquidity": "55247544359771005711269499",
+            "tvl": "136622849014643344368540120",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -91,7 +91,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "461502",
+            "priceUsd": "437400",
             "maxLtv": "950000000000000000",
             "lt": "970000000000000000",
             "solvencyOracle": {
@@ -108,13 +108,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "40288344201411498",
+            "collateralBaseApr": "59940004530753944",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "53819581026384000",
+            "debtBaseApr": "77601946908384000",
             "debtPrograms": [],
-            "liquidity": "17194424599033452590166084",
-            "tvl": "144113128015200888612400479",
+            "liquidity": "14554809336218989548775850",
+            "tvl": "159538713904193277884340875",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -168,7 +168,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "461502",
+            "priceUsd": "437400",
             "maxLtv": "750000000000000000",
             "lt": "800000000000000000",
             "solvencyOracle": {
@@ -185,18 +185,18 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "21340042107348704",
+            "collateralBaseApr": "16137484611413002",
             "collateralPrograms": [
                 {
                     "rewardTokenSymbol": "SILO",
-                    "apr": "10290835941278854"
+                    "apr": "8635294718429960"
                 }
             ],
             "protectedPrograms": [],
-            "debtBaseApr": "55394064612576000",
+            "debtBaseApr": "48170765036304000",
             "debtPrograms": [],
-            "liquidity": "16629200767443165975991754",
-            "tvl": "30699363156802579082682697",
+            "liquidity": "19915335889871031999206501",
+            "tvl": "33409141665438980282274678",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -243,7 +243,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 6,
-            "priceUsd": "999863",
+            "priceUsd": "999875",
             "maxLtv": "750000000000000000",
             "lt": "800000000000000000",
             "solvencyOracle": {
@@ -260,22 +260,22 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "37503102231302125",
+            "collateralBaseApr": "28973115379784720",
             "collateralPrograms": [
                 {
                     "rewardTokenSymbol": "S",
-                    "apr": "49228561652850094"
+                    "apr": "56170652553502097"
                 },
                 {
                     "rewardTokenSymbol": "SILO",
-                    "apr": "2413293133534606"
+                    "apr": "2497301649045265"
                 }
             ],
             "protectedPrograms": [],
-            "debtBaseApr": "81050418347616000",
+            "debtBaseApr": "71239232542320000",
             "debtPrograms": [],
-            "liquidity": "40911062011859",
-            "tvl": "89811728822300",
+            "liquidity": "38896619211229",
+            "tvl": "74606127358994",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -329,7 +329,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "461502",
+            "priceUsd": "437400",
             "maxLtv": "750000000000000000",
             "lt": "800000000000000000",
             "solvencyOracle": {
@@ -352,7 +352,7 @@ export const siloMarketData = [
             "debtBaseApr": "31536000",
             "debtPrograms": [],
             "liquidity": "1000000000000000000",
-            "tvl": "79341474806964836152660889",
+            "tvl": "45578943980753507274431420",
             "isNonBorrowable": true,
             "collateralPoints": [
                 {
@@ -399,7 +399,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 6,
-            "priceUsd": "999863",
+            "priceUsd": "999875",
             "maxLtv": "0",
             "lt": "0",
             "solvencyOracle": {
@@ -416,22 +416,22 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "55279683881601118",
+            "collateralBaseApr": "21281769034730945",
             "collateralPrograms": [
                 {
                     "rewardTokenSymbol": "S",
-                    "apr": "25909424150340481"
+                    "apr": "32827422331261797"
                 },
                 {
                     "rewardTokenSymbol": "SILO",
-                    "apr": "7775811166937826"
+                    "apr": "8934974789884676"
                 }
             ],
             "protectedPrograms": [],
-            "debtBaseApr": "95629666714704000",
+            "debtBaseApr": "59335376591664000",
             "debtPrograms": [],
-            "liquidity": "9968363277948",
-            "tvl": "27875499780718",
+            "liquidity": "12538126139670",
+            "tvl": "20853125727223",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -482,7 +482,7 @@ export const siloMarketData = [
                 "coinGecko": null
             },
             "decimals": 18,
-            "priceUsd": "465337",
+            "priceUsd": "441424",
             "maxLtv": "900000000000000000",
             "lt": "950000000000000000",
             "solvencyOracle": {
@@ -505,7 +505,7 @@ export const siloMarketData = [
             "debtBaseApr": "31536000",
             "debtPrograms": [],
             "liquidity": "0",
-            "tvl": "13745727743186042670057095",
+            "tvl": "14818214905502151955990709",
             "isNonBorrowable": true,
             "collateralPoints": [
                 {
@@ -552,7 +552,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "461502",
+            "priceUsd": "437400",
             "maxLtv": "0",
             "lt": "0",
             "solvencyOracle": {
@@ -569,13 +569,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "24511039657558254",
+            "collateralBaseApr": "28615831192073334",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "41978934194256000",
+            "debtBaseApr": "45357978498768000",
             "debtPrograms": [],
-            "liquidity": "5462500809337092191426346",
-            "tvl": "17448081489269038632264957",
+            "liquidity": "4488878248204803670652653",
+            "tvl": "17413728220829238302084386",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -629,7 +629,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "460424",
+            "priceUsd": "437673",
             "maxLtv": "900000000000000000",
             "lt": "950000000000000000",
             "solvencyOracle": {
@@ -651,8 +651,8 @@ export const siloMarketData = [
             "protectedPrograms": [],
             "debtBaseApr": "31536000",
             "debtPrograms": [],
-            "liquidity": "1370637151090366332107814",
-            "tvl": "11135020940015074582247557",
+            "liquidity": "3951278472402489936640501",
+            "tvl": "13775346319107022517171369",
             "isNonBorrowable": true,
             "collateralPoints": [
                 {
@@ -699,7 +699,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "461502",
+            "priceUsd": "437400",
             "maxLtv": "0",
             "lt": "0",
             "solvencyOracle": {
@@ -716,22 +716,22 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "31346856373867722",
+            "collateralBaseApr": "41934754542894267",
             "collateralPrograms": [
                 {
                     "rewardTokenSymbol": "SILO",
-                    "apr": "20666107429303030"
+                    "apr": "17848127290378770"
                 },
                 {
                     "rewardTokenSymbol": "wOS",
-                    "apr": "16578073001078637"
+                    "apr": "15833831771352271"
                 }
             ],
             "protectedPrograms": [],
-            "debtBaseApr": "68346865350288000",
+            "debtBaseApr": "79051230177840000",
             "debtPrograms": [],
-            "liquidity": "7803152410995672066683677",
-            "tvl": "16956979148262638983201443",
+            "liquidity": "6690156466548679160649577",
+            "tvl": "17797513246877193889908694",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -782,7 +782,7 @@ export const siloMarketData = [
                 "coinGecko": null
             },
             "decimals": 6,
-            "priceUsd": "1000189",
+            "priceUsd": "1000725",
             "maxLtv": "900000000000000000",
             "lt": "950000000000000000",
             "solvencyOracle": {
@@ -805,7 +805,7 @@ export const siloMarketData = [
             "debtBaseApr": "31536000",
             "debtPrograms": [],
             "liquidity": "0",
-            "tvl": "4587606808294",
+            "tvl": "3778858441545",
             "isNonBorrowable": true,
             "collateralPoints": [
                 {
@@ -860,7 +860,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 6,
-            "priceUsd": "999863",
+            "priceUsd": "999875",
             "maxLtv": "0",
             "lt": "0",
             "solvencyOracle": {
@@ -877,13 +877,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "88414066777718152",
+            "collateralBaseApr": "80512716763453033",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "120940161952608000",
+            "debtBaseApr": "115409619365328000",
             "debtPrograms": [],
-            "liquidity": "710940439406",
-            "tvl": "3788465735061",
+            "liquidity": "822025635637",
+            "tvl": "3656847361096",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -920,6 +920,134 @@ export const siloMarketData = [
     },
     {
         "protocolKey": "sonic",
+        "id": "37",
+        "isVerified": true,
+        "configAddress": "0xe7579D515BD1676b6Da703786189a457B9bB3Fc3",
+        "boostedContentKey": null,
+        "silo0": {
+            "tokenAddress": "0xBe27993204Ec64238F71A527B4c4D5F4949034C3",
+            "symbol": "PT-wstkscUSD (29 May)",
+            "name": "Rings • Pendle",
+            "logos": {
+                "trustWallet": null,
+                "coinMarketCap": null,
+                "coinGecko": null
+            },
+            "decimals": 6,
+            "priceUsd": "976922",
+            "maxLtv": "850000000000000000",
+            "lt": "900000000000000000",
+            "solvencyOracle": {
+                "address": "0x347DdE1179A9cEC4E17d72250Bdf16c2ed8c70CD",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "maxLtvOracle": {
+                "address": "0x347DdE1179A9cEC4E17d72250Bdf16c2ed8c70CD",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "collateralBaseApr": "0",
+            "collateralPrograms": [],
+            "protectedPrograms": [],
+            "debtBaseApr": "0",
+            "debtPrograms": [],
+            "liquidity": "0",
+            "tvl": "13559720792",
+            "isNonBorrowable": true,
+            "collateralPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 1
+                }
+            ],
+            "protectedPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 1
+                }
+            ],
+            "debtPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 0.5,
+                    "multiplier": 1
+                }
+            ],
+            "oracleLabel": "Custom oracle",
+            "oracleContentKey": "sonic-37-PT_wstkscUSD"
+        },
+        "silo1": {
+            "tokenAddress": "0x80Eede496655FB9047dd39d9f418d5483ED600df",
+            "symbol": "frxUSD",
+            "name": "Frax USD",
+            "logos": {
+                "trustWallet": null,
+                "coinMarketCap": null,
+                "coinGecko": {
+                    "small": "https://coin-images.coingecko.com/coins/images/53963/small/frxUSD.png?1737792154",
+                    "large": "https://coin-images.coingecko.com/coins/images/53963/large/frxUSD.png?1737792154"
+                }
+            },
+            "decimals": 18,
+            "priceUsd": "997292",
+            "maxLtv": "0",
+            "lt": "0",
+            "solvencyOracle": {
+                "address": "0x0000000000000000000000000000000000000000",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "maxLtvOracle": {
+                "address": "0x0000000000000000000000000000000000000000",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "collateralBaseApr": "315822925178",
+            "collateralPrograms": [],
+            "protectedPrograms": [],
+            "debtBaseApr": "245041531776000",
+            "debtPrograms": [],
+            "liquidity": "7000487186530131515950939",
+            "tvl": "7010526686678816356441565",
+            "isNonBorrowable": false,
+            "collateralPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 2
+                }
+            ],
+            "protectedPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 2
+                }
+            ],
+            "debtPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 0.5,
+                    "multiplier": 0
+                }
+            ],
+            "oracleLabel": "Custom oracle",
+            "oracleContentKey": "sonic-37-frxUSD"
+        }
+    },
+    {
+        "protocolKey": "sonic",
         "id": "27",
         "isVerified": true,
         "configAddress": "0xaaF2F78f5eA77bF4EA150E869C54eEb73185a3BF",
@@ -937,7 +1065,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "5978872",
+            "priceUsd": "4986557",
             "maxLtv": "550000000000000000",
             "lt": "650000000000000000",
             "solvencyOracle": {
@@ -959,8 +1087,8 @@ export const siloMarketData = [
             "protectedPrograms": [],
             "debtBaseApr": "31536000",
             "debtPrograms": [],
-            "liquidity": "1",
-            "tvl": "541356399112468000340190",
+            "liquidity": "4850270869045041",
+            "tvl": "544960156100857864127850",
             "isNonBorrowable": true,
             "collateralPoints": [
                 {
@@ -999,7 +1127,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 6,
-            "priceUsd": "999863",
+            "priceUsd": "999875",
             "maxLtv": "550000000000000000",
             "lt": "650000000000000000",
             "solvencyOracle": {
@@ -1016,13 +1144,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "113666841578537404",
+            "collateralBaseApr": "122584525590399408",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "210246783877152000",
+            "debtBaseApr": "218337900089184000",
             "debtPrograms": [],
-            "liquidity": "370276664314",
-            "tvl": "1142103674161",
+            "liquidity": "316274634029",
+            "tvl": "1060630675345",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -1073,7 +1201,7 @@ export const siloMarketData = [
                 "coinGecko": null
             },
             "decimals": 6,
-            "priceUsd": "970529",
+            "priceUsd": "976922",
             "maxLtv": "870000000000000000",
             "lt": "920000000000000000",
             "solvencyOracle": {
@@ -1096,7 +1224,7 @@ export const siloMarketData = [
             "debtBaseApr": "0",
             "debtPrograms": [],
             "liquidity": "0",
-            "tvl": "1244986846186",
+            "tvl": "1656439743811",
             "isNonBorrowable": true,
             "collateralPoints": [
                 {
@@ -1135,7 +1263,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 6,
-            "priceUsd": "999863",
+            "priceUsd": "999875",
             "maxLtv": "0",
             "lt": "0",
             "solvencyOracle": {
@@ -1152,18 +1280,18 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "41721192009196996",
+            "collateralBaseApr": "63684212800756489",
             "collateralPrograms": [
                 {
                     "rewardTokenSymbol": "SILO",
-                    "apr": "50345119524273538"
+                    "apr": "47130859842255172"
                 }
             ],
             "protectedPrograms": [],
-            "debtBaseApr": "101496419296848000",
+            "debtBaseApr": "125397350983440000",
             "debtPrograms": [],
-            "liquidity": "1133700119521",
-            "tvl": "2086823795507",
+            "liquidity": "834844846376",
+            "tvl": "1916047965723",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -1214,7 +1342,7 @@ export const siloMarketData = [
                 "coinGecko": null
             },
             "decimals": 18,
-            "priceUsd": "2101376230",
+            "priceUsd": "1841885391",
             "maxLtv": "870000000000000000",
             "lt": "920000000000000000",
             "solvencyOracle": {
@@ -1237,7 +1365,7 @@ export const siloMarketData = [
             "debtBaseApr": "31536000",
             "debtPrograms": [],
             "liquidity": "0",
-            "tvl": "733804556177606707960",
+            "tvl": "822091633333862697845",
             "isNonBorrowable": true,
             "collateralPoints": [
                 {
@@ -1276,7 +1404,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "2137421500",
+            "priceUsd": "1868702531",
             "maxLtv": "0",
             "lt": "0",
             "solvencyOracle": {
@@ -1293,18 +1421,18 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "53181527550126773",
+            "collateralBaseApr": "39866703576516697",
             "collateralPrograms": [
                 {
                     "rewardTokenSymbol": "SILO",
-                    "apr": "38300116885605989"
+                    "apr": "31375333518818449"
                 }
             ],
             "protectedPrograms": [],
-            "debtBaseApr": "66385505022480000",
+            "debtBaseApr": "53537194279584000",
             "debtPrograms": [],
-            "liquidity": "36909657276117237885",
-            "tvl": "641598567237938920422",
+            "liquidity": "95432585635191970035",
+            "tvl": "770014545654348381368",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -1341,153 +1469,6 @@ export const siloMarketData = [
     },
     {
         "protocolKey": "sonic",
-        "id": "9",
-        "isVerified": true,
-        "configAddress": "0x9603Af53dC37F4BB6386f358A51a04fA8f599101",
-        "boostedContentKey": null,
-        "silo0": {
-            "tokenAddress": "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38",
-            "symbol": "S",
-            "name": "Sonic",
-            "logos": {
-                "trustWallet": null,
-                "coinMarketCap": null,
-                "coinGecko": {
-                    "small": "https://coin-images.coingecko.com/coins/images/52857/small/wrapped_sonic.png?1734536585",
-                    "large": "https://coin-images.coingecko.com/coins/images/52857/large/wrapped_sonic.png?1734536585"
-                }
-            },
-            "decimals": 18,
-            "priceUsd": "461502",
-            "maxLtv": "800000000000000000",
-            "lt": "850000000000000000",
-            "solvencyOracle": {
-                "address": "0x7bd2a4820abf7F8708c0ce57a03e615956bF2f3A",
-                "oracleKey": "none",
-                "baseToken": null,
-                "quoteToken": null,
-                "name": null
-            },
-            "maxLtvOracle": {
-                "address": "0x7bd2a4820abf7F8708c0ce57a03e615956bF2f3A",
-                "oracleKey": "none",
-                "baseToken": null,
-                "quoteToken": null,
-                "name": null
-            },
-            "collateralBaseApr": "37232481053505085",
-            "collateralPrograms": [],
-            "protectedPrograms": [],
-            "debtBaseApr": "59972520096432000",
-            "debtPrograms": [],
-            "liquidity": "267081737498448653214986",
-            "tvl": "990597396259608751244874",
-            "isNonBorrowable": false,
-            "collateralPoints": [
-                {
-                    "_tag": "sonic",
-                    "multiplier": 8
-                },
-                {
-                    "_tag": "silo",
-                    "basePoints": 1,
-                    "multiplier": 1
-                }
-            ],
-            "protectedPoints": [
-                {
-                    "_tag": "sonic",
-                    "multiplier": 8
-                },
-                {
-                    "_tag": "silo",
-                    "basePoints": 1,
-                    "multiplier": 1
-                }
-            ],
-            "debtPoints": [
-                {
-                    "_tag": "silo",
-                    "basePoints": 0.5,
-                    "multiplier": 2
-                }
-            ],
-            "oracleLabel": "Chainlink",
-            "oracleContentKey": "sonic-9-s"
-        },
-        "silo1": {
-            "tokenAddress": "0x50c42dEAcD8Fc9773493ED674b675bE577f2634b",
-            "symbol": "ETH",
-            "name": "Ether",
-            "logos": {
-                "trustWallet": null,
-                "coinMarketCap": null,
-                "coinGecko": {
-                    "small": "https://coin-images.coingecko.com/coins/images/53332/small/weth_2.jpg?1736149977",
-                    "large": "https://coin-images.coingecko.com/coins/images/53332/large/weth_2.jpg?1736149977"
-                }
-            },
-            "decimals": 18,
-            "priceUsd": "2137421500",
-            "maxLtv": "800000000000000000",
-            "lt": "850000000000000000",
-            "solvencyOracle": {
-                "address": "0xed4399235f377AFB48dA005607a0F52Ed7C3bC7F",
-                "oracleKey": "none",
-                "baseToken": null,
-                "quoteToken": null,
-                "name": null
-            },
-            "maxLtvOracle": {
-                "address": "0xed4399235f377AFB48dA005607a0F52Ed7C3bC7F",
-                "oracleKey": "none",
-                "baseToken": null,
-                "quoteToken": null,
-                "name": null
-            },
-            "collateralBaseApr": "1479045379673783",
-            "collateralPrograms": [],
-            "protectedPrograms": [],
-            "debtBaseApr": "10311961969584000",
-            "debtPrograms": [],
-            "liquidity": "650642670787843269837",
-            "tvl": "841811914039055141698",
-            "isNonBorrowable": false,
-            "collateralPoints": [
-                {
-                    "_tag": "sonic",
-                    "multiplier": 4
-                },
-                {
-                    "_tag": "silo",
-                    "basePoints": 1,
-                    "multiplier": 1
-                }
-            ],
-            "protectedPoints": [
-                {
-                    "_tag": "sonic",
-                    "multiplier": 4
-                },
-                {
-                    "_tag": "silo",
-                    "basePoints": 1,
-                    "multiplier": 1
-                }
-            ],
-            "debtPoints": [
-                {
-                    "_tag": "silo",
-                    "basePoints": 0.5,
-                    "multiplier": 1
-                }
-            ],
-            "oracleLabel": "Chainlink",
-            "oracleContentKey": "sonic-9-eth"
-        }
-    },
-    {
-        "protocolKey": "sonic",
         "id": "15",
         "isVerified": true,
         "configAddress": "0xFe514E71F0933F63B374056557AED3dBB381C646",
@@ -1505,7 +1486,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "461502",
+            "priceUsd": "437400",
             "maxLtv": "750000000000000000",
             "lt": "800000000000000000",
             "solvencyOracle": {
@@ -1522,13 +1503,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "7673414060802878",
+            "collateralBaseApr": "6389587049598485",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "20314718031888000",
+            "debtBaseApr": "18537570738432000",
             "debtPrograms": [],
-            "liquidity": "582399961350619598011489",
-            "tvl": "1222399841894391242219310",
+            "liquidity": "723379979196708223000571",
+            "tvl": "1392046647046763007933985",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -1575,7 +1556,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 6,
-            "priceUsd": "999863",
+            "priceUsd": "999875",
             "maxLtv": "700000000000000000",
             "lt": "750000000000000000",
             "solvencyOracle": {
@@ -1592,13 +1573,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "23151081328114953",
+            "collateralBaseApr": "24420137090935556",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "62722908400608000",
+            "debtBaseApr": "64419113220480000",
             "debtPrograms": [],
-            "liquidity": "936773532621",
-            "tvl": "1656066339701",
+            "liquidity": "883698687637",
+            "tvl": "1595361631405",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -1643,6 +1624,153 @@ export const siloMarketData = [
     },
     {
         "protocolKey": "sonic",
+        "id": "9",
+        "isVerified": true,
+        "configAddress": "0x9603Af53dC37F4BB6386f358A51a04fA8f599101",
+        "boostedContentKey": null,
+        "silo0": {
+            "tokenAddress": "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38",
+            "symbol": "S",
+            "name": "Sonic",
+            "logos": {
+                "trustWallet": null,
+                "coinMarketCap": null,
+                "coinGecko": {
+                    "small": "https://coin-images.coingecko.com/coins/images/52857/small/wrapped_sonic.png?1734536585",
+                    "large": "https://coin-images.coingecko.com/coins/images/52857/large/wrapped_sonic.png?1734536585"
+                }
+            },
+            "decimals": 18,
+            "priceUsd": "437400",
+            "maxLtv": "800000000000000000",
+            "lt": "850000000000000000",
+            "solvencyOracle": {
+                "address": "0x7bd2a4820abf7F8708c0ce57a03e615956bF2f3A",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "maxLtvOracle": {
+                "address": "0x7bd2a4820abf7F8708c0ce57a03e615956bF2f3A",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "collateralBaseApr": "43235054538872976",
+            "collateralPrograms": [],
+            "protectedPrograms": [],
+            "debtBaseApr": "64626283296000000",
+            "debtPrograms": [],
+            "liquidity": "155825063509922466381025",
+            "tvl": "731779642712949749596374",
+            "isNonBorrowable": false,
+            "collateralPoints": [
+                {
+                    "_tag": "sonic",
+                    "multiplier": 8
+                },
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 1
+                }
+            ],
+            "protectedPoints": [
+                {
+                    "_tag": "sonic",
+                    "multiplier": 8
+                },
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 1
+                }
+            ],
+            "debtPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 0.5,
+                    "multiplier": 2
+                }
+            ],
+            "oracleLabel": "Chainlink",
+            "oracleContentKey": "sonic-9-s"
+        },
+        "silo1": {
+            "tokenAddress": "0x50c42dEAcD8Fc9773493ED674b675bE577f2634b",
+            "symbol": "ETH",
+            "name": "Ether",
+            "logos": {
+                "trustWallet": null,
+                "coinMarketCap": null,
+                "coinGecko": {
+                    "small": "https://coin-images.coingecko.com/coins/images/53332/small/weth_2.jpg?1736149977",
+                    "large": "https://coin-images.coingecko.com/coins/images/53332/large/weth_2.jpg?1736149977"
+                }
+            },
+            "decimals": 18,
+            "priceUsd": "1868702531",
+            "maxLtv": "800000000000000000",
+            "lt": "850000000000000000",
+            "solvencyOracle": {
+                "address": "0xed4399235f377AFB48dA005607a0F52Ed7C3bC7F",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "maxLtvOracle": {
+                "address": "0xed4399235f377AFB48dA005607a0F52Ed7C3bC7F",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "collateralBaseApr": "1142087575706458",
+            "collateralPrograms": [],
+            "protectedPrograms": [],
+            "debtBaseApr": "9061502994000000",
+            "debtPrograms": [],
+            "liquidity": "612463632076370523804",
+            "tvl": "778181801131731896820",
+            "isNonBorrowable": false,
+            "collateralPoints": [
+                {
+                    "_tag": "sonic",
+                    "multiplier": 4
+                },
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 1
+                }
+            ],
+            "protectedPoints": [
+                {
+                    "_tag": "sonic",
+                    "multiplier": 4
+                },
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 1
+                }
+            ],
+            "debtPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 0.5,
+                    "multiplier": 1
+                }
+            ],
+            "oracleLabel": "Chainlink",
+            "oracleContentKey": "sonic-9-eth"
+        }
+    },
+    {
+        "protocolKey": "sonic",
         "id": "26",
         "isVerified": true,
         "configAddress": "0xefA367570B11f8745B403c0D458b9D2EAf424686",
@@ -1657,7 +1785,7 @@ export const siloMarketData = [
                 "coinGecko": null
             },
             "decimals": 18,
-            "priceUsd": "2137581465",
+            "priceUsd": "1869065994",
             "maxLtv": "850000000000000000",
             "lt": "900000000000000000",
             "solvencyOracle": {
@@ -1680,7 +1808,7 @@ export const siloMarketData = [
             "debtBaseApr": "31536000",
             "debtPrograms": [],
             "liquidity": "0",
-            "tvl": "336191608674326450751",
+            "tvl": "324976687260736820908",
             "isNonBorrowable": true,
             "collateralPoints": [
                 {
@@ -1735,7 +1863,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "2137421500",
+            "priceUsd": "1868702531",
             "maxLtv": "0",
             "lt": "0",
             "solvencyOracle": {
@@ -1752,13 +1880,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "63609067540570205",
+            "collateralBaseApr": "74887911500604863",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "79395673686192000",
+            "debtBaseApr": "93220474940784000",
             "debtPrograms": [],
-            "liquidity": "10245678859430096206",
-            "tvl": "178333168256985887622",
+            "liquidity": "9349795408806513648",
+            "tvl": "187289969864225944742",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -1812,7 +1940,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "84538710946",
+            "priceUsd": "81393229873",
             "maxLtv": "850000000000000000",
             "lt": "900000000000000000",
             "solvencyOracle": {
@@ -1829,13 +1957,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "10535056891104497",
+            "collateralBaseApr": "10538608231435113",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "27520749598320000",
+            "debtBaseApr": "27525818600352000",
             "debtPrograms": [],
-            "liquidity": "3058194628667033368",
-            "tvl": "5612312759703062561",
+            "liquidity": "3058101516371430212",
+            "tvl": "5612840393951302845",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -1898,7 +2026,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "84962420522",
+            "priceUsd": "81735766008",
             "maxLtv": "850000000000000000",
             "lt": "900000000000000000",
             "solvencyOracle": {
@@ -1915,13 +2043,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "4842019606065755",
+            "collateralBaseApr": "4865058460549796",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "18657640747152000",
+            "debtBaseApr": "18702213855696000",
             "debtPrograms": [],
-            "liquidity": "3291206602608551281",
-            "tvl": "4739473689881522643",
+            "liquidity": "3280587021803619251",
+            "tvl": "4729097284337856070",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -1966,6 +2094,153 @@ export const siloMarketData = [
     },
     {
         "protocolKey": "sonic",
+        "id": "36",
+        "isVerified": true,
+        "configAddress": "0xDace786ceF546C258C67B3EF68AeD91B887BE0f0",
+        "boostedContentKey": null,
+        "silo0": {
+            "tokenAddress": "0xE5DA20F15420aD15DE0fa650600aFc998bbE3955",
+            "symbol": "stS",
+            "name": "Beets Staked Sonic",
+            "logos": {
+                "trustWallet": null,
+                "coinMarketCap": null,
+                "coinGecko": {
+                    "small": "https://coin-images.coingecko.com/coins/images/52937/small/token-beets-staked-sonic.png?1734712659",
+                    "large": "https://coin-images.coingecko.com/coins/images/52937/large/token-beets-staked-sonic.png?1734712659"
+                }
+            },
+            "decimals": 18,
+            "priceUsd": "443019",
+            "maxLtv": "700000000000000000",
+            "lt": "750000000000000000",
+            "solvencyOracle": {
+                "address": "0x4D7262786976917f0d7a83d6Ef3089273e117cF7",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "maxLtvOracle": {
+                "address": "0x4D7262786976917f0d7a83d6Ef3089273e117cF7",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "collateralBaseApr": "0",
+            "collateralPrograms": [],
+            "protectedPrograms": [],
+            "debtBaseApr": "31536000",
+            "debtPrograms": [],
+            "liquidity": "24819432533173966651162",
+            "tvl": "24819432533173966651162",
+            "isNonBorrowable": false,
+            "collateralPoints": [
+                {
+                    "_tag": "sonic",
+                    "multiplier": 8
+                },
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 1
+                }
+            ],
+            "protectedPoints": [
+                {
+                    "_tag": "sonic",
+                    "multiplier": 8
+                },
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 1
+                }
+            ],
+            "debtPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 0.5,
+                    "multiplier": 1
+                }
+            ],
+            "oracleLabel": "Custom oracle",
+            "oracleContentKey": "sonic-36-stS"
+        },
+        "silo1": {
+            "tokenAddress": "0x29219dd400f2Bf60E5a23d13Be72B486D4038894",
+            "symbol": "USDC",
+            "name": "Bridged USDC (Sonic Labs)",
+            "logos": {
+                "trustWallet": null,
+                "coinMarketCap": null,
+                "coinGecko": {
+                    "small": "https://coin-images.coingecko.com/coins/images/53064/small/logo.png?1735179479",
+                    "large": "https://coin-images.coingecko.com/coins/images/53064/large/logo.png?1735179479"
+                }
+            },
+            "decimals": 6,
+            "priceUsd": "999875",
+            "maxLtv": "700000000000000000",
+            "lt": "750000000000000000",
+            "solvencyOracle": {
+                "address": "0x688951Ad1FAfb55484Fd4a3f867aacA88B0Bfa4c",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "maxLtvOracle": {
+                "address": "0x688951Ad1FAfb55484Fd4a3f867aacA88B0Bfa4c",
+                "oracleKey": "none",
+                "baseToken": null,
+                "quoteToken": null,
+                "name": null
+            },
+            "collateralBaseApr": "310769549236638",
+            "collateralPrograms": [],
+            "protectedPrograms": [],
+            "debtBaseApr": "6613464449952000",
+            "debtPrograms": [],
+            "liquidity": "94797799753",
+            "tvl": "100020003226",
+            "isNonBorrowable": false,
+            "collateralPoints": [
+                {
+                    "_tag": "sonic",
+                    "multiplier": 10
+                },
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 2
+                }
+            ],
+            "protectedPoints": [
+                {
+                    "_tag": "sonic",
+                    "multiplier": 10
+                },
+                {
+                    "_tag": "silo",
+                    "basePoints": 1,
+                    "multiplier": 2
+                }
+            ],
+            "debtPoints": [
+                {
+                    "_tag": "silo",
+                    "basePoints": 0.5,
+                    "multiplier": 1
+                }
+            ],
+            "oracleLabel": "Chainlink",
+            "oracleContentKey": "sonic-usdc-chainlink"
+        }
+    },
+    {
+        "protocolKey": "sonic",
         "id": "33",
         "isVerified": true,
         "configAddress": "0x11BBa83002915bB204B348C2174626612260DDaa",
@@ -1983,7 +2258,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "519",
+            "priceUsd": "492",
             "maxLtv": "700000000000000000",
             "lt": "750000000000000000",
             "solvencyOracle": {
@@ -2006,7 +2281,7 @@ export const siloMarketData = [
             "debtBaseApr": "0",
             "debtPrograms": [],
             "liquidity": "0",
-            "tvl": "152839774755614369451289713",
+            "tvl": "155603105729528590084288306",
             "isNonBorrowable": true,
             "collateralPoints": [
                 {
@@ -2045,7 +2320,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 6,
-            "priceUsd": "999863",
+            "priceUsd": "999875",
             "maxLtv": "0",
             "lt": "0",
             "solvencyOracle": {
@@ -2062,13 +2337,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "72850053510869717",
+            "collateralBaseApr": "49015134095357700",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "117687491072496000",
+            "debtBaseApr": "96534479808864000",
             "debtPrograms": [],
-            "liquidity": "11701660526",
-            "tvl": "37494157851",
+            "liquidity": "13452189315",
+            "tvl": "30879075500",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -2122,7 +2397,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "467240",
+            "priceUsd": "443019",
             "maxLtv": "950000000000000000",
             "lt": "970000000000000000",
             "solvencyOracle": {
@@ -2139,13 +2414,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "18761005852746799",
+            "collateralBaseApr": "10217596462072708",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "42571444640544000",
+            "debtBaseApr": "31417057781712000",
             "debtPrograms": [],
-            "liquidity": "47846037334987374161669",
-            "tvl": "99695134295622855814417",
+            "liquidity": "51905433982754129497326",
+            "tvl": "84173079094585806669988",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -2192,7 +2467,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 18,
-            "priceUsd": "461502",
+            "priceUsd": "437400",
             "maxLtv": "700000000000000000",
             "lt": "750000000000000000",
             "solvencyOracle": {
@@ -2209,13 +2484,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "21266979482675075",
+            "collateralBaseApr": "37548697246148627",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "45325662550416000",
+            "debtBaseApr": "60226671117168000",
             "debtPrograms": [],
-            "liquidity": "53419517822620996398274",
-            "tvl": "119241229067552405101647",
+            "liquidity": "22248097452972032940203",
+            "tvl": "83475649149986403291402",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -2269,7 +2544,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 8,
-            "priceUsd": "84893010000",
+            "priceUsd": "82023407761",
             "maxLtv": "920000000000000000",
             "lt": "950000000000000000",
             "solvencyOracle": {
@@ -2286,13 +2561,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "4345587772779632",
+            "collateralBaseApr": "4965377270633848",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "22363230744720000",
+            "debtBaseApr": "23905079585136000",
             "debtPrograms": [],
-            "liquidity": "12263501",
-            "tvl": "15897924",
+            "liquidity": "14628463",
+            "tvl": "19359225",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -2328,7 +2603,7 @@ export const siloMarketData = [
                 "coinGecko": null
             },
             "decimals": 8,
-            "priceUsd": "84893010000",
+            "priceUsd": "82023407761",
             "maxLtv": "920000000000000000",
             "lt": "950000000000000000",
             "solvencyOracle": {
@@ -2345,13 +2620,13 @@ export const siloMarketData = [
                 "quoteToken": null,
                 "name": null
             },
-            "collateralBaseApr": "12321564583004895",
+            "collateralBaseApr": "6080023283714937",
             "collateralPrograms": [],
             "protectedPrograms": [],
-            "debtBaseApr": "37657357342848000",
+            "debtBaseApr": "26452587687408000",
             "debtPrograms": [],
-            "liquidity": "10093350",
-            "tvl": "16968700",
+            "liquidity": "17529263",
+            "tvl": "24584343",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
@@ -2397,7 +2672,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 8,
-            "priceUsd": "84893010000",
+            "priceUsd": "82023407761",
             "maxLtv": "950000000000000000",
             "lt": "970000000000000000",
             "solvencyOracle": {
@@ -2459,7 +2734,7 @@ export const siloMarketData = [
                 }
             },
             "decimals": 8,
-            "priceUsd": "84893010000",
+            "priceUsd": "82023407761",
             "maxLtv": "950000000000000000",
             "lt": "970000000000000000",
             "solvencyOracle": {
@@ -2481,8 +2756,8 @@ export const siloMarketData = [
             "protectedPrograms": [],
             "debtBaseApr": "0",
             "debtPrograms": [],
-            "liquidity": "3575",
-            "tvl": "3575",
+            "liquidity": "54514",
+            "tvl": "54514",
             "isNonBorrowable": false,
             "collateralPoints": [
                 {
