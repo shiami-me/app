@@ -9,6 +9,7 @@ import ChatMain from "@/components/chat/Main";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
 import ContextDisplay from "@/components/chat/ContextDisplay";
 
 export default function FloatingChat({
@@ -68,7 +69,7 @@ export default function FloatingChat({
     if (!input.trim()) return;
     
     if (!chatId) {
-      const newChatId = caller.split("/").join("-");
+      const newChatId = caller.split("/").join("-") + "-" + uuidv4();
       const chats = JSON.parse(localStorage.getItem("chats") || "{}");
       chats[newChatId] = { id: newChatId, title: caller.split("/").map(toTitleCase).join(" ") };
       localStorage.setItem("chats", JSON.stringify(chats));
