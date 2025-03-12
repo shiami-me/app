@@ -144,7 +144,7 @@ const ChatMain: React.FC<Props> = ({
                 <div key={message.id} className="flex justify-end">
                   <div
                     className={
-                      "max-w-[75%] rounded-3xl px-5 py-3 bg-primary text-primary-foreground"
+                      "max-w-[75%] font-semibold rounded-3xl px-5 py-3 bg-primary text-primary-foreground"
                     }
                   >
                     <p className="text-md break-words whitespace-pre-wrap">
