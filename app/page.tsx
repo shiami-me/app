@@ -161,6 +161,12 @@ export default function Home() {
                   Try Demo
                 </Button>
               </Link>
+              <Link href="https://docs.shiami.me" target='_blank'>
+                <Button variant="ghost" 
+                  className={!scrolled ? "text-gray-800 dark:text-gray-200 border-gray-800 dark:border-gray-200" : ""}>
+                  Docs
+                </Button>
+              </Link>
               <ModeToggle />
             </div>
           </div>

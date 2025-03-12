@@ -15,6 +15,7 @@ import {
   Plus,
   ChevronRight,
   CreditCard,
+  FileText,
 } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavDashboards } from "@/components/nav-dashboards";
@@ -81,6 +82,11 @@ const data: any = {
       icon: History,
     },
   ],
+  docs: {
+    name: "Documentation",
+    url: "https://docs.shiami.me",
+    icon: FileText,
+  },
 };
 
 export function AppSidebar() {
@@ -323,7 +329,24 @@ export function AppSidebar() {
 
       {/* Footer */}
       <div className="border-t p-3 flex items-center justify-between mt-auto bg-muted/10">
-        <ModeToggle />
+        <div className="flex items-center gap-2">
+          <ModeToggle />
+          <a 
+            href={data.docs.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block"
+          >
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 rounded-full hover:bg-muted/60"
+              title="Documentation"
+            >
+              <FileText className="h-4 w-4" />
+            </Button>
+          </a>
+        </div>
         {(!collapsed || mobileOpen) && (
           <Button 
             variant="ghost" 
