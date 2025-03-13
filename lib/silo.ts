@@ -362,6 +362,46 @@ export const getUpdatedSiloMarketData = async (publicClient: PublicClient, marke
   return updatedMarkets;
 };
 
+export async function getUpdatedMarketsForTokens(
+  publicClient: PublicClient, 
+  marketData: any[], 
+  requestedTokens: string[]
+): Promise<any[]> {
+  const siloConnection = new SiloConnection(publicClient);
+  const filteredMarkets = [];
+
+  // First, filter the markets based on the requested tokens
+  for (const market of marketData) {
+    const marketTokens = [
+      market.silo0.symbol.toLowerCase(),
+      market.silo1.symbol.toLowerCase()
+    ];
+    // Count how many requested tokens are in this market
+    const matchCount = requestedTokens.filter(token => 
+      marketTokens.includes(token.toLowerCase())
+    ).length;
+    
+    // Check if at least two tokens match (or all tokens if less than 2 requested)
+    const minRequired = Math.min(2, requestedTokens.length);
+    if (matchCount >= minRequired) {
+      try {
+        // Now update only the markets that match our filter
+        const updatedSilo0 = await siloConnection.updateSiloMarketData(market, 0);
+        const updatedMarket = await siloConnection.updateSiloMarketData(updatedSilo0, 1);
+        filteredMarkets.push(updatedMarket);
+      } catch (error) {
+        console.error(`Error updating market ${market.id}:`, error);
+        // Include the market anyway, but with the original data
+        filteredMarkets.push(market);
+      }
+    }
+  }
+
+  return filteredMarkets;
+}
+
+
+
 // Get complete user position data
 export const getUserPositionData = async (
   publicClient: PublicClient,
