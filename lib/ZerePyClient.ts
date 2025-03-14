@@ -82,7 +82,7 @@ export class ZerePyClient {
         } else if (parsed.status === "error") {
           setMessages((prev) =>
             prev.map((msg) =>
-              msg.id === messageId ? { ...msg, text: `Error: ${parsed.message}` } : msg
+              msg.id === messageId ? { ...msg, text: `Error: ${parsed.error}` } : msg
             )
           );
           ws.close();
