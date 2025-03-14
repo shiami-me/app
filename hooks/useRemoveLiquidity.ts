@@ -1,10 +1,19 @@
 import { useCallback } from "react";
+import { encodeFunctionData } from "viem";
 import { waitForTransactionReceipt } from "@wagmi/core";
+import { usePublicClient, useWalletClient } from "wagmi";
 import { Message } from "@/types/messages";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { RemoveLiquidity, TransactionStatus } from "@/types/transaction";
 import { config } from "@/providers/WalletProvider";
 import { useCancelTransaction } from "@/hooks/useCancelTransaction";
+import { ERC20_ABI } from "@/utils/abis";
+import {
+  RemoveLiquidityBoostedV3,
+  Slippage,
+  TokenAmount,
+  PermitHelper,
+} from "@balancer/sdk";
 
 interface UseRemoveLiquidityProps {
   tx: RemoveLiquidity;
@@ -27,6 +36,8 @@ export const useRemoveLiquidity = ({
   updateStatus,
   chat,
 }: UseRemoveLiquidityProps) => {
+  const walletClient = useWalletClient();
+  const publicClient = usePublicClient();
   const cancelTransaction = useCancelTransaction({
     txType: "withdraw",
     client,
@@ -37,12 +48,58 @@ export const useRemoveLiquidity = ({
 
   return useCallback(async () => {
     try {
+      updateStatus("approving");
+
+      let transaction: any;
+      if (tx.permitData && walletClient.data?.account) {
+        updateStatus("signing");
+        const client = {
+          ...publicClient, // Use publicClient for reads
+          signTypedData: walletClient.data.signTypedData.bind(walletClient), // Use walletClient for signing
+        };
+        
+        const removeLiquidity = new RemoveLiquidityBoostedV3();
+        const slippage = Slippage.fromPercentage(
+          tx.permitData.slippage.percentage.toString() as `${number}`
+        );
+        const queryOutput = {
+          ...tx.permitData.queryOutput,
+          amountsOut: tx.permitData.queryOutput.amountsOut.map((amount) =>
+            TokenAmount.fromRawAmount(amount.token, BigInt(amount.amount))
+          ),
+          bptIn: TokenAmount.fromRawAmount(
+            tx.permitData.queryOutput.bptIn.token,
+            BigInt(tx.permitData.queryOutput.bptIn.amount)
+          ),
+        };
+        
+        const permit2 = await PermitHelper.signRemoveLiquidityBoostedApproval({
+          ...queryOutput,
+          slippage,
+          client: client as any,
+          owner: walletClient.data?.account,
+        });
+        
+        const call = removeLiquidity.buildCallWithPermit(
+          { ...queryOutput, slippage },
+          permit2
+        );
+        
+        transaction = {
+          to: call.to,
+          data: call.callData,
+          value: BigInt(call.value),
+        };
+      } else {
+        transaction = tx.transaction;
+      }
+      
       updateStatus("confirming");
       
       const result = {
-        to: tx.transaction.to as `0x${string}`,
-        data: tx.transaction.data as `0x${string}`,
-        value: tx.transaction.value,
+        to: transaction.to as `0x${string}`,
+        data: transaction.data as `0x${string}`,
+        value: transaction.value,
       };
       
       await sendTransaction(result, {
@@ -92,6 +149,8 @@ export const useRemoveLiquidity = ({
     setMessages,
     messages,
     client,
+    walletClient,
+    publicClient,
     cancelTransaction,
     updateStatus,
     chat

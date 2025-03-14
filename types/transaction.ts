@@ -1,3 +1,5 @@
+import { AddLiquidityBoostedQueryOutput, Address, ExactInQueryOutput, ExactOutQueryOutput, Path, RemoveLiquidityBoostedQueryOutput, Slippage } from "@balancer/sdk";
+
 type TransactionType =
   | "transfer"
   | "swap"
@@ -15,6 +17,24 @@ export interface TransactionData {
   data: string;
   value: bigint;
 }
+
+export type BeetsSwap = {
+  transaction: {
+    to: string;
+    data: string;
+    value: number;
+  };
+  approvals: {
+    token: string;
+    spender: string;
+    amount: number;
+  }[];
+  paths: Path[];
+  permitData: {
+    slippage: Slippage;
+    queryOutput: ExactInQueryOutput;
+  }
+};
 
 export interface BaseTransaction {
   type: TransactionType;
@@ -49,7 +69,7 @@ export interface ApproveTransaction {
 }
 
 export interface AddLiquidity {
-  transaction: TransactionData;
+  transaction?: TransactionData;
   priceImpact?: string;
   expectedBptOut?: string;
   poolAddress: string;
@@ -61,7 +81,11 @@ export interface AddLiquidity {
       spender: string;
     }
   ];
-  minBptOut: string;
+  minBptOut?: string;
+  permitData?: {
+    slippage: Slippage;
+    queryOutput: AddLiquidityBoostedQueryOutput;
+  };
 }
 
 export interface TokenAmountData {
@@ -85,9 +109,18 @@ export interface RemoveLiquidity {
   // Additional metadata
   poolAddress?: string; // Pool contract address
   priceImpact?: string | number; // Price impact as percentage
+  permitData?: {
+    slippage: Slippage;
+    queryOutput: RemoveLiquidityBoostedQueryOutput;
+  };
 }
 
-export type Tx = BaseTransaction | ApproveTransaction | AddLiquidity | RemoveLiquidity;
+export type Tx =
+  | BaseTransaction
+  | ApproveTransaction
+  | AddLiquidity
+  | RemoveLiquidity
+  | BeetsSwap;
 
 export function isBaseTransaction(tx: Tx): tx is BaseTransaction {
   return "type" in tx;
@@ -98,13 +131,15 @@ export function isApproveTransaction(tx: Tx): tx is ApproveTransaction {
 }
 
 export function isAddLiquidity(tx: Tx): tx is AddLiquidity {
-  return "approvals" in tx;
+  return "approvals" in tx && "expectedBptOut" in tx;
 }
 
-export function isRemoveLiquidity(
-  tx: Tx
-): tx is RemoveLiquidity {
-  return "transaction" in tx;
+export function isRemoveLiquidity(tx: Tx): tx is RemoveLiquidity {
+  return ("bptIn" in tx || "expectedAmountsOut" in tx || "tokenOut" in tx);
+}
+
+export function isBeetsSwap(tx: Tx): tx is BeetsSwap {
+  return "paths" in tx && "approvals" in tx;
 }
 
 export type TransactionStatus = {
@@ -112,6 +147,7 @@ export type TransactionStatus = {
     | "idle"
     | "approving"
     | "approved"
+    | "signing"
     | "confirming"
     | "confirmed"
     | "failed";

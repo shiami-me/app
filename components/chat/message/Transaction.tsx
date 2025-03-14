@@ -5,7 +5,8 @@ import {
   isBaseTransaction, 
   isApproveTransaction,
   isAddLiquidity,
-  isRemoveLiquidity
+  isRemoveLiquidity,
+  isBeetsSwap
 } from "@/types/transaction";
 import { Config, useAccount } from "wagmi";
 import { SendTransactionMutateAsync } from "wagmi/query";
@@ -13,6 +14,7 @@ import SendTransaction from "./transaction/Send";
 import ApproveSendTransaction from "./transaction/Approval";
 import AddLiquidityTransaction from "./transaction/AddLiquidity";
 import RemoveLiquidityTransaction from "./transaction/RemoveLiquidity";
+import BeetsSwapTransaction from "./transaction/BeetsSwap";
 import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { useCancelTransaction } from "@/hooks/useCancelTransaction";
@@ -46,6 +48,8 @@ const Transaction: React.FC<Props> = ({
     txType = "deposit";
   } else if (isRemoveLiquidity(tx)) {
     txType = "withdraw";
+  } else if (isBeetsSwap(tx)) {
+    txType = "swap";
   }
   
   const cancelTransaction = useCancelTransaction({
@@ -95,6 +99,16 @@ const Transaction: React.FC<Props> = ({
         />
       ) : isRemoveLiquidity(tx) ? (
         <RemoveLiquidityTransaction
+          tx={tx}
+          account={account.address!}
+          sendTransaction={sendTransaction}
+          setMessages={setMessages}
+          messages={messages}
+          client={client}
+          closeModal={() => setIsModalOpen(false)}
+        />
+      ) : isBeetsSwap(tx) ? (
+        <BeetsSwapTransaction
           tx={tx}
           account={account.address!}
           sendTransaction={sendTransaction}

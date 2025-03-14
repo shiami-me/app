@@ -26,7 +26,13 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({ status }) => {
           <span>Approved! Processing...</span>
         </div>
       );
-      
+    case 'signing':
+      return (
+        <div className="flex items-center">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <span>Signing...</span>
+        </div>
+      );
     case 'confirming':
       return (
         <div className="flex items-center">

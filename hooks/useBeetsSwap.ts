@@ -5,18 +5,13 @@ import { usePublicClient, useWalletClient } from "wagmi";
 import { Message } from "@/types/messages";
 import { ZerePyClient } from "@/lib/ZerePyClient";
 import { ERC20_ABI } from "@/utils/abis";
-import { AddLiquidity, TransactionStatus } from "@/types/transaction";
+import { BeetsSwap, TransactionStatus } from "@/types/transaction";
 import { config } from "@/providers/WalletProvider";
 import { useCancelTransaction } from "@/hooks/useCancelTransaction";
-import {
-  AddLiquidityBoostedV3,
-  Permit2Helper,
-  Slippage,
-  TokenAmount,
-} from "@balancer/sdk";
+import { ExactInQueryOutput, Permit2Helper, Slippage, Swap, SwapKind, TokenAmount } from "@balancer/sdk";
 
-interface UseAddLiquidityProps {
-  tx: AddLiquidity;
+interface UseBeetsSwapProps {
+  tx: BeetsSwap;
   account: string;
   sendTransaction: any;
   setMessages: (messages: Message[]) => void;
@@ -26,7 +21,7 @@ interface UseAddLiquidityProps {
   chat: string;
 }
 
-export const useAddLiquidity = ({
+export const useBeetsSwap = ({
   tx,
   account,
   sendTransaction,
@@ -35,11 +30,11 @@ export const useAddLiquidity = ({
   client,
   updateStatus,
   chat,
-}: UseAddLiquidityProps) => {
-  const walletClient = useWalletClient();
+}: UseBeetsSwapProps) => {
   const publicClient = usePublicClient();
+  const walletClient = useWalletClient();
   const cancelTransaction = useCancelTransaction({
-    txType: "deposit",
+    txType: "swap",
     client,
     setMessages,
     messages,
@@ -52,6 +47,7 @@ export const useAddLiquidity = ({
 
       // Process all required token approvals
       for (const approval of tx.approvals) {
+        if (approval.token === "0x0000000000000000000000000000000000000000" || approval.token === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") continue;
         const allowance = (await publicClient?.readContract({
           address: approval.token as `0x${string}`,
           abi: ERC20_ABI,
@@ -59,13 +55,16 @@ export const useAddLiquidity = ({
           args: [account, approval.spender],
         })) as unknown as bigint;
 
-        if (BigInt(allowance) < BigInt(approval.amount)) {
+        // Convert approval amount to BigInt for comparison
+        const approvalAmount = BigInt(approval.amount.toString());
+
+        if (BigInt(allowance) < approvalAmount) {
           const approveTx = await sendTransaction({
             to: approval.token as `0x${string}`,
             data: encodeFunctionData({
               abi: ERC20_ABI,
               functionName: "approve",
-              args: [approval.spender, approval.amount],
+              args: [approval.spender, approvalAmount],
             }),
           });
 
@@ -86,6 +85,7 @@ export const useAddLiquidity = ({
           }
         }
       }
+
       let transaction: any;
       if (tx.permitData && walletClient.data?.account) {
         updateStatus("signing");
@@ -93,35 +93,43 @@ export const useAddLiquidity = ({
           ...publicClient, // ✅ Use publicClient for reads
           signTypedData: walletClient.data.signTypedData.bind(walletClient), // ✅ Use walletClient for signing
         };
-        
-        const addLiquidity = new AddLiquidityBoostedV3();
+        const swap = new Swap({
+          chainId: 146,
+          paths: tx.paths,
+          swapKind: SwapKind.GivenIn,
+        });
         const slippage = Slippage.fromPercentage(
           tx.permitData.slippage.percentage.toString() as `${number}`
         );
-        const queryOutput = {
+        const queryOutput: ExactInQueryOutput = {
           ...tx.permitData.queryOutput,
-          amountsIn: tx.permitData.queryOutput.amountsIn.map((amount) =>
-            TokenAmount.fromRawAmount(amount.token, BigInt(amount.amount))
+          amountIn: TokenAmount.fromRawAmount(
+            tx.permitData.queryOutput.amountIn.token,
+            BigInt(tx.permitData.queryOutput.amountIn.amount)
           ),
-          bptOut: TokenAmount.fromRawAmount(
-            tx.permitData.queryOutput.bptOut.token,
-            BigInt(tx.permitData.queryOutput.bptOut.amount)
+          pathAmounts: tx.permitData.queryOutput.pathAmounts?.map((amount) =>
+            BigInt(amount)
+          ),
+          expectedAmountOut: TokenAmount.fromRawAmount(
+            tx.permitData.queryOutput.expectedAmountOut.token,
+            BigInt(tx.permitData.queryOutput.expectedAmountOut.amount)
           ),
         };
-        const permit2 = await Permit2Helper.signAddLiquidityBoostedApproval({
-          ...queryOutput,
+        const permit2 = await Permit2Helper.signSwapApproval({
+          queryOutput,
           slippage,
           client: client as any,
+          wethIsEth: true,
           owner: walletClient.data?.account,
         });
-        const call = addLiquidity.buildCallWithPermit2(
-          { ...queryOutput, slippage },
+        const call = swap.buildCallWithPermit2(
+          { queryOutput, slippage },
           permit2
         );
         transaction = {
           to: call.to,
           data: call.callData,
-          value: BigInt(call.value),
+          value: call.value ? BigInt(call.value) : BigInt(0),
         };
       } else transaction = tx.transaction;
       // All approvals successful, proceed with actual transaction
@@ -135,12 +143,20 @@ export const useAddLiquidity = ({
 
       await sendTransaction(result, {
         onSuccess: async (data: any) => {
-          const confirmMessage = `## Liquidity Added Successfully 🚀\n\n**Transaction Details:**\n- **Status:** Confirmed ✅\n- **Hash:** [${data.slice(
+          // Create transaction confirmation message
+          const tokenIn = tx.paths[0].tokens[0].address;
+          const tokenOut =
+            tx.paths[0].tokens[tx.paths[0].tokens.length - 1].address;
+          const inputAmount = tx.paths[0].inputAmountRaw;
+          const outputAmount = tx.paths[0].outputAmountRaw;
+
+          const confirmMessage = `## Swap Executed Successfully 🔄\n\n**Transaction Details:**\n- **Status:** Confirmed ✅\n- **Hash:** [${data.slice(
             0,
             10
           )}...${data.slice(
             -8
-          )}](https://sonicscan.org/tx/${data})\n\nView complete transaction on [Sonic Explorer](https://sonicscan.org/tx/${data})`;
+          )}](https://sonicscan.org/tx/${data})\n- **Swapped:** ${inputAmount} of token ${tokenIn}\n- **For:** ${outputAmount} of token ${tokenOut}\n\nView complete transaction on [Sonic Explorer](https://sonicscan.org/tx/${data})`;
+
           try {
             const txReceipt = await waitForTransactionReceipt(config, {
               hash: data,
@@ -185,7 +201,7 @@ export const useAddLiquidity = ({
     setMessages,
     messages,
     client,
-    walletClient,
+    publicClient,
     cancelTransaction,
     updateStatus,
     chat,
