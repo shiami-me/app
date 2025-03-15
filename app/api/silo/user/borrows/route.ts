@@ -51,8 +51,8 @@ export async function GET(request: NextRequest) {
         maxBorrowAmountFormatted: formatUnits(maxBorrowAmount),
         loanToValuePercentage: ((Number(loanToValue) / 10**18) * 100).toFixed(2) + '%',
         // Calculate remaining borrow capacity
-        remainingBorrowCapacity: (BigInt(maxBorrowAmount) - BigInt(borrowedAmount)).toString(),
-        remainingBorrowCapacityFormatted: formatUnits((BigInt(maxBorrowAmount) - BigInt(borrowedAmount)).toString()),
+        remainingBorrowCapacity: maxBorrowAmount,
+        remainingBorrowCapacityFormatted: formatUnits((BigInt(maxBorrowAmount)).toString()),
       },
       timestamp: new Date().toISOString(),
     }, { status: 200 });

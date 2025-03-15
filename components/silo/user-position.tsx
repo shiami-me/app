@@ -94,7 +94,7 @@ const SiloUserPosition = ({ silo, userData, silo1 }: { silo: any, userData: any,
         <div className="bg-gray-50 dark:bg-gray-800/40 p-4 rounded-lg">
           <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Available to Borrow</h3>
           <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-            {(Number(position.maxBorrowAmount) - Number(position.borrowedAmount)) / 10**silo.decimals} {silo.symbol}
+            {(Number(position.maxBorrowAmount)) / 10**silo.decimals} {silo.symbol}
           </p>
         </div>
       </div>

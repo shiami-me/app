@@ -2249,35 +2249,6 @@ export const SILO_ABI = [
         name: "_owner",
         type: "address",
       },
-    ],
-    name: "withdraw",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "shares",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_assets",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_receiver",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_owner",
-        type: "address",
-      },
       {
         internalType: "enum ISilo.CollateralType",
         name: "_collateralType",

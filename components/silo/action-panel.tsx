@@ -370,7 +370,7 @@ const BorrowPanel = ({ siloData, userData, token0, token1 }: { siloData: any, us
   const { borrow, loading } = useSiloBorrow();
   
   const maxBorrow = userData?.position 
-    ? (Number(userData.position.maxBorrowAmount) - Number(userData.position.borrowedAmount)) / 10**siloData.decimals 
+    ? (userData.position.maxBorrowAmount) / 10**siloData.decimals 
     : 0;
     
   const isBorrowDisabled = !siloData || siloData.isNonBorrowable || maxBorrow <= 0;
