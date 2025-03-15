@@ -16,6 +16,8 @@ import { useSetActiveWallet } from "@privy-io/wagmi";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TemplatesList from "@/components/agent-creation/templates-list";
 
 const MAX_AGENTS = 5;
 
@@ -27,12 +29,13 @@ const CreateAgentPage = () => {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSettingWallet, setIsSettingWallet] = useState(false);
-  const client = new ZerePyClient("https://api.shiami.me");
+  const client = new ZerePyClient("http://localhost:8001");
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { wallets, ready: walletsReady } = useWallets();
   const { setActiveWallet } = useSetActiveWallet();
   const [ disabled, setDisabled ] = useState(["transactions", "silo"])
+  const [activeTab, setActiveTab] = useState("templates");
 
   useEffect(() => {
     (async () => {
@@ -244,109 +247,129 @@ const CreateAgentPage = () => {
         </Card>
       </div>
 
-      <div className="grid gap-6">
-        {/* Task input */}
-        <Card className="p-6">
-          <h2 className="text-lg font-medium mb-3">Define Task</h2>
-          <div className="flex gap-4 mb-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Enter the task you want the agents to perform..."
-                value={task}
-                onChange={(e) => setTask(e.target.value)}
-                className="h-12"
-              />
-            </div>
-            <div className="flex flex-col items-end">
-              <Button 
-                onClick={() => setIsModalOpen(true)} 
-                className="gap-1"
-                disabled={agents.length >= MAX_AGENTS}
-              >
-                <PlusCircle size={18} /> Add Agent
-              </Button>
-              <span className="text-xs text-muted-foreground mt-1">
-                {agents.length}/{MAX_AGENTS} agents
-              </span>
-            </div>
-          </div>
+      <Tabs 
+        defaultValue="templates" 
+        value={activeTab} 
+        onValueChange={setActiveTab}
+        className="mb-6"
+      >
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="templates">Templates</TabsTrigger>
+          <TabsTrigger value="custom">Custom Workflow</TabsTrigger>
+        </TabsList>
 
-          {/* Additional inputs for name and is_one_time */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            <div className="space-y-2">
-              <Label htmlFor="workflow-name">Workflow Name</Label>
-              <Input
-                id="workflow-name"
-                placeholder={isOneTime ? "Optional for one-time workflows" : "Required for reusable workflows"}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required={!isOneTime}
-              />
-            </div>
-            <div className="flex items-center justify-between space-x-2">
-              <div>
-                <Label htmlFor="is-one-time">One-time Workflow</Label>
-                <p className="text-sm text-muted-foreground">
-                  One-time workflows are executed once and not saved for future use
-                </p>
+        <TabsContent value="templates">
+          <TemplatesList onSelect={() => {
+            // We're not using this onSelect anymore as the templates handle their own creation
+          }} />
+        </TabsContent>
+
+        <TabsContent value="custom">
+          <div className="grid gap-6">
+            {/* Task input */}
+            <Card className="p-6">
+              <h2 className="text-lg font-medium mb-3">Define Task</h2>
+              <div className="flex gap-4 mb-4">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Enter the task you want the agents to perform..."
+                    value={task}
+                    onChange={(e) => setTask(e.target.value)}
+                    className="h-12"
+                  />
+                </div>
+                <div className="flex flex-col items-end">
+                  <Button 
+                    onClick={() => setIsModalOpen(true)} 
+                    className="gap-1"
+                    disabled={agents.length >= MAX_AGENTS}
+                  >
+                    <PlusCircle size={18} /> Add Agent
+                  </Button>
+                  <span className="text-xs text-muted-foreground mt-1">
+                    {agents.length}/{MAX_AGENTS} agents
+                  </span>
+                </div>
               </div>
-              <Switch 
-                id="is-one-time"
-                checked={isOneTime}
-                onCheckedChange={setIsOneTime}
-              />
-            </div>
+
+              {/* Additional inputs for name and is_one_time */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="workflow-name">Workflow Name</Label>
+                  <Input
+                    id="workflow-name"
+                    placeholder={isOneTime ? "Optional for one-time workflows" : "Required for reusable workflows"}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required={!isOneTime}
+                  />
+                </div>
+                <div className="flex items-center justify-between space-x-2">
+                  <div>
+                    <Label htmlFor="is-one-time">One-time Workflow</Label>
+                    <p className="text-sm text-muted-foreground">
+                      One-time workflows are executed once and not saved for future use
+                    </p>
+                  </div>
+                  <Switch 
+                    id="is-one-time"
+                    checked={isOneTime}
+                    onCheckedChange={setIsOneTime}
+                  />
+                </div>
+              </div>
+            </Card>
+
+            {/* Agents list */}
+            <Card className="p-6">
+              <h2 className="text-lg font-medium mb-3">Agent Workflow</h2>
+              {agents.length > 0 ? (
+                <>
+                  <AgentsList 
+                    agents={agents} 
+                    onDelete={handleDeleteAgent} 
+                    onReorder={handleReorderAgents} 
+                  />
+                  
+                  <Alert className="mt-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50">
+                    <KeyRound className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <AlertDescription className="text-sm text-blue-800 dark:text-blue-300">
+                      Creating an agent requires your signature using the embedded wallet. You&apos;ll be prompted to sign a message.
+                    </AlertDescription>
+                  </Alert>
+                </>
+              ) : (
+                <div className="text-center py-12 border border-dashed rounded-lg">
+                  <p className="text-muted-foreground">
+                    No agents added yet. Add agents to create your workflow.
+                  </p>
+                </div>
+              )}
+
+              {agents.length > 0 && (
+                <div className="mt-6 flex justify-end">
+                  <Button 
+                    onClick={handleSubmit} 
+                    disabled={isSubmitting || isSettingWallet || (!isOneTime && !name.trim())} 
+                    className="gap-2"
+                  >
+                    {isSubmitting || isSettingWallet ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" /> 
+                        {isSettingWallet ? "Setting wallet..." : "Creating..."}
+                      </>
+                    ) : (
+                      <>
+                        <Save size={18} /> Create Workflow
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </Card>
           </div>
-        </Card>
-
-        {/* Agents list */}
-        <Card className="p-6">
-          <h2 className="text-lg font-medium mb-3">Agent Workflow</h2>
-          {agents.length > 0 ? (
-            <>
-              <AgentsList 
-                agents={agents} 
-                onDelete={handleDeleteAgent} 
-                onReorder={handleReorderAgents} 
-              />
-              
-              <Alert className="mt-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50">
-                <KeyRound className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <AlertDescription className="text-sm text-blue-800 dark:text-blue-300">
-                  Creating an agent requires your signature using the embedded wallet. You&apos;ll be prompted to sign a message.
-                </AlertDescription>
-              </Alert>
-            </>
-          ) : (
-            <div className="text-center py-12 border border-dashed rounded-lg">
-              <p className="text-muted-foreground">
-                No agents added yet. Add agents to create your workflow.
-              </p>
-            </div>
-          )}
-
-          {agents.length > 0 && (
-            <div className="mt-6 flex justify-end">
-              <Button 
-                onClick={handleSubmit} 
-                disabled={isSubmitting || isSettingWallet || (!isOneTime && !name.trim())} 
-                className="gap-2"
-              >
-                {isSubmitting || isSettingWallet ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> 
-                    {isSettingWallet ? "Setting wallet..." : "Creating..."}
-                  </>
-                ) : (
-                  <>
-                    <Save size={18} /> Create Workflow
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </Card>
-      </div>
+        </TabsContent>
+      </Tabs>
 
       <AddAgentModal 
         isOpen={isModalOpen} 
