@@ -7,6 +7,9 @@ import Image from "next/image";
 import { BookOpen, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "../ui/card";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import remarkBreaks from "remark-breaks";
 
 interface Props {
   sources: Source[];
@@ -58,7 +61,32 @@ const Sources: React.FC<Props> = (props: Props) => {
         </div>
         ) : (
         <ReactMarkdown
-          components={props.components}
+          remarkPlugins={[remarkGfm, remarkBreaks]}
+          rehypePlugins={[rehypeHighlight]}
+          components={{
+            table: ({ children }) => (
+              <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
+                {children}
+              </table>
+            ),
+            th: ({ children }) => (
+              <th className="border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-left">
+                {children}
+              </th>
+            ),
+            td: ({ children }) => (
+              <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">
+                {children}
+              </td>
+            ),
+            a: ({ ...props }) => (
+              <a
+                {...props}
+                target="_blank"
+                className="text-blue-600 hover:underline dark:text-blue-400"
+              />
+            ),
+          }}
           className="text-md prose dark:prose-invert max-w-none break-words whitespace-pre-wrap"
         >
           {props.response}
