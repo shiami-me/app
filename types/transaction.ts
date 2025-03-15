@@ -10,6 +10,7 @@ type TransactionType =
   | "bridge"
   | "stake"
   | "undelegate"
+  | "claim_rewards"
   | "withdraw_stake";
 
 export interface TransactionData {
