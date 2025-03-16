@@ -12,7 +12,7 @@ import { useChat } from "@/providers/ChatProvider";
 
 const chatSuggestions = [
   {
-    text: "Swap 1 S to Anon",
+    text: "Top 5 Looping Opportunities on Silo Finance",
     color: "text-blue-500/90 border-blue-200/50 dark:border-blue-500/20",
     icon: <Gauge className="w-5 h-5" />,
   },
