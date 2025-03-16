@@ -23,7 +23,7 @@ interface Props {
 const Sources: React.FC<Props> = (props: Props) => {
   const [openSourceIndex, setOpenSourceIndex] = useState<number | null>(null);
   const [toolMessage, setToolMessage] = useState<string | null>(null);
-
+  console.log(props.response);
   useEffect(() => {
     try {
       const parsedResponse = JSON.parse(props.response);
@@ -86,10 +86,14 @@ const Sources: React.FC<Props> = (props: Props) => {
                 className="text-blue-600 hover:underline dark:text-blue-400"
               />
             ),
+            p: ({ children }) => (
+              <p className="my-1">{children}</p>
+            ),
+            br: () => <br className="leading-tight" />
           }}
           className="text-md prose dark:prose-invert max-w-none break-words whitespace-pre-wrap"
         >
-          {props.response}
+          {props.response.replace(/\n/g, '  \n')}
         </ReactMarkdown>
 
         )}
