@@ -130,20 +130,17 @@ export function useSiloMarkets(filteredToken: string | null, marketIds: number[]
     setError(null);
 
     try {
-      const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-      const url = new URL("/api/silo/filter", baseURL);
-      
-      // Add token filter if provided
+      const params = new URLSearchParams();
+
       if (filteredToken) {
-        url.searchParams.append("tokens", filteredToken);
+        params.append("tokens", filteredToken);
       }
-      
-      const response = await fetch(url.toString(), {
+
+      const response = await fetch(`/api/silo/filter?${params.toString()}`, {
         headers: {
           "Content-Type": "application/json"
         }
       });
-
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
