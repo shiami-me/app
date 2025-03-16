@@ -19,11 +19,12 @@ export const useSiloWithdraw = () => {
     amount: number,
     receiver?: string,
     collateralType: number = 0,
+    id?: string
   ) => {
     setLoading(true);
     try {
       const { configAddress, isToken0Silo0, tokenAddress, decimals } = 
-        await getSiloConfigAddress(token0, token1);
+        await getSiloConfigAddress(token0, token1, id);
 
       const siloConn = new SiloConnection(publicClient!);
       const siloAddress = await siloConn.getSiloAddress(configAddress, isToken0Silo0 ? 0 : 1);

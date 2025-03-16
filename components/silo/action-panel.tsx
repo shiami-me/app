@@ -186,7 +186,7 @@ const DepositPanel = ({ siloData, userData, token0, token1 }: { siloData: any, u
     }
 
     try {
-      await deposit(token0, token1, parseFloat(amount), isProtected ? 0 : 1);
+      await deposit(token0, token1, parseFloat(amount), isProtected ? 0 : 1, siloData.id);
       toast.success("Deposit successful", {
         description: `Successfully deposited ${amount} ${siloData.symbol}`
       });
@@ -278,7 +278,7 @@ const WithdrawPanel = ({ siloData, userData, token0, token1 }: { siloData: any, 
     }
 
     try {
-      await withdraw(token0, token1, parseFloat(amount), undefined, isProtected ? 0 : 1);
+      await withdraw(token0, token1, parseFloat(amount), undefined, isProtected ? 0 : 1, siloData.id);
       toast.success("Withdraw successful", {
         description: `Successfully withdrawn ${amount} ${siloData.symbol}`
       });
@@ -393,7 +393,7 @@ const BorrowPanel = ({ siloData, userData, token0, token1 }: { siloData: any, us
     }
 
     try {
-      await borrow(token0, token1, parseFloat(amount));
+      await borrow(token0, token1, parseFloat(amount), siloData.id);
       toast.success("Borrow successful", {
         description: `Successfully borrowed ${amount} ${siloData.symbol}`
       });
@@ -507,7 +507,7 @@ const RepayPanel = ({ siloData, userData, token0, token1 }: { siloData: any, use
     }
 
     try {
-      await repay(token0, token1, parseFloat(amount));
+      await repay(token0, token1, parseFloat(amount), siloData.id);
       toast.success("Repay successful", {
         description: `Successfully repaid ${amount} ${siloData.symbol}`
       });

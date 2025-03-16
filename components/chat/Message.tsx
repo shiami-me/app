@@ -13,6 +13,8 @@ import {
 import RenderImage from "./message/Image";
 import Transaction from "./message/Transaction";
 import { isAddLiquidity, isApproveTransaction, isBaseTransaction, isBeetsSwap, isRemoveLiquidity } from "@/types/transaction";
+import { isStrategyOutput } from "@/types/messages";
+import StrategyOutput from "./message/StrategyOutput";
 
 interface Props {
   client: ZerePyClient;
@@ -77,44 +79,70 @@ const RenderMessage: React.FC<Props> = ({
         </div>
       );
     } else {
-      let txMatch;
+      let parsedData;
       try {
-        txMatch = JSON.parse(response);
+        parsedData = JSON.parse(response);
+        
+        // Check if this is strategy output
+        if (isStrategyOutput(parsedData)) {
+          return (
+            <div key={message.id} className="flex justify-start">
+              <div className="w-full md:p-5">
+                <StrategyOutput data={parsedData} />
+              </div>
+            </div>
+          );
+        }
+        
+        // Check if this is a transaction
+        if (isBaseTransaction(parsedData) || isApproveTransaction(parsedData) || 
+            isAddLiquidity(parsedData) || isRemoveLiquidity(parsedData) || isBeetsSwap(parsedData)) {
+          return (
+            <Transaction
+              tx={parsedData}
+              client={client}
+              sendTransaction={sendTransaction}
+              messages={messages}
+              setMessages={setMessages}
+            />
+          );
+        }
       } catch {
+        // Try to extract JSON from the response
         const match = response.match(/\{.*?\}/);
         try {
-          txMatch = match ? JSON.parse(match[0]) : false;
+          parsedData = match ? JSON.parse(match[0]) : false;
+          if (parsedData && (isBaseTransaction(parsedData) || isApproveTransaction(parsedData) || 
+              isAddLiquidity(parsedData) || isRemoveLiquidity(parsedData) || isBeetsSwap(parsedData))) {
+            return (
+              <Transaction
+                tx={parsedData}
+                client={client}
+                sendTransaction={sendTransaction}
+                messages={messages}
+                setMessages={setMessages}
+              />
+            );
+          }
         } catch {
-          txMatch = false;
+          parsedData = false;
         }
       }
-      console.log(txMatch)
-      if (txMatch && (isBaseTransaction(txMatch) || isApproveTransaction(txMatch) || isAddLiquidity(txMatch) || isRemoveLiquidity(txMatch) || isBeetsSwap(txMatch))) {
-        return (
-          <Transaction
-            tx={txMatch}
-            client={client}
-            sendTransaction={sendTransaction}
-            messages={messages}
-            setMessages={setMessages}
-          />
-        );
-      } else {
-        const { sources, response } = parseResponse(message.text);
-
-        return (
-          <div key={message.id} className="flex justify-start">
-            <div className="w-full md:p-5">
-              <Sources
-                sources={sources}
-                components={components}
-                message={message}
-                response={response}
-              />
-            </div>
+      
+      // Default rendering with sources
+      const { sources, response: parsedResponse } = parseResponse(message.text);
+      return (
+        <div key={message.id} className="flex justify-start">
+          <div className="w-full md:p-5">
+            <Sources
+              sources={sources}
+              components={components}
+              message={message}
+              response={parsedResponse}
+            />
           </div>
-        );
-      }
+        </div>
+      );
     }
   }
 };
