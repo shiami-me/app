@@ -88,7 +88,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({ marketData, userData }
                   height={20}
                   className="rounded-full mr-2"
                 />
-                {marketData.silo0.symbol}
+                {marketData.silo0.symbol === "S" ? "wS" : marketData.silo0.symbol}
               </Button>
               <Button 
                 variant={activeSilo === "silo1" ? "default" : "outline"} 
@@ -102,7 +102,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({ marketData, userData }
                   height={20}
                   className="rounded-full mr-2"
                 />
-                {marketData.silo1.symbol}
+                {marketData.silo1.symbol === "S" ? "wS" : marketData.silo1.symbol}
               </Button>
             </div>
           </div>
@@ -225,7 +225,6 @@ const DepositPanel = ({ siloData, userData, token0, token1 }: { siloData: any, u
       <div className="flex items-center justify-between space-x-2">
         <div>
           <span className="text-sm font-medium">Protected Mode</span>
-          <p className="text-xs text-gray-500">Protected deposits have priority during liquidations</p>
         </div>
         <Switch 
           checked={isProtected}
