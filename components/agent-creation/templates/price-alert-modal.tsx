@@ -70,7 +70,7 @@ const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
     try {
       // Create a descriptive name and task
       const workflowName = `${ticker} Price Alert (${interval}h)`;
-      const task = `Send me a price alert for token ${ticker} to ${email} every ${interval} hours`;
+      const task = `Send me a price alert for token symbol ${ticker} to ${email} every ${interval} hours`;
 
       // Create the agents sequence
       const agents: Agent[] = [
