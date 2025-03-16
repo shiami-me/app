@@ -117,6 +117,7 @@ export class SiloConnection {
     return {
       ...market,
       [siloKey]: {
+        id: market.id,
         ...market[siloKey],
         siloAddress,
         liquidity: siloData.liquidity,
@@ -312,7 +313,8 @@ export class SiloConnection {
 
 export const getSiloConfigAddress = async (
   token0: string,
-  token1: string
+  token1: string,
+  id?: string
 ): Promise<SiloConfig> => {
   // This data is still hardcoded, but the dynamic values will be fetched using SiloLens
   const siloData = siloMarketData
@@ -322,6 +324,7 @@ export const getSiloConfigAddress = async (
       (market.silo0.symbol === token0 && market.silo1.symbol === token1) ||
       (market.silo0.symbol === token1 && market.silo1.symbol === token0)
     ) {
+      if (id && market.id !== id) continue;
       return {
         configAddress: market.configAddress as Address,
         isToken0Silo0: market.silo0.symbol === token0,

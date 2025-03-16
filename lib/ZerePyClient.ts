@@ -98,6 +98,7 @@ export class ZerePyClient {
           (parsed.approve && parsed.swap) || 
           (parsed.permitData) ||
           (parsed.transaction) ||
+          (parsed.strategies) ||
           Array.isArray(parsed)
         ) {
           try {
@@ -111,7 +112,7 @@ export class ZerePyClient {
           fullResponse += chunk;
         }
       } catch {
-        if (!fullResponse.includes("type") && !fullResponse.includes("transaction") && !fullResponse.includes("permitData")) {
+        if (!fullResponse.includes("type") && !fullResponse.includes("transaction") && !fullResponse.includes("permitData") && !fullResponse.includes("strategies_count")) {
           try {
             const fullParsed = JSON.parse(fullResponse);
             if (fullParsed.tool) {
