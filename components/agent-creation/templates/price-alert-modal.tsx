@@ -89,7 +89,7 @@ const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
         {
           title: "email_formatter",
           type: "text",
-          prompt: `Format the price data into a clean, readable email template that includes the price, 24h change, volume, and a brief market summary for ${ticker}. It should just return (recepient, body)`,
+          prompt: `Format the price data into a clean, readable email template that includes the price for ${ticker}. It should just return (recepient, body)`,
           next: "notifier",
         },
         {
