@@ -130,7 +130,8 @@ export function useSiloMarkets(filteredToken: string | null, marketIds: number[]
     setError(null);
 
     try {
-      const url = new URL("http://localhost:3000/api/silo/filter");
+      const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+      const url = new URL("/api/silo/filter", baseURL);
       
       // Add token filter if provided
       if (filteredToken) {
