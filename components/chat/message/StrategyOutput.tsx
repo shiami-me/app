@@ -480,7 +480,7 @@ const YieldTableDialog: React.FC<{ strategy: Strategy }> = ({ strategy }) => {
           </DialogTitle>
         </DialogHeader>
         <motion.div 
-          className="max-h-[500px] overflow-y-auto"
+          className="max-h-[500px] overflow-y-auto custom-scrollbar"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
