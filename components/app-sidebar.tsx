@@ -16,6 +16,7 @@ import {
   ChevronRight,
   CreditCard,
   FileText,
+  Clock,
 } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavDashboards } from "@/components/nav-dashboards";
@@ -51,6 +52,11 @@ const data: any = {
       url: "/dashboard/beets",
       icon: PieChart,
     },
+    {
+      name: "Pendle",
+      url: "/dashboard/pendle",
+      icon: Clock
+    }
   ],
   // Update agents section with wallet
   agents: [
