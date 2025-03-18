@@ -27,12 +27,20 @@ export const SiloPairCard: React.FC<SiloPairCardProps> = ({ markets }) => {
           symbol: markets[0].market,
           depositAPR: markets[0].deposit_apr,
           borrowAPR: markets[0].borrow_apr,
+          collateralPrograms: markets[0].collateral_programs,
+          debtPrograms: markets[0].debt_programs,
+          collateralPoints: markets[0].collateral_points,
+          debtPoints: markets[0].debt_points,
           isBorrowable: markets[0].isBorrowable
         },
         token1: {
           symbol: markets[1].market,
           depositAPR: markets[1].deposit_apr,
           borrowAPR: markets[1].borrow_apr,
+          collateralPrograms: markets[1].collateral_programs,
+          debtPrograms: markets[1].debt_programs,
+          collateralPoints: markets[1].collateral_points,
+          debtPoints: markets[1].debt_points,
           isBorrowable: markets[1].isBorrowable
         }
       }

@@ -51,11 +51,13 @@ const MarketTable = () => {
             (
               (parseFloat(item.silo0.collateralBaseApr) / 10 ** 18) *
               100
-            ).toFixed(2) + "%",
+            ),
           borrow_apr:
-            ((parseFloat(item.silo0.debtBaseApr) / 10 ** 18) * 100).toFixed(
-              2
-            ) + "%",
+            ((parseFloat(item.silo0.debtBaseApr) / 10 ** 18) * 100),
+          collateral_programs: item.silo0.collateralPrograms,
+          debt_programs: item.silo0.debtPrograms,
+          collateral_points: item.silo0.collateralPoints,
+          debt_points: item.silo0.debtPoints,
           isBorrowable: !item.silo0.isNonBorrowable,
           logo:
             item.silo0.logos.coinGecko?.large ||
@@ -72,11 +74,13 @@ const MarketTable = () => {
             (
               (parseFloat(item.silo1.collateralBaseApr) / 10 ** 18) *
               100
-            ).toFixed(2) + "%",
+            ),
           borrow_apr:
-            ((parseFloat(item.silo1.debtBaseApr) / 10 ** 18) * 100).toFixed(
-              2
-            ) + "%",
+            ((parseFloat(item.silo1.debtBaseApr) / 10 ** 18) * 100),
+          collateral_programs: item.silo1.collateralPrograms,
+          debt_programs: item.silo1.debtPrograms,
+          collateral_points: item.silo1.collateralPoints,
+          debt_points: item.silo1.debtPoints,
           isBorrowable: !item.silo1.isNonBorrowable,
           logo:
             item.silo1.logos.coinGecko?.large ||

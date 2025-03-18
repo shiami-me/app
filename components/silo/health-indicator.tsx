@@ -21,7 +21,6 @@ export const HealthIndicator: React.FC<HealthIndicatorProps> = ({
   const liquidationThresholdPercentage = parseFloat(
     solvencyData.liquidationThresholdPercentage || "100"
   );
-  console.log(ltvPercentage, liquidationThresholdPercentage);
   // Health is based on how close the LTV is to the liquidation threshold
   const healthPercentage = Math.max(
     0,

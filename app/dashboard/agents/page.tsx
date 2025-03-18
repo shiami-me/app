@@ -95,7 +95,6 @@ const AgentsPage = () => {
     setError(null);
     try {
       const data = await client.listAgents(address);
-      console.log(data)
       setAgents(data);
     } catch (err) {
       setError((err as Error).message);
@@ -109,7 +108,6 @@ const AgentsPage = () => {
 
   useEffect(() => {
     if (address) {
-        console.log(address)
         fetchAgents();
     }
   }, [address]);

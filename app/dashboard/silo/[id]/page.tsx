@@ -54,10 +54,6 @@ export default function SiloDetailPage() {
             fetch(`/api/silo/user/solvency?siloAddress=${marketData.silo0.siloAddress}&userAddress=${userAddress}`).then(res => res.json()),
             fetch(`/api/silo/user/solvency?siloAddress=${marketData.silo1.siloAddress}&userAddress=${userAddress}`).then(res => res.json())
           ]);
-          console.log(silo0Position)
-          console.log(silo1Position)
-          console.log(silo0Solvency)
-            console.log(silo1Solvency)
           setUserData({
             silo0: {
               position: silo0Position.position,

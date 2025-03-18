@@ -1,11 +1,21 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, BadgeCheck, ExternalLink, PlusCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  BadgeCheck,
+  ExternalLink,
+  PlusCircle,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useChat } from "@/providers/ChatProvider";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SiloDetailHeaderProps {
   marketData: any;
@@ -31,19 +41,59 @@ export const SiloDetailHeader: React.FC<SiloDetailHeaderProps> = ({
           configAddress: marketData.configAddress,
           token0: {
             symbol: marketData.silo0.symbol,
-            depositAPR: ((parseFloat(marketData.silo0.collateralBaseApr) / 10 ** 18) * 100).toFixed(2) + "%",
-            borrowAPR: ((parseFloat(marketData.silo0.debtBaseApr) / 10 ** 18) * 100).toFixed(2) + "%",
+            collateralPoints: marketData.silo0.collateralPoints,
+            debtPoints: marketData.silo0.debtPoints,
+            depositAPR:
+              (
+                ((parseFloat(marketData.silo0.collateralBaseApr) +
+                  marketData.silo0.collateralPrograms.reduce(
+                    (acc: number, val: any) => acc + parseFloat(val.apr),
+                    0.0
+                  )) /
+                  10 ** 18) *
+                100
+              ).toFixed(2) + "%",
+            borrowAPR:
+              (
+                ((parseFloat(marketData.silo0.debtBaseApr) +
+                  marketData.silo0.debtPrograms.reduce(
+                    (acc: number, val: any) => acc + parseFloat(val.apr),
+                    0.0
+                  )) /
+                  10 ** 18) *
+                100
+              ).toFixed(2) + "%",
             isBorrowable: !marketData.silo0.isNonBorrowable,
           },
           token1: {
             symbol: marketData.silo1.symbol,
-            depositAPR: ((parseFloat(marketData.silo1.collateralBaseApr) / 10 ** 18) * 100).toFixed(2) + "%",
-            borrowAPR: ((parseFloat(marketData.silo1.debtBaseApr) / 10 ** 18) * 100).toFixed(2) + "%",
+            collateralPoints: marketData.silo1.collateralPoints,
+            debtPoints: marketData.silo1.debtPoints,
+            depositAPR:
+              (
+                ((parseFloat(marketData.silo1.collateralBaseApr) +
+                  marketData.silo1.collateralPrograms.reduce(
+                    (acc: number, val: any) => acc + parseFloat(val.apr),
+                    0.0
+                  )) /
+                  10 ** 18) *
+                100
+              ).toFixed(2) + "%",
+            borrowAPR:
+              (
+                ((parseFloat(marketData.silo1.debtBaseApr) +
+                  marketData.silo1.debtPrograms.reduce(
+                    (acc: number, val: any) => acc + parseFloat(val.apr),
+                    0.0
+                  )) /
+                  10 ** 18) *
+                100
+              ).toFixed(2) + "%",
             isBorrowable: !marketData.silo1.isNonBorrowable,
-          }
+          },
         },
-        user: userData || null
-      }
+        user: userData || null,
+      },
     });
   };
 

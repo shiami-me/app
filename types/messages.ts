@@ -83,6 +83,10 @@ export type StrategyOverview = {
   borrow_token_logo: string;
   deposit_apr: string;
   borrow_apr: string;
+  collateral_programs: any[];
+  debt_programs: any[];
+  collateral_points: any[];
+  debt_points: any[];
   spread: string;
   best_loops: number;
   max_leverage: string;

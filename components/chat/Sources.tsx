@@ -23,7 +23,6 @@ interface Props {
 const Sources: React.FC<Props> = (props: Props) => {
   const [openSourceIndex, setOpenSourceIndex] = useState<number | null>(null);
   const [toolMessage, setToolMessage] = useState<string | null>(null);
-  console.log(props.response);
   useEffect(() => {
     try {
       const parsedResponse = JSON.parse(props.response);

@@ -218,7 +218,13 @@ const DepositPanel = ({ siloData, userData, token0, token1 }: { siloData: any, u
         </div>
         <div className="flex justify-between text-xs text-gray-500">
           <span>Deposit Balance: {depositAmount} {siloData.symbol}</span>
-          <span>Deposit APR: {((Number(siloData.collateralBaseApr) / 10**18) * 100).toFixed(2)}%</span>
+          <span>
+            Deposit APR: {(
+              (Number(siloData.collateralBaseApr) + siloData.collateralPrograms.reduce((acc: any, program: any) => acc + Number(program.apr), 0)) 
+              / 10 ** 18 * 100
+            ).toFixed(2)}%
+          </span>
+
         </div>
       </div>
       
@@ -449,7 +455,13 @@ const BorrowPanel = ({ siloData, userData, token0, token1 }: { siloData: any, us
           </Button>
         </div>
         <div className="flex justify-between text-xs text-gray-500">
-          <span>Borrow APR: {((Number(siloData.debtBaseApr) / 10**18) * 100).toFixed(2)}%</span>
+          <span>
+            Borrow APR: {(
+              (Number(siloData.debtBaseApr) + siloData.debtPrograms.reduce((acc: any, program: any) => acc + Number(program.apr), 0)) 
+              / 10 ** 18 * 100
+            ).toFixed(2)}%
+          </span>
+
           <span>Max LTV: {((Number(siloData.maxLtv) / 10**18) * 100).toFixed(2)}%</span>
         </div>
       </div>

@@ -73,7 +73,6 @@ const SiloUserPosition = ({ silo, userData, silo1 }: { silo: any, userData: any,
 
   const { position, solvency } = userData;
   const hasBorrows = Number(position.borrowedAmount) > 0;
-  console.log(silo1)
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

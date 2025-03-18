@@ -41,7 +41,6 @@ export default function FloatingChat({
   };
   
   useEffect(() => {
-    console.log(caller)
     if (caller) {
       setChatId(caller.split("/").join("-"));
     }

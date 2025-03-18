@@ -2,8 +2,12 @@ export interface MarketData {
   id: string | number;
   reviewed: boolean;
   market: string;
-  deposit_apr: string;
-  borrow_apr: string;
+  deposit_apr: number;
+  borrow_apr: number;
+  collateral_programs: any[];
+  debt_programs: any[];
+  collateral_points: any[];
+  debt_points: any[];
   isBorrowable: boolean;
   logo: string;
   token0: string;

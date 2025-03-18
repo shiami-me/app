@@ -18,14 +18,12 @@ export const useSiloTransaction = () => {
     sendTransaction: SendTransactionMutateAsync<Config, unknown>,
   ) => {
     try {
-      console.log('checkAndApproveToken', tokenAddress, spenderAddress, amount);
       const allowance = await publicClient?.readContract({
         address: tokenAddress as `0x${string}`,
         abi: ERC20_ABI,
         functionName: 'allowance',
         args: [address, spenderAddress],
       }) as bigint;
-      console.log('allowance', allowance);
       if (allowance < amount) {
         const approveTx = await sendTransaction({
           to: tokenAddress as `0x${string}`,

@@ -39,6 +39,7 @@ import {
 import { useSiloMarkets, calculateMaxLeverage, calculateMaxYield } from "@/hooks/silo/useSiloMarkets";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
+import PointsIcon from "@/components/shared/points-icon";
 
 interface StrategyOutputProps {
   data: LoopingStrategyOutput;
@@ -196,7 +197,7 @@ const StrategyCard: React.FC<{
           </div>
 
           <motion.div 
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50/80 dark:bg-gray-900/30 rounded-xl mb-4 shadow-sm"
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 border border-gray-200 dark:border-gray-800 rounded-xl mb-4 shadow-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1 }}
@@ -206,9 +207,46 @@ const StrategyCard: React.FC<{
                 <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
                 <span className="text-xs font-medium">Deposit APR</span>
               </div>
-              <span className="font-bold text-gray-900 dark:text-gray-100">
-                {strategy.strategy_overview.deposit_apr}
-              </span>
+              <div className="flex items-center gap-1">
+                <span className="font-bold text-gray-900 dark:text-gray-100">
+                  {strategy.strategy_overview.deposit_apr}
+                </span>
+                
+                {strategy.strategy_overview.collateral_programs.length > 0 && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 text-gray-500 cursor-help hover:text-blue-500 transition-colors" />
+                      </TooltipTrigger>
+                      <TooltipContent 
+                        className="w-64 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg"
+                        sideOffset={5}
+                      >
+                        <div className="space-y-2">
+                          {strategy.strategy_overview.collateral_programs && 
+                           Array.isArray(strategy.strategy_overview.collateral_programs) && 
+                           strategy.strategy_overview.collateral_programs.length > 0 && (
+                            <>
+                              
+                              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Reward Programs:</p>
+                              {strategy.strategy_overview.collateral_programs.map((program: any, idx: number) => (
+                                <div key={idx} className="flex justify-between">
+                                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                                    Rewards APR in {program.rewardTokenSymbol}:
+                                  </span>
+                                  <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                    {(Number(program.apr) / 10**16).toFixed(2)}%
+                                  </span>
+                                </div>
+                              ))}
+                            </>
+                          )}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col items-start">
@@ -216,9 +254,47 @@ const StrategyCard: React.FC<{
                 <TrendingUp className="h-4 w-4 text-red-600 dark:text-red-400" />
                 <span className="text-xs font-medium">Borrow APR</span>
               </div>
-              <span className="font-bold text-gray-900 dark:text-gray-100">
-                {strategy.strategy_overview.borrow_apr}
-              </span>
+              <div className="flex items-center gap-1">
+                <span className="font-bold text-gray-900 dark:text-gray-100">
+                  {strategy.strategy_overview.borrow_apr}
+                </span>
+                
+                {strategy.strategy_overview.debt_programs.length > 0 && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 text-gray-500 cursor-help hover:text-blue-500 transition-colors" />
+                      </TooltipTrigger>
+                      <TooltipContent 
+                        className="w-64 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg"
+                        sideOffset={5}
+                      >
+                        <div className="space-y-2">
+                          
+                          {strategy.strategy_overview.debt_programs && 
+                           Array.isArray(strategy.strategy_overview.debt_programs) && 
+                           strategy.strategy_overview.debt_programs.length > 0 && (
+                            <>
+                              
+                              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Reward Programs:</p>
+                              {strategy.strategy_overview.debt_programs.map((program: any, idx: number) => (
+                                <div key={idx} className="flex justify-between">
+                                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                                    Rewards APR in {program.rewardTokenSymbol}:
+                                  </span>
+                                  <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                    {(Number(program.apr) / 10**16).toFixed(2)}%
+                                  </span>
+                                </div>
+                              ))}
+                            </>
+                          )}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col items-start">
@@ -248,7 +324,7 @@ const StrategyCard: React.FC<{
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <div className="p-4 rounded-lg bg-gray-50/90 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800">
+            <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-800">
               <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
                 <ShieldCheck className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400" />
                 Strategy Details
@@ -274,6 +350,39 @@ const StrategyCard: React.FC<{
                   </div>
                 </motion.div>
               </div>
+              
+              {/* Points Display Section */}
+              {((strategy.strategy_overview.collateral_points && strategy.strategy_overview.collateral_points.length > 0) ||
+                (strategy.strategy_overview.debt_points && strategy.strategy_overview.debt_points.length > 0)) && (
+                <div className="mt-4 border-t border-gray-100 dark:border-gray-800 pt-4">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Points</h4>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {/* Collateral Points */}
+                    {strategy.strategy_overview.collateral_points && strategy.strategy_overview.collateral_points.length > 0 && (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Collateral:</span>
+                        <div className="flex gap-1.5">
+                          {strategy.strategy_overview.collateral_points.map((point: any, i: number) => (
+                            <PointsIcon key={`collateral-${i}`} point={point} type="collateral" />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Debt Points */}
+                    {strategy.strategy_overview.debt_points && strategy.strategy_overview.debt_points.length > 0 && (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Debt:</span>
+                        <div className="flex gap-1.5">
+                          {strategy.strategy_overview.debt_points.map((point: any, i: number) => (
+                            <PointsIcon key={`debt-${i}`} point={point} type="debt" />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -550,8 +659,6 @@ const StrategyOutput: React.FC<StrategyOutputProps> = ({ data }) => {
   
   // Process market data to update strategies when markets data changes
   useEffect(() => {
-    console.log(markets)
-    console.log(marketIds)
     if (markets && markets.length > 0) {
       const updatedStrategies = data.strategies.map(strategy => {
         // Find matching market
@@ -587,6 +694,10 @@ const StrategyOutput: React.FC<StrategyOutputProps> = ({ data }) => {
             ...strategy.strategy_overview,
             deposit_apr: depositSide.deposit_apr,
             borrow_apr: borrowSide.borrow_apr,
+            collateral_programs: depositSide.collateral_programs,
+            debt_programs: borrowSide.debt_programs,
+            collateral_points: depositSide.collateral_points,
+            debt_points: borrowSide.debt_points,
             spread: formattedSpread,
             max_leverage: formattedMaxLeverage,
             max_yield: formattedMaxYield,

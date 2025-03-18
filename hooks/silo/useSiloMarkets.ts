@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 interface SiloLogo {
   large?: string;
@@ -16,6 +16,10 @@ export interface SiloTokenData {
   symbol: string;
   collateralBaseApr: string;
   debtBaseApr: string;
+  collateralPrograms: any[];
+  debtPrograms: any[];
+  collateralPoints: any[];
+  debtPoints: any[];
   isNonBorrowable: boolean;
   maxLtv: string;
   lt: string;
@@ -39,6 +43,10 @@ export interface ProcessedSiloMarket {
     market: string;
     deposit_apr: string;
     borrow_apr: string;
+    collateral_programs: any[];
+    debt_programs: any[];
+    collateral_points: any[];
+    debt_points: any[];
     isBorrowable: boolean;
     token0: string;
     token1: string;
@@ -51,6 +59,10 @@ export interface ProcessedSiloMarket {
     market: string;
     deposit_apr: string;
     borrow_apr: string;
+    collateral_programs: any[];
+    debt_programs: any[];
+    collateral_points: any[];
+    debt_points: any[];
     isBorrowable: boolean;
     token0: string;
     token1: string;
@@ -68,7 +80,10 @@ export interface SiloApiResponse {
   timestamp: string;
 }
 
-export function useSiloMarkets(filteredToken: string | null, marketIds: number[] = []) {
+export function useSiloMarkets(
+  filteredToken: string | null,
+  marketIds: number[] = []
+) {
   const [markets, setMarkets] = useState<ProcessedSiloMarket[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,49 +92,84 @@ export function useSiloMarkets(filteredToken: string | null, marketIds: number[]
   // Process the raw market data from API
   const processMarketData = (data: SiloApiResponse): ProcessedSiloMarket[] => {
     if (!data.markets) return [];
-    
+
     return data.markets.map((item: RawSiloMarket) => {
       // Get logos with fallbacks
-      const silo0Logo = 
-        (item.silo0.logos.trustWallet?.large || 
-         item.silo0.logos.coinGecko?.large || 
-         item.silo0.logos.coinMarketCap?.large || 
-         "https://coin-images.coingecko.com/coins/images/52857/large/wrapped_sonic.png?1734536585");
-         
-      const silo1Logo = 
-        (item.silo1.logos.trustWallet?.large || 
-         item.silo1.logos.coinGecko?.large || 
-         item.silo1.logos.coinMarketCap?.large || 
-         "https://coin-images.coingecko.com/coins/images/52857/large/wrapped_sonic.png?1734536585");
+      const silo0Logo =
+        item.silo0.logos.trustWallet?.large ||
+        item.silo0.logos.coinGecko?.large ||
+        item.silo0.logos.coinMarketCap?.large ||
+        "https://coin-images.coingecko.com/coins/images/52857/large/wrapped_sonic.png?1734536585";
 
+      const silo1Logo =
+        item.silo1.logos.trustWallet?.large ||
+        item.silo1.logos.coinGecko?.large ||
+        item.silo1.logos.coinMarketCap?.large ||
+        "https://coin-images.coingecko.com/coins/images/52857/large/wrapped_sonic.png?1734536585";
       return {
         id: parseInt(item.id),
         reviewed: item.isVerified,
         market: `${item.silo0.symbol}/${item.silo1.symbol}`,
         silo0: {
           market: item.silo0.symbol,
-          deposit_apr: `${(parseFloat(item.silo0.collateralBaseApr) / 10**18) * 100}%`,
-          borrow_apr: `${(parseFloat(item.silo0.debtBaseApr) / 10**18) * 100}%`,
+          deposit_apr: `${(
+            ((parseFloat(item.silo0.collateralBaseApr) +
+              item.silo0.collateralPrograms.reduce(
+                (acc: number, val: any) => acc + parseFloat(val.apr), 0
+              )) /
+              10 ** 18) *
+            100
+          ).toFixed(2)}%`,
+          borrow_apr: `${(
+            ((parseFloat(item.silo0.debtBaseApr) +
+              item.silo0.debtPrograms.reduce(
+                (acc: number, val: any) => acc + parseFloat(val.apr), 0
+              )) /
+              10 ** 18) *
+            100
+          ).toFixed(2)}%`,
+          collateral_programs: item.silo0.collateralPrograms,
+          debt_programs: item.silo0.debtPrograms,
+          collateral_points: item.silo0.collateralPoints,
+          debt_points: item.silo0.debtPoints,
           isBorrowable: !item.silo0.isNonBorrowable,
           token0: item.silo0.symbol,
           token1: item.silo1.symbol,
-          max_ltv: parseInt(item.silo0.maxLtv) / 10**18,
-          lt: parseInt(item.silo0.lt) / 10**18,
-          liquidity: parseInt(item.silo0.liquidity) / 10**item.silo0.decimals,
-          logo: silo0Logo
+          max_ltv: parseInt(item.silo0.maxLtv) / 10 ** 18,
+          lt: parseInt(item.silo0.lt) / 10 ** 18,
+          liquidity: parseInt(item.silo0.liquidity) / 10 ** item.silo0.decimals,
+          logo: silo0Logo,
         },
         silo1: {
           market: item.silo1.symbol,
-          deposit_apr: `${(parseFloat(item.silo1.collateralBaseApr) / 10**18) * 100}%`,
-          borrow_apr: `${(parseFloat(item.silo1.debtBaseApr) / 10**18) * 100}%`,
+          deposit_apr: `${(
+            ((parseFloat(item.silo1.collateralBaseApr) +
+              item.silo1.collateralPrograms.reduce(
+                (acc: number, val: any) => acc + parseFloat(val.apr), 0
+              )) /
+              10 ** 18) *
+            100
+          ).toFixed(2)}%`,
+          borrow_apr: `${(
+            ((parseFloat(item.silo1.debtBaseApr) +
+              item.silo1.debtPrograms.reduce(
+                (acc: number, val: any) => acc + parseFloat(val.apr), 0
+              )) /
+              10 ** 18) *
+            100
+          ).toFixed(2)}%`,
+          collateral_programs: item.silo1.collateralPrograms,
+          debt_programs: item.silo1.debtPrograms,
+          collateral_points: item.silo1.collateralPoints,
+          debt_points: item.silo1.debtPoints,
           isBorrowable: !item.silo1.isNonBorrowable,
           token0: item.silo1.symbol,
           token1: item.silo0.symbol,
-          max_ltv: parseInt(item.silo1.maxLtv) / 10**18,
-          lt: parseInt(item.silo1.lt) / 10**18,
-          liquidity: parseInt(item.silo1.liquidity) / 10**item.silo1.decimals,
-          logo: silo1Logo
-        }
+          max_ltv: parseInt(item.silo1.maxLtv) / 10 ** 18,
+          lt: parseInt(item.silo1.lt) / 10 ** 18,
+          liquidity: parseInt(item.silo1.liquidity) / 10 ** item.silo1.decimals,
+          logo: silo1Logo,
+        },
       };
     });
   };
@@ -138,8 +188,8 @@ export function useSiloMarkets(filteredToken: string | null, marketIds: number[]
 
       const response = await fetch(`/api/silo/filter?${params.toString()}`, {
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -147,18 +197,17 @@ export function useSiloMarkets(filteredToken: string | null, marketIds: number[]
 
       const data: SiloApiResponse = await response.json();
       const processedData = processMarketData(data);
-      
+
       // Filter by market IDs if provided
       let filteredMarkets = processedData;
       if (marketIds.length > 0) {
-        filteredMarkets = processedData.filter(market => 
+        filteredMarkets = processedData.filter((market) =>
           marketIds.includes(market.id)
         );
       }
-      
+
       setMarkets(filteredMarkets);
       setLastUpdated(new Date());
-      console.log("Fetched Silo markets:", filteredMarkets);
     } catch (err) {
       console.error("Error fetching Silo markets:", err);
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -173,12 +222,12 @@ export function useSiloMarkets(filteredToken: string | null, marketIds: number[]
     fetchMarketData();
   }, [markets]);
 
-  return { 
-    markets, 
-    loading, 
-    error, 
-    refresh: fetchMarketData, 
-    lastUpdated 
+  return {
+    markets,
+    loading,
+    error,
+    refresh: fetchMarketData,
+    lastUpdated,
   };
 }
 
@@ -188,6 +237,10 @@ export function calculateMaxLeverage(maxLtv: number): number {
   return 1 / (1 - maxLtv);
 }
 
-export function calculateMaxYield(depositApr: number, borrowApr: number, maxLeverage: number): number {
-  return (depositApr * maxLeverage) - (borrowApr * (maxLeverage - 1));
+export function calculateMaxYield(
+  depositApr: number,
+  borrowApr: number,
+  maxLeverage: number
+): number {
+  return depositApr * maxLeverage - borrowApr * (maxLeverage - 1);
 }

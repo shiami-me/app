@@ -111,8 +111,8 @@ export class SiloConnection {
   async updateSiloMarketData(market: any, siloIndex: 0 | 1): Promise<any> {
     const siloKey = siloIndex === 0 ? 'silo0' : 'silo1';
     const siloAddress = await this.getSiloAddress(market.configAddress as Address, siloIndex);
-    const siloData = await this.getSiloData(siloAddress);
-    
+    // const siloData = await this.getSiloData(siloAddress);
+
     // Update the market data with the fetched values
     return {
       ...market,
@@ -120,11 +120,11 @@ export class SiloConnection {
         id: market.id,
         ...market[siloKey],
         siloAddress,
-        liquidity: siloData.liquidity,
-        collateralBaseApr: siloData.collateralBaseApr,
-        debtBaseApr: siloData.debtBaseApr,
-        maxLtv: siloData.maxLtv,
-        lt: siloData.lt,
+        // liquidity: siloData.liquidity,
+        // collateralBaseApr: siloData.collateralBaseApr,
+        // debtBaseApr: siloData.debtBaseApr,
+        // maxLtv: siloData.maxLtv,
+        // lt: siloData.lt,
       }
     };
   }
@@ -343,12 +343,43 @@ export const getSiloConfigAddress = async (
   throw new Error(`No silo found for token pair ${token0}/${token1}`);
 };
 
+async function fetchLiveMarketData(): Promise<any[] | null> {
+  const url = 'https://v2.silo.finance/api/display-markets-v2';
+  const payload = {
+    isCurated: true,
+    protocolKey: null,
+    search: null,
+    sort: null
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch market data from API:', error);
+    return null;
+  }
+}
+
 // Helper function to get updated market data with dynamic values from SiloLens
 export const getUpdatedSiloMarketData = async (publicClient: PublicClient, marketData: any[]): Promise<any[]> => {
+  const apiMarketData = await fetchLiveMarketData();
+  const effectiveMarketData = apiMarketData || marketData;
+
   const siloConnection = new SiloConnection(publicClient);
   const updatedMarkets = [];
 
-  for (const market of marketData) {
+  for (const market of effectiveMarketData) {
     try {
       // Update silo0 data
       let updatedMarket = await siloConnection.updateSiloMarketData(market, 0);
@@ -370,11 +401,14 @@ export async function getUpdatedMarketsForTokens(
   marketData: any[], 
   requestedTokens: string[]
 ): Promise<any[]> {
+  const apiMarketData = await fetchLiveMarketData();
+  const effectiveMarketData = apiMarketData || marketData;
+  
   const siloConnection = new SiloConnection(publicClient);
   const filteredMarkets = [];
 
   // First, filter the markets based on the requested tokens
-  for (const market of marketData) {
+  for (const market of effectiveMarketData) {
     const marketTokens = [
       market.silo0.symbol.toLowerCase(),
       market.silo1.symbol.toLowerCase()
