@@ -17,7 +17,7 @@ export const formatPointsText = (point: any) => {
   };
 
   if (point.basePoints) {
-    return `${point.basePoints} ${getLabel()} point${point.basePoints > 1 ? 's' : ''} per $ / day`;
+    return `${point.basePoints * point.multiplier} ${getLabel()} point${point.basePoints > 1 ? 's' : ''} per $ / day`;
   } else {
     return `${point.multiplier}x ${getLabel()} points`;
   }

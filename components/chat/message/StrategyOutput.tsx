@@ -20,6 +20,7 @@ import {
   ShieldCheck,
   RefreshCw,
   Info,
+  Calculator,
 } from "lucide-react";
 import {
   Dialog,
@@ -39,7 +40,7 @@ import {
 import { useSiloMarkets, calculateMaxLeverage, calculateMaxYield } from "@/hooks/silo/useSiloMarkets";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
-import PointsIcon from "@/components/shared/points-icon";
+import { formatPointsText, TokenIcon } from "@/components/shared/points-icon";
 
 interface StrategyOutputProps {
   data: LoopingStrategyOutput;
@@ -60,14 +61,33 @@ const StrategyCard: React.FC<{
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [riskExpanded, setRiskExpanded] = useState(false);
-
-  // Parse available liquidity value for proper formatting
   const numericLiquidity = parseFloat(
     strategy.strategy_overview.available_liquidity.replace(/,/g, "")
   );
   const formattedLiquidity = !isNaN(numericLiquidity)
     ? `${formatNumber(numericLiquidity)} ${strategy.borrow_token}`
     : `${strategy.strategy_overview.available_liquidity} ${strategy.borrow_token}`;
+
+  // Parse leverage value for points calculations
+  const leverageValue = parseFloat(
+    strategy.strategy_overview.max_leverage.replace('x', '')
+  );
+  
+  const ltvUsedValue = parseFloat(strategy.strategy_overview.ltv_used) * 100
+
+  // Helper to format points after multiplier
+  const formatPointMultiplier = (point: any, multiplier: number) => {
+    if (!point) return null;
+    
+    if (point.basePoints) {
+      const multipliedPoints = (point.basePoints * point.multiplier * multiplier).toFixed(2);
+      return `${multipliedPoints} points per $ / day`;
+    } else if (point.multiplier) {
+      const multipliedValue = (point.multiplier * multiplier).toFixed(2);
+      return `${multipliedValue}x points`;
+    }
+    return null;
+  };
 
   return (
     <motion.div
@@ -351,40 +371,75 @@ const StrategyCard: React.FC<{
                 </motion.div>
               </div>
               
-              {/* Points Display Section */}
-              {((strategy.strategy_overview.collateral_points && strategy.strategy_overview.collateral_points.length > 0) ||
-                (strategy.strategy_overview.debt_points && strategy.strategy_overview.debt_points.length > 0)) && (
-                <div className="mt-4 border-t border-gray-100 dark:border-gray-800 pt-4">
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Points</h4>
-                  <div className="flex flex-wrap items-center gap-3">
-                    {/* Collateral Points */}
-                    {strategy.strategy_overview.collateral_points && strategy.strategy_overview.collateral_points.length > 0 && (
-                      <div className="flex flex-col gap-1">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">Collateral:</span>
-                        <div className="flex gap-1.5">
-                          {strategy.strategy_overview.collateral_points.map((point: any, i: number) => (
-                            <PointsIcon key={`collateral-${i}`} point={point} type="collateral" />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Debt Points */}
-                    {strategy.strategy_overview.debt_points && strategy.strategy_overview.debt_points.length > 0 && (
-                      <div className="flex flex-col gap-1">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">Debt:</span>
-                        <div className="flex gap-1.5">
-                          {strategy.strategy_overview.debt_points.map((point: any, i: number) => (
-                            <PointsIcon key={`debt-${i}`} point={point} type="debt" />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           </motion.div>
+
+          {/* Points Multiplier Section - Always visible */}
+          {((strategy.strategy_overview.collateral_points && strategy.strategy_overview.collateral_points.length > 0) ||
+            (strategy.strategy_overview.debt_points && strategy.strategy_overview.debt_points.length > 0)) && (
+            <motion.div 
+              className="mb-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.25 }}
+            >
+              <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-800">
+                <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+                  <Calculator className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" />
+                  Points
+                </h3>
+                
+                <div className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">Leverage: {leverageValue.toFixed(2)}x</div>
+                    <div className="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded-full">LTV: {(ltvUsedValue).toFixed(2)}%</div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Collateral Points After Loop */}
+                  {strategy.strategy_overview.collateral_points && strategy.strategy_overview.collateral_points.length > 0 && (
+                    <div className="border border-green-100 dark:border-green-900/30 rounded-lg p-3 bg-green-50/50 dark:bg-green-900/10">
+                      <h5 className="font-medium text-green-700 dark:text-green-400 mb-2">Collateral Points</h5>
+                      <ul className="space-y-2">
+                        {strategy.strategy_overview.collateral_points.map((point: any, i: number) => (
+                          <li key={`coll-mult-${i}`} className="flex items-center gap-2 text-sm">
+                            <TokenIcon tag={point._tag} size="sm" />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Base: {formatPointsText(point)}</span>
+                              <span className="text-sm font-semibold text-green-700 dark:text-green-400">
+                                After Strategy: {formatPointMultiplier(point, leverageValue)}
+                              </span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Debt Points After Loop */}
+                  {strategy.strategy_overview.debt_points && strategy.strategy_overview.debt_points.length > 0 && (
+                    <div className="border border-blue-100 dark:border-blue-900/30 rounded-lg p-3 bg-blue-50/50 dark:bg-blue-900/10">
+                      <h5 className="font-medium text-blue-700 dark:text-blue-400 mb-2">Debt Points</h5>
+                      <ul className="space-y-2">
+                        {strategy.strategy_overview.debt_points.map((point: any, i: number) => (
+                          <li key={`debt-mult-${i}`} className="flex items-center gap-2 text-sm">
+                            <TokenIcon tag={point._tag} size="sm" />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Base: {formatPointsText(point)}</span>
+                              <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+                                After Strategy: {formatPointMultiplier(point, leverageValue - 1)}
+                              </span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Risk Considerations Toggle */}
           <div className="mt-4 border-t border-gray-100 dark:border-gray-800 pt-4">
