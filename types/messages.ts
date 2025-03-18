@@ -93,6 +93,7 @@ export type StrategyOverview = {
   max_yield: string;
   initial_investment: string;
   available_liquidity: string;
+  ltv_used: string;
 };
 
 export type Strategy = {
