@@ -392,7 +392,7 @@ const StrategyCard: React.FC<{
                 <div className="text-sm text-gray-700 dark:text-gray-300 mb-3">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">Leverage: {leverageValue.toFixed(2)}x</div>
-                    <div className="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded-full">LTV: {(ltvUsedValue).toFixed(2)}%</div>
+                    <div className="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded-full">LTV Used (Max LTV * 95%): {(ltvUsedValue).toFixed(2)}%</div>
                   </div>
                 </div>
                 
