@@ -1,4 +1,5 @@
 import { PendleMarket } from "@/lib/pendle/types";
+import { ContextItem } from "@/providers/ChatProvider";
 
 export interface PendleDashboardProps {
   markets: PendleMarket[];
@@ -6,7 +7,7 @@ export interface PendleDashboardProps {
   isRefreshing: boolean;
   lastUpdated: string | null;
   onRefresh: () => void;
-  onAddToContext: () => void;
+  onAddToContext: (item: ContextItem) => void;
 }
 
 export interface PendleMarketCardProps {

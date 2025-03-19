@@ -40,3 +40,37 @@ export function formatNumber(value: number | string | undefined | null): string 
     return numValue.toFixed(2);
   }
 }
+
+/**
+ * Format a date from a unix timestamp (seconds) 
+ */
+export function formatDate(timestamp: number): string {
+  if (!timestamp) return "N/A";
+  
+  // Convert seconds to milliseconds for JS Date
+  const date = new Date(timestamp * 1000);
+  
+  const options: Intl.DateTimeFormatOptions = { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  };
+  
+  return date.toLocaleDateString(undefined, options);
+}
+
+/**
+ * Format a number as a percentage
+ */
+export function formatPercent(value: number, decimals: number = 2): string {
+  if (value === undefined || value === null) return "0%";
+  
+  // Convert to percentage
+  const percentValue = value * 100;
+  
+  if (Math.abs(percentValue) < 0.01 && percentValue !== 0) {
+    return percentValue > 0 ? "<0.01%" : ">-0.01%";
+  }
+  
+  return `${percentValue.toFixed(decimals)}%`;
+}

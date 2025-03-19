@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, PlusCircle, BarChart3 } from "lucide-react";
+import { Loader2, RefreshCw, PlusCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { PendleDashboardProps } from "./types";
@@ -79,20 +79,46 @@ export function PendleDashboard({
     }
   };
 
-  const loaderVariants = {
-    animate: {
-      opacity: [0.5, 1, 0.5]
-    },
-    transition: {
-      duration: 1.5,
-      repeat: Infinity,
-      repeatType: "loop" as const
-    }
-  };
-
   // Handler for adding a specific market to context
   const handleAddMarketToContext = (market: PendleMarket) => {
-    console.log("Adding market to context:", market);
+    onAddToContext({
+      id: `pendle-market-${market.address}`,
+      type: "pendle-market",
+      title: `Pendle Market: ${market.symbol}`,
+      data: {
+        symbol: market.symbol,
+        address: market.address,
+        protocol: market.protocol,
+        underlyingApy: market.underlyingApy,
+        impliedApy: market.impliedApy,
+        maxBoostedApy: market.maxBoostedApy,
+        liquidity: market.liquidity,
+        tradingVolume: market.tradingVolume,
+        expiry: market.expiry,
+      }
+    });
+  };
+
+  // Handle adding all markets overview to context
+  const handleAddAllMarketsToContext = () => {
+    onAddToContext({
+      id: "pendle-markets-overview",
+      type: "pendle-markets",
+      title: "Pendle Finance Markets Overview",
+      data: {
+        marketsCount: markets.length,
+        totalLiquidity: markets.reduce((sum, market) => sum + market.liquidity, 0),
+        markets: markets.map(market => ({
+          symbol: market.symbol,
+          address: market.address,
+          protocol: market.protocol,
+          impliedApy: market.impliedApy,
+          liquidity: market.liquidity,
+          expiry: market.expiry
+        })),
+        lastUpdated: lastUpdated
+      }
+    });
   };
 
   if (loading && markets.length === 0) {
@@ -210,7 +236,7 @@ export function PendleDashboard({
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={onAddToContext}
+                            onClick={handleAddAllMarketsToContext}
                             className="border-gray-200 dark:border-gray-700 shadow-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
                           >
                             <PlusCircle className="h-4 w-4 mr-1.5" />
@@ -271,7 +297,7 @@ export function PendleDashboard({
               >
                 <PendleMarketCard 
                   market={market} 
-                  onAddToContext={handleAddMarketToContext}
+                  onAddToContext={() => handleAddMarketToContext(market)}
                 />
               </motion.div>
             ))}

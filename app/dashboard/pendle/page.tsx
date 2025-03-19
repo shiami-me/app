@@ -36,29 +36,6 @@ export default function PendlePage() {
     fetchMarkets();
   }, [fetchMarkets]);
 
-  const handleAddAllToContext = () => {
-    // Add a summary of all markets to context
-    addToContext({
-      id: "pendle-all-markets",
-      type: "pendle-summary",
-      title: "Pendle Finance Markets",
-      data: {
-        marketCount: markets.length,
-        timestamp: lastUpdated,
-        markets: markets.map(market => ({
-          id: market.address,
-          symbol: market.symbol,
-          protocol: market.protocol,
-          liquidity: market.liquidity,
-          expiry: market.expiry,
-          underlyingApy: market.underlyingApy,
-          impliedApy: market.impliedApy,
-          maxBoostedAPY: market.maxBoostedApy
-        }))
-      }
-    });
-  };
-
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -74,7 +51,7 @@ export default function PendlePage() {
           isRefreshing={isRefreshing}
           lastUpdated={lastUpdated}
           onRefresh={fetchMarkets}
-          onAddToContext={handleAddAllToContext}
+          onAddToContext={addToContext}
         />
       </motion.div>
     </AnimatePresence>

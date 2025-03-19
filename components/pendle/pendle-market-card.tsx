@@ -1,24 +1,16 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, PlusCircle, LineChart, DollarSign, TrendingUp } from "lucide-react";
+import { ExternalLink, PlusCircle, LineChart, DollarSign, TrendingUp, ArrowRight } from "lucide-react";
 import { PendleMarketCardProps } from "./types";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
+import { formatDate, formatNumber, formatPercent } from "@/lib/utils"; 
 
 export function PendleMarketCard({ market, onAddToContext }: PendleMarketCardProps) {
-  // Format date from unix timestamp
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString();
-  };
-
-  // Format percentage for display
-  const formatPercent = (value: number) => {
-    return `${(value * 100).toFixed(2)}%`;
-  };
-
   // Animation variants
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -176,19 +168,25 @@ export function PendleMarketCard({ market, onAddToContext }: PendleMarketCardPro
           <div className="flex flex-col space-y-2 border-t border-gray-100 dark:border-gray-800 pt-3">
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-600 dark:text-gray-400">Liquidity:</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">${market.liquidity.toLocaleString()}</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                ${formatNumber(market.liquidity)}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-600 dark:text-gray-400">Volume:</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">${market.tradingVolume.toLocaleString()}</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                ${formatNumber(market.tradingVolume)}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-600 dark:text-gray-400">Expiry:</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatDate(market.expiry)}</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {formatDate(market.expiry)}
+              </span>
             </div>
           </div>
 
-          {market.categoryIds.length > 0 && (
+          {market.categoryIds && market.categoryIds.length > 0 && (
             <div className="flex items-center justify-between py-2 border-t border-gray-100 dark:border-gray-800 mt-2">
               <div className="flex flex-col">
                 <span className="text-xs text-gray-600 dark:text-gray-400 mb-1">
@@ -255,6 +253,19 @@ export function PendleMarketCard({ market, onAddToContext }: PendleMarketCardPro
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          
+          {/* View Details Button */}
+          <Button 
+            variant="default"
+            size="sm"
+            asChild
+            className="text-xs px-3 bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            <Link href={`/dashboard/pendle/${market.address}`} className="flex items-center">
+              View Details
+              <ArrowRight className="ml-1 h-3.5 w-3.5" />
+            </Link>
+          </Button>
         </div>
       </Card>
     </motion.div>
