@@ -25,6 +25,34 @@ interface RemoveLiquidityDualData {
   priceImpact: number;
 }
 
+// Define types for swap data
+interface SwapData {
+  amountOut: string;
+  priceImpact: number;
+}
+
+// Define types for mint operations
+interface MintSyData {
+  amountOut: string;
+  priceImpact: number;
+}
+
+interface MintPyData {
+  amountOut: string;
+  priceImpact: number;
+}
+
+// Define types for redeem operations
+interface RedeemSyData {
+  amountOut: string;
+  priceImpact: number;
+}
+
+interface RedeemPyData {
+  amountOut: string;
+  priceImpact: number;
+}
+
 export class PendleConnection {
   private baseUrl: string;
 
@@ -110,7 +138,8 @@ export class PendleConnection {
     amountIn: string,
     slippage: number = 0.01,
     zpi: boolean = false,
-    userAddress: string
+    userAddress: string,
+    enableAggregator: boolean = false
   ): Promise<{data: AddLiquidityData, tx: {to: string, data: string, value: string}}> {
     try {
       // Format amount to Wei (18 decimals)
@@ -123,7 +152,8 @@ export class PendleConnection {
           slippage,
           tokenIn,
           amountIn: amountInWei,
-          zpi
+          zpi,
+          enableAggregator
         }
       );
       
@@ -156,7 +186,8 @@ export class PendleConnection {
     amountTokenIn: string,
     amountPtIn: string,
     slippage: number = 0.01,
-    userAddress: string
+    userAddress: string,
+    enableAggregator: boolean = false
   ): Promise<{data: AddLiquidityDualData, tx: {to: string, data: string, value: string}}> {
     try {
       // Format amounts to Wei (18 decimals)
@@ -170,7 +201,8 @@ export class PendleConnection {
           slippage,
           tokenIn,
           amountTokenIn: amountTokenInWei,
-          amountPtIn: amountPtInWei
+          amountPtIn: amountPtInWei,
+          enableAggregator
         }
       );
       
@@ -198,7 +230,8 @@ export class PendleConnection {
     tokenOut: string,
     amountIn: string,
     slippage: number = 0.01,
-    userAddress: string
+    userAddress: string,
+    enableAggregator: boolean = false
   ): Promise<{data: RemoveLiquidityData, tx: {to: string, data: string, value: string}}> {
     try {
       // Format amount to Wei (18 decimals)
@@ -210,7 +243,8 @@ export class PendleConnection {
           receiver: userAddress,
           slippage,
           tokenOut,
-          amountIn: amountInWei
+          amountIn: amountInWei,
+          enableAggregator
         }
       );
       
@@ -238,7 +272,8 @@ export class PendleConnection {
     tokenOut: string,
     amountIn: string,
     slippage: number = 0.01,
-    userAddress: string
+    userAddress: string,
+    enableAggregator: boolean = false
   ): Promise<{data: RemoveLiquidityDualData, tx: {to: string, data: string, value: string}}> {
     try {
       // Format amount to Wei (18 decimals)
@@ -250,7 +285,8 @@ export class PendleConnection {
           receiver: userAddress,
           slippage,
           tokenOut,
-          amountIn: amountInWei
+          amountIn: amountInWei,
+          enableAggregator
         }
       );
       
@@ -265,6 +301,222 @@ export class PendleConnection {
       };
     } catch (error) {
       console.error('Error removing dual liquidity:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Execute a swap in a Pendle market
+   * Follows the example in swap.ts
+   */
+  async swap(
+    chainId: number,
+    marketAddress: string,
+    tokenIn: string,
+    tokenOut: string,
+    amountIn: string,
+    slippage: number = 0.01,
+    userAddress: string,
+    enableAggregator: boolean = false
+  ): Promise<{data: SwapData, tx: {to: string, data: string, value: string}}> {
+    try {
+      // Format amount to Wei (18 decimals)
+      const amountInWei = this.formatToWei(amountIn);
+      
+      const result = await callSDK<SwapData>(
+        `v1/sdk/${chainId}/markets/${marketAddress}/swap`,
+        {
+          receiver: userAddress,
+          slippage,
+          tokenIn,
+          tokenOut,
+          amountIn: amountInWei,
+          enableAggregator
+        }
+      );
+      
+      console.log('Amount Out: ', result.data.amountOut);
+      console.log('Price impact: ', result.data.priceImpact);
+      
+      // Return both data and tx
+      return {
+        data: result.data,
+        tx: result.tx
+      };
+    } catch (error) {
+      console.error('Error swapping tokens:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Mint SY tokens from a base token
+   * Follows the example in mint-sy.ts
+   */
+  async mintSy(
+    chainId: number,
+    sy: string,
+    tokenIn: string,
+    amountIn: string,
+    slippage: number = 0.01,
+    userAddress: string,
+    enableAggregator: boolean = false
+  ): Promise<{data: MintSyData, tx: {to: string, data: string, value: string}}> {
+    try {
+      // Format amount to Wei (18 decimals)
+      const amountInWei = this.formatToWei(amountIn);
+      
+      const result = await callSDK<MintSyData>(
+        `v1/sdk/${chainId}/mint-sy`,
+        {
+          receiver: userAddress,
+          sy,
+          tokenIn,
+          amountIn: amountInWei,
+          slippage,
+          enableAggregator
+        }
+      );
+      
+      console.log('Amount SY Out: ', result.data.amountOut);
+      console.log('Price impact: ', result.data.priceImpact);
+      
+      // Return both data and tx
+      return {
+        data: result.data,
+        tx: result.tx
+      };
+    } catch (error) {
+      console.error('Error minting SY:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Mint PT and YT from SY or a base token
+   * Follows the example in mint-py.ts
+   */
+  async mintPy(
+    chainId: number,
+    yt: string,
+    tokenIn: string,
+    amountIn: string,
+    slippage: number = 0.01,
+    userAddress: string,
+    enableAggregator: boolean = false
+  ): Promise<{data: MintPyData, tx: {to: string, data: string, value: string}}> {
+    try {
+      // Format amount to Wei (18 decimals)
+      const amountInWei = this.formatToWei(amountIn);
+      
+      const result = await callSDK<MintPyData>(
+        `v1/sdk/${chainId}/mint`,
+        {
+          receiver: userAddress,
+          yt,
+          tokenIn,
+          amountIn: amountInWei,
+          slippage,
+          enableAggregator
+        }
+      );
+      
+      console.log('Amount PT & YT Out: ', result.data.amountOut);
+      console.log('Price impact: ', result.data.priceImpact);
+      
+      // Return both data and tx
+      return {
+        data: result.data,
+        tx: result.tx
+      };
+    } catch (error) {
+      console.error('Error minting PT and YT:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Redeem SY tokens to a base token
+   * Follows the example in redeem-sy.ts
+   */
+  async redeemSy(
+    chainId: number,
+    sy: string,
+    tokenOut: string,
+    amountIn: string,
+    slippage: number = 0.01,
+    userAddress: string,
+    enableAggregator: boolean = false
+  ): Promise<{data: RedeemSyData, tx: {to: string, data: string, value: string}}> {
+    try {
+      // Format amount to Wei (18 decimals)
+      const amountInWei = this.formatToWei(amountIn);
+      
+      const result = await callSDK<RedeemSyData>(
+        `v1/sdk/${chainId}/redeem-sy`,
+        {
+          receiver: userAddress,
+          sy,
+          tokenOut,
+          amountIn: amountInWei,
+          slippage,
+          enableAggregator
+        }
+      );
+      
+      console.log('Amount Out: ', result.data.amountOut);
+      console.log('Price impact: ', result.data.priceImpact);
+      
+      // Return both data and tx
+      return {
+        data: result.data,
+        tx: result.tx
+      };
+    } catch (error) {
+      console.error('Error redeeming SY:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Redeem PT and YT to SY or a base token
+   * Follows the example in redeem-py.ts
+   */
+  async redeemPy(
+    chainId: number,
+    yt: string,
+    tokenOut: string,
+    amountIn: string,
+    slippage: number = 0.01,
+    userAddress: string,
+    enableAggregator: boolean = false
+  ): Promise<{data: RedeemPyData, tx: {to: string, data: string, value: string}}> {
+    try {
+      // Format amount to Wei (18 decimals)
+      const amountInWei = this.formatToWei(amountIn);
+      
+      const result = await callSDK<RedeemPyData>(
+        `v1/sdk/${chainId}/redeem`,
+        {
+          receiver: userAddress,
+          yt,
+          tokenOut,
+          amountIn: amountInWei,
+          slippage,
+          enableAggregator
+        }
+      );
+      
+      console.log('Amount Out: ', result.data.amountOut);
+      console.log('Price impact: ', result.data.priceImpact);
+      
+      // Return both data and tx
+      return {
+        data: result.data,
+        tx: result.tx
+      };
+    } catch (error) {
+      console.error('Error redeeming PT and YT:', error);
       throw error;
     }
   }

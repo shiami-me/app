@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { PendleConnection } from "@/lib/pendle/connection";
 import { PendleMarket } from "@/lib/pendle/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ExternalLink, ArrowLeft, CreditCard, Calendar, BarChart2, ArrowDown, ChevronRight, FileText, Info as InfoIcon, Plus } from "lucide-react";
+import { ExternalLink, ArrowLeft, CreditCard, BarChart2, ArrowDown, ChevronRight, FileText, Info as InfoIcon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -14,6 +14,7 @@ import { formatDate, formatPercent, formatNumber } from "@/lib/utils";
 import { PendleMarketLiquidity } from "@/components/pendle/pendle-market-liquidity";
 import { useChat } from "@/providers/ChatProvider";
 import { Badge } from "@/components/ui/badge";
+import { PendleMarketSwap } from "@/components/pendle/pendle-market-swap";
 
 export default function PendleMarketDetailPage() {
   const { address } = useParams();
@@ -352,15 +353,7 @@ export default function PendleMarketDetailPage() {
               </TabsContent>
               
               <TabsContent value="swap" className="focus:outline-none">
-                <div className="flex flex-col items-center justify-center p-12 text-center">
-                  <div className="rounded-full bg-muted/80 p-3 mb-4">
-                    <Calendar className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Coming Soon</h3>
-                  <p className="text-sm text-muted-foreground max-w-xs">
-                    Swap functionality for Pendle markets will be available soon. Check back later for updates.
-                  </p>
-                </div>
+                <PendleMarketSwap market={market} />
               </TabsContent>
             </Tabs>
           </div>

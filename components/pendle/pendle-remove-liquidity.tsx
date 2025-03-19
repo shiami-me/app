@@ -162,6 +162,11 @@ export function PendleRemoveLiquidity({ market }: PendleRemoveLiquidityProps) {
       const pendleClient = new PendleConnection();
       const parsedTokenOut = pendleClient.parseTokenId(tokenOut)?.address || "";
       
+      // Determine if we need to use aggregator based on token
+      const enableAggregator = !market.inputTokens.map(
+        token => pendleClient.parseTokenId(token)?.address
+      ).includes(parsedTokenOut);
+      
       if (isDualMode) {
         // Remove liquidity with dual outputs (token and PT)
         const response = await pendleClient.removeLiquidityDual(
@@ -170,7 +175,8 @@ export function PendleRemoveLiquidity({ market }: PendleRemoveLiquidityProps) {
           parsedTokenOut,
           amountIn,
           slippage,
-          address
+          address,
+          enableAggregator
         );
 
         setResult({
@@ -210,7 +216,8 @@ export function PendleRemoveLiquidity({ market }: PendleRemoveLiquidityProps) {
           parsedTokenOut,
           amountIn,
           slippage,
-          address
+          address,
+          enableAggregator
         );
 
         setResult({
@@ -272,7 +279,9 @@ export function PendleRemoveLiquidity({ market }: PendleRemoveLiquidityProps) {
   };
 
   // Prepare available output tokens
-  const availableTokens = [...(market.outputTokens || [market.underlyingAsset])].filter(Boolean);
+  const availableTokens = assets.length > 0 
+    ? assets.map(asset => `${asset.chainId}-${asset.address}`)
+    : [...(market.outputTokens || [market.underlyingAsset])].filter(Boolean);
 
   return (
     <div className="space-y-6">
@@ -462,7 +471,7 @@ export function PendleRemoveLiquidity({ market }: PendleRemoveLiquidityProps) {
                             />
                           </div>
                         )}
-                        {asset ? asset.symbol : token}
+                        {asset ? `${asset.symbol} - ${asset.type}` : token}
                       </div>
                     </SelectItem>
                   );

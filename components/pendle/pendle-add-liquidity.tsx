@@ -210,6 +210,11 @@ export function PendleAddLiquidity({ market }: PendleAddLiquidityProps) {
       const pendleClient = new PendleConnection();
       const tokenAddress = pendleClient.parseTokenId(tokenIn)?.address || "";
       
+      // Determine if we need to use aggregator based on token
+      const enableAggregator = !market.inputTokens.map(
+        token => pendleClient.parseTokenId(token)?.address
+      ).includes(tokenAddress);
+      
       if (isDualMode) {
         // Call dual liquidity function
         const response = await pendleClient.addLiquidityDual(
@@ -219,7 +224,8 @@ export function PendleAddLiquidity({ market }: PendleAddLiquidityProps) {
           amountIn,
           amountPtIn,
           slippage,
-          address
+          address,
+          enableAggregator
         );
 
         setResult({
@@ -263,7 +269,8 @@ export function PendleAddLiquidity({ market }: PendleAddLiquidityProps) {
           amountIn,
           slippage,
           keepYt,
-          address
+          address,
+          enableAggregator
         );
 
         setResult({
@@ -308,7 +315,9 @@ export function PendleAddLiquidity({ market }: PendleAddLiquidityProps) {
   };
 
   // Prepare available input tokens with asset info
-  const availableTokens = [...market.inputTokens].filter(Boolean);
+  const availableTokens = assets.length > 0 
+    ? assets.map(asset => `${asset.chainId}-${asset.address}`)
+    : [...market.inputTokens].filter(Boolean);
 
   return (
     <div className="space-y-6">
@@ -480,7 +489,7 @@ export function PendleAddLiquidity({ market }: PendleAddLiquidityProps) {
                           />
                         </div>
                       )}
-                      {asset ? asset.symbol : token}
+                        {asset ? `${asset.symbol} - ${asset.type}` : token}
                     </div>
                   </SelectItem>
                 );
