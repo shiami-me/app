@@ -11,7 +11,8 @@ export async function POST(request: NextRequest) {
       amountIn, 
       slippage = 0.01,
       receiver,
-      isDualMode = false
+      isDualMode = false,
+      enableAggregator = false
     } = body;
 
     // Validate required params
@@ -32,7 +33,8 @@ export async function POST(request: NextRequest) {
         tokenOut,
         amountIn,
         slippage,
-        receiver
+        receiver,
+        enableAggregator
       );
     } else {
       result = await pendleClient.removeLiquidity(
@@ -41,7 +43,8 @@ export async function POST(request: NextRequest) {
         tokenOut,
         amountIn,
         slippage,
-        receiver
+        receiver,
+        enableAggregator
       );
     }
     

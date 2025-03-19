@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
       receiver,
       // For dual mode
       amountPtIn,
-      isDualMode = false
+      isDualMode = false,
+      enableAggregator = false
     } = body;
 
     // Validate required params
@@ -44,7 +45,8 @@ export async function POST(request: NextRequest) {
         amountIn,
         amountPtIn,
         slippage,
-        receiver
+        receiver,
+        enableAggregator
       );
     } else {
       result = await pendleClient.addLiquidity(
@@ -54,7 +56,8 @@ export async function POST(request: NextRequest) {
         amountIn,
         slippage,
         zpi,
-        receiver
+        receiver.
+        enableAggregator
       );
     }
     
