@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         amountIn,
         slippage,
         zpi,
-        receiver.
+        receiver,
         enableAggregator
       );
     }

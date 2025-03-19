@@ -10,17 +10,17 @@ export async function GET(request: NextRequest) {
       : 146;
 
     const pendleClient = new PendleConnection();
-    const markets = await pendleClient.getMarkets(chainId);
+    const assets = await pendleClient.getAssets(chainId);
     
     return NextResponse.json({
       success: true,
-      data: markets,
+      data: assets,
     });
     
   } catch (error: any) {
-    console.error("Error fetching markets:", error);
+    console.error("Error fetching tokens:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch markets" },
+      { error: error.message || "Failed to fetch tokens" },
       { status: 500 }
     );
   }
@@ -32,17 +32,17 @@ export async function POST(request: NextRequest) {
     const { chainId = 146 } = body;
 
     const pendleClient = new PendleConnection();
-    const markets = await pendleClient.getMarkets(chainId);
+    const assets = await pendleClient.getAssets(chainId);
     
     return NextResponse.json({
       success: true,
-      data: markets,
+      data: assets,
     });
     
   } catch (error: any) {
-    console.error("Error fetching markets:", error);
+    console.error("Error fetching tokens:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch markets" },
+      { error: error.message || "Failed to fetch tokens" },
       { status: 500 }
     );
   }
