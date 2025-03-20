@@ -759,7 +759,6 @@ export function PendleRedeem({ market }: PendleRedeemProps) {
           <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
           <div>
             <p className="font-medium">Connect your wallet</p>
-            <p>To use the MAX button and see your token balances</p>
           </div>
         </div>
       )}
