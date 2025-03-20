@@ -15,6 +15,7 @@ import Transaction from "./message/Transaction";
 import { isAddLiquidity, isApproveTransaction, isBaseTransaction, isBeetsSwap, isRemoveLiquidity } from "@/types/transaction";
 import { isStrategyOutput } from "@/types/messages";
 import StrategyOutput from "./message/StrategyOutput";
+import { isPendleTransaction } from "@/types/pendle-types";
 
 interface Props {
   client: ZerePyClient;
@@ -95,7 +96,7 @@ const RenderMessage: React.FC<Props> = ({
         }
         
         // Check if this is a transaction
-        if (isBaseTransaction(parsedData) || isApproveTransaction(parsedData) || 
+        if (isPendleTransaction(parsedData) || isBaseTransaction(parsedData) || isApproveTransaction(parsedData) || 
             isAddLiquidity(parsedData) || isRemoveLiquidity(parsedData) || isBeetsSwap(parsedData)) {
           return (
             <Transaction
@@ -112,7 +113,7 @@ const RenderMessage: React.FC<Props> = ({
         const match = response.match(/\{.*?\}/);
         try {
           parsedData = match ? JSON.parse(match[0]) : false;
-          if (parsedData && (isBaseTransaction(parsedData) || isApproveTransaction(parsedData) || 
+          if (parsedData && (isPendleTransaction(parsedData) || isBaseTransaction(parsedData) || isApproveTransaction(parsedData) || 
               isAddLiquidity(parsedData) || isRemoveLiquidity(parsedData) || isBeetsSwap(parsedData))) {
             return (
               <Transaction

@@ -19,6 +19,8 @@ import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { useCancelTransaction } from "@/hooks/useCancelTransaction";
 import { useChat } from "@/providers/ChatProvider";
+import { isPendleTransaction } from "@/types/pendle-types";
+import PendleTransactionRouter from "./transaction/pendle";
 
 interface Props {
   client: ZerePyClient;
@@ -40,7 +42,9 @@ const Transaction: React.FC<Props> = ({
   const { chatId } = useChat();
   
   let txType = "transaction";
-  if (isBaseTransaction(tx)) {
+  if (isPendleTransaction(tx)){
+    txType = tx.type;
+  } else if (isBaseTransaction(tx)) {
     txType = tx.type;
   } else if (isApproveTransaction(tx)) {
     txType = "approve";
@@ -67,7 +71,15 @@ const Transaction: React.FC<Props> = ({
 
   return (
     <Modal isOpen={isModalOpen} onClose={closeModal}>
-      {isBaseTransaction(tx) ? (
+      {isPendleTransaction(tx) ? (
+        <PendleTransactionRouter
+          tx={tx}
+          setMessages={setMessages}
+          messages={messages}
+          client={client}
+          closeModal={() => setIsModalOpen(false)}
+        />
+      ) : isBaseTransaction(tx) ? (
         <SendTransaction
           client={client}
           setMessages={setMessages}

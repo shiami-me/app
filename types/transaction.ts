@@ -1,4 +1,5 @@
 import { AddLiquidityBoostedQueryOutput, Address, ExactInQueryOutput, ExactOutQueryOutput, Path, RemoveLiquidityBoostedQueryOutput, Slippage } from "@balancer/sdk";
+import { PendleTransaction } from "./pendle-types";
 
 type TransactionType =
   | "transfer"
@@ -121,7 +122,8 @@ export type Tx =
   | ApproveTransaction
   | AddLiquidity
   | RemoveLiquidity
-  | BeetsSwap;
+  | BeetsSwap
+  | PendleTransaction;
 
 export function isBaseTransaction(tx: Tx): tx is BaseTransaction {
   return "type" in tx;
