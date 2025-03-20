@@ -347,7 +347,7 @@ async function fetchLiveMarketData(): Promise<any[] | null> {
   const url = 'https://v2.silo.finance/api/display-markets-v2';
   const payload = {
     isCurated: true,
-    protocolKey: null,
+    chainKey: null,
     search: null,
     sort: null
   };
