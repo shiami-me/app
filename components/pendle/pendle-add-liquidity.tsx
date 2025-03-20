@@ -315,9 +315,9 @@ export function PendleAddLiquidity({ market }: PendleAddLiquidityProps) {
   };
 
   // Prepare available input tokens with asset info
-  const availableTokens = assets.length > 0 
+  const availableTokens = assets.length > 0 && !isDualMode
     ? assets.map(asset => `${asset.chainId}-${asset.address}`)
-    : [...market.inputTokens].filter(Boolean);
+    : [...market.inputTokens, market.sy].filter(Boolean);
 
   return (
     <div className="space-y-6">
