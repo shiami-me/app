@@ -41,6 +41,7 @@ import { useSiloMarkets, calculateMaxLeverage, calculateMaxYield } from "@/hooks
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatPointsText, TokenIcon } from "@/components/shared/points-icon";
+import { PendleConnection } from "@/lib/pendle/connection";
 
 interface StrategyOutputProps {
   data: LoopingStrategyOutput;
@@ -392,7 +393,7 @@ const StrategyCard: React.FC<{
                 <div className="text-sm text-gray-700 dark:text-gray-300 mb-3">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">Leverage: {leverageValue.toFixed(2)}x</div>
-                    <div className="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded-full">LTV Used (Max LTV * 95%): {(ltvUsedValue).toFixed(2)}%</div>
+                    <div className="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded-full">LTV Used: {(ltvUsedValue).toFixed(2)}%</div>
                   </div>
                 </div>
                 
@@ -714,57 +715,70 @@ const StrategyOutput: React.FC<StrategyOutputProps> = ({ data }) => {
   
   // Process market data to update strategies when markets data changes
   useEffect(() => {
-    if (markets && markets.length > 0) {
-      const updatedStrategies = data.strategies.map(strategy => {
-        // Find matching market
-        const market = markets.find(m => m.id === parseInt((strategy.market_id).toString()));
-        
-        if (!market) return strategy;
-        
-        // Determine which side of the market to use based on deposit token
-        const isDeposit0 = market.silo0.market === strategy.deposit_token;
-        const isBorrow1 = market.silo1.market === strategy.borrow_token;
-        
-        const depositSide = isDeposit0 ? market.silo0 : market.silo1;
-        const borrowSide = isBorrow1 ? market.silo1 : market.silo0;
-        
-        // Parse APRs to numbers for calculations
-        const depositApr = parseFloat(depositSide.deposit_apr.replace('%', '')) / 100;
-        const borrowApr = parseFloat(borrowSide.borrow_apr.replace('%', '')) / 100;
-        
-        // Calculate max leverage and max yield
-        const maxLtv = depositSide.max_ltv;
-        const maxLeverage = calculateMaxLeverage(maxLtv);
-        const maxYield = calculateMaxYield(depositApr, borrowApr, maxLeverage);
-        
-        // Format for display
-        const formattedMaxLeverage = maxLeverage.toFixed(2) + 'x';
-        const formattedMaxYield = maxYield > 0 ? `${(maxYield * 100).toFixed(2)}%` : '0%';
-        const formattedSpread = ((depositApr - borrowApr) * 100).toFixed(2) + '%';
-        
-        return {
-          ...strategy,
-          verified: market.reviewed,
-          strategy_overview: {
-            ...strategy.strategy_overview,
-            deposit_apr: depositSide.deposit_apr,
-            borrow_apr: borrowSide.borrow_apr,
-            collateral_programs: depositSide.collateral_programs,
-            debt_programs: borrowSide.debt_programs,
-            collateral_points: depositSide.collateral_points,
-            debt_points: borrowSide.debt_points,
-            spread: formattedSpread,
-            max_leverage: formattedMaxLeverage,
-            max_yield: formattedMaxYield,
-            available_liquidity: borrowSide.liquidity.toString(),
-            deposit_token_logo: depositSide.logo,
-            borrow_token_logo: borrowSide.logo,
+    (async () => {
+      if (markets && markets.length > 0) {
+        const updatedStrategies = await Promise.all(data.strategies.map(async strategy => {
+          // Find matching market
+          const market = markets.find(m => m.id === parseInt((strategy.market_id).toString()));
+          
+          if (!market) return strategy;
+          
+          // Determine which side of the market to use based on deposit token
+          const isDeposit0 = market.silo0.market === strategy.deposit_token;
+          const isBorrow1 = market.silo1.market === strategy.borrow_token;
+          
+          const depositSide = isDeposit0 ? market.silo0 : market.silo1;
+          const borrowSide = isBorrow1 ? market.silo1 : market.silo0;
+          
+          // Parse APRs to numbers for calculations
+          let depositApr = parseFloat(depositSide.deposit_apr.replace('%', '')) / 100;
+          const borrowApr = parseFloat(borrowSide.borrow_apr.replace('%', '')) / 100;
+          if (strategy.deposit_token.startsWith("PT")) {
+            const pendle = new PendleConnection();
+            const pendleMarkets = await pendle.getMarkets();
+            const matchingMarket = pendleMarkets.find(market =>
+              market.symbol === strategy.deposit_token.split("-")[1].split(" ")[0]
+            );
+            if (matchingMarket) {
+              depositApr = matchingMarket.impliedApy;
+              depositSide.deposit_apr = ((matchingMarket.impliedApy) * 100).toFixed(2) + '%';
+            }
           }
-        };
-      });
-      
-      setEnhancedStrategies(updatedStrategies);
-    }
+          // Calculate max leverage and max yield
+          const maxLtv = depositSide.max_ltv;
+          const maxLeverage = calculateMaxLeverage(maxLtv);
+          const maxYield = calculateMaxYield(depositApr, borrowApr, maxLeverage);
+          
+          // Format for display
+          const formattedMaxLeverage = maxLeverage.toFixed(2) + 'x';
+          const formattedMaxYield = maxYield > 0 ? `${(maxYield * 100).toFixed(2)}%` : '0%';
+          const formattedSpread = ((depositApr - borrowApr) * 100).toFixed(2) + '%';
+          
+          return {
+            ...strategy,
+            verified: market.reviewed,
+            strategy_overview: {
+              ...strategy.strategy_overview,
+              deposit_apr: depositSide.deposit_apr,
+              borrow_apr: borrowSide.borrow_apr,
+              collateral_programs: depositSide.collateral_programs,
+              debt_programs: borrowSide.debt_programs,
+              collateral_points: depositSide.collateral_points,
+              debt_points: borrowSide.debt_points,
+              spread: formattedSpread,
+              max_leverage: formattedMaxLeverage,
+              max_yield: formattedMaxYield,
+              available_liquidity: borrowSide.liquidity.toString(),
+              deposit_token_logo: depositSide.logo,
+              borrow_token_logo: borrowSide.logo,
+            }
+          };
+        }));
+        
+        setEnhancedStrategies(updatedStrategies);
+
+      }
+    })()
   }, [markets, data.strategies]);
 
   return (
