@@ -211,7 +211,7 @@ export function PendleAddLiquidity({ market }: PendleAddLiquidityProps) {
       const tokenAddress = pendleClient.parseTokenId(tokenIn)?.address || "";
       
       // Determine if we need to use aggregator based on token
-      const enableAggregator = !market.inputTokens.map(
+      const enableAggregator = ![...market.tokensMintSy, market.sy].map(
         token => pendleClient.parseTokenId(token)?.address
       ).includes(tokenAddress);
       
@@ -316,8 +316,8 @@ export function PendleAddLiquidity({ market }: PendleAddLiquidityProps) {
 
   // Prepare available input tokens with asset info
   const availableTokens = assets.length > 0 && !isDualMode
-    ? assets.map(asset => `${asset.chainId}-${asset.address}`)
-    : [...market.inputTokens, market.sy].filter(Boolean);
+    ? [...market.inputTokens].filter(Boolean)
+    : [...market.tokensMintSy, market.sy].filter(Boolean);
 
   return (
     <div className="space-y-6">

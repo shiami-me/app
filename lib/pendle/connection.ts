@@ -1,4 +1,4 @@
-import { PendleMarket, PendleMarketsResponse, PendleAsset, PendleAssetsResponse } from './types';
+import { PendleMarket, PendleAsset } from './types';
 import { callSDK } from './helper';
 
 // Define the correct return types based on the examples
@@ -62,10 +62,10 @@ export class PendleConnection {
 
   /**
    * Fetches all markets for a given chain ID and transforms the response
-   * from list format to proper market objects
+   * from the new API format to proper market objects
    */
   async getMarkets(chainId: number = 146): Promise<PendleMarket[]> {
-    const url = `${this.baseUrl}/bff/v3/markets/all?chainId=${chainId}&select=all`;
+    const url = `${this.baseUrl}/core/v1/${chainId}/markets`;
     
     try {
       const response = await fetch(url);
@@ -73,8 +73,8 @@ export class PendleConnection {
         throw new Error(`Failed to fetch markets: ${response.statusText}`);
       }
       
-      const data = await response.json() as PendleMarketsResponse;
-      return this.transformMarketsResponse(data);
+      const data = await response.json();
+      return await this.transformNewMarketsResponse(data.results);
     } catch (error) {
       console.error('Error fetching Pendle markets:', error);
       throw error;
@@ -82,11 +82,10 @@ export class PendleConnection {
   }
 
   /**
-   * Fetches all assets for a given chain ID and transforms the response
-   * from list format to proper asset objects
+   * Fetches all assets for a given chain ID using the new endpoint
    */
   async getAssets(chainId: number = 146): Promise<PendleAsset[]> {
-    const url = `${this.baseUrl}/bff/v3/assets/all?chainId=${chainId}`;
+    const url = `${this.baseUrl}/core/v1/${chainId}/assets/all`;
     
     try {
       const response = await fetch(url);
@@ -94,8 +93,27 @@ export class PendleConnection {
         throw new Error(`Failed to fetch assets: ${response.statusText}`);
       }
       
-      const data = await response.json() as PendleAssetsResponse;
-      return this.transformAssetsResponse(data);
+      // The API returns an array of assets with a different structure
+      const data = await response.json();
+      
+      // Map the response to match our PendleAsset interface
+      return data.map((asset: any) => ({
+        chainId: asset.chainId,
+        address: asset.address,
+        symbol: asset.symbol,
+        // Use simpleIcon as the icon source
+        icon: asset.simpleIcon || asset.proIcon || '',
+        decimals: asset.decimals,
+        // Map price.usd to price
+        price: asset.price?.usd || null,
+        // Use baseType as the type if available, otherwise use the first type from types array
+        type: asset.baseType || (asset.types && asset.types.length > 0 ? asset.types[0] : ''),
+        // No direct mapping for underlyingPool in the new response
+        underlyingPool: null,
+        zappable: asset.zappable || false,
+        // No direct expiry field in the response, default to null
+        expiry: null
+      }));
     } catch (error) {
       console.error('Error fetching Pendle assets:', error);
       throw error;
@@ -540,111 +558,185 @@ export class PendleConnection {
   }
 
   /**
-   * Transforms the list-based API response into an array of market objects
+   * Fetches the list of supported tokens for a specific market
+   * This includes tokens for minting SY, redeeming SY, tokens in, and tokens out
    */
-  private transformMarketsResponse(response: PendleMarketsResponse): PendleMarket[] {
-    const markets: PendleMarket[] = [];
-    const len = response.chainIdList.length;
+  async getMarketTokens(chainId: number, marketAddress: string): Promise<{
+    tokensMintSy: string[];
+    tokensRedeemSy: string[];
+    tokensIn: string[];
+    tokensOut: string[];
+  }> {
+    const url = `${this.baseUrl}/core/v1/sdk/${chainId}/markets/${marketAddress}/tokens`;
     
-    for (let i = 0; i < len; i++) {
-      if (!response.liquidityList[i]) continue;
-      const market: PendleMarket = {
-        chainId: response.chainIdList[i],
-        address: response.addressList[i],
-        symbol: response.symbolList[i],
-        expiry: response.expiryList[i],
-        icon: response.iconList[i],
-        pt: response.ptList[i],
-        yt: response.ytList[i],
-        sy: response.syList[i],
-        accountingAsset: response.accountingAssetList[i],
-        underlyingAsset: response.underlyingAssetList[i],
-        rewardTokens: response.rewardTokensList[i] || [],
-        inputTokens: response.inputTokensList[i] || [],
-        outputTokens: response.outputTokensList[i] || [],
-        protocol: response.protocolList[i],
-        underlyingPool: response.underlyingPoolList[i],
-        isWhitelistedPro: response.isWhitelistedProList[i],
-        maxBoostedApy: response.maxBoostedApyList[i],
-        lpRewardApy: response.lpRewardApyList[i],
-        voterApy: response.voterApyList[i],
-        ytRoi: response.ytRoiList[i],
-        ptRoi: response.ptRoiList[i],
-        estimatedDailyPoolRewards: response.estimatedDailyPoolRewardsList[i] || [],
-        liquidityChange24h: response.liquidityChange24hList[i],
-        tradingVolumeChange24h: response.tradingVolumeChange24hList[i],
-        underlyingApyChange24h: response.underlyingApyChange24hList[i],
-        impliedApyChange24h: response.impliedApyChange24hList[i],
-        categoryIds: response.categoryIdsList[i] || [],
-        timestamp: response.timestampList[i],
-        scalarRoot: response.scalarRootList[i],
-        initialAnchor: response.initialAnchorList[i],
-        info: response.infoList[i],
-        extendedInfo: response.extendedInfoList[i],
-        tvlThresholdTimestamp: response.tvlThresholdTimestampList[i],
-        offchainRewardApy: response.offchainRewardApyList[i],
-        whitelistedAt: response.whitelistedAtList[i],
-        marketMathData: response.marketMathDataList[i],
-        isNew: response.isNewList[i],
-        isFeatured: response.isFeaturedList[i],
-        isPopular: response.isPopularList[i],
-        apyMethodology: response.apyMethodologyList[i],
-        groupId: response.groupIdList[i],
-        votable: response.votableList[i],
-        isActive: response.isActiveList[i],
-        isWhitelistedLimitOrder: response.isWhitelistedLimitOrderList[i],
-        accentColor: response.accentColorList[i],
-        totalPt: response.totalPtList[i],
-        totalSy: response.totalSyList[i],
-        totalLp: response.totalLpList[i],
-        totalActiveSupply: response.totalActiveSupplyList[i],
-        liquidity: response.liquidityList[i],
-        tradingVolume: response.tradingVolumeList[i],
-        underlyingInterestApy: response.underlyingInterestApyList[i],
-        underlyingRewardApy: response.underlyingRewardApyList[i],
-        underlyingRewardApyBreakdown: response.underlyingRewardApyBreakdownList[i] || [],
-        underlyingApy: response.underlyingApyList[i],
-        impliedApy: response.impliedApyList[i],
-        ytFloatingApy: response.ytFloatingApyList[i],
-        ptDiscount: response.ptDiscountList[i],
-        swapFeeApy: response.swapFeeApyList[i],
-        pendleApy: response.pendleApyList[i],
-        arbApy: response.arbApyList[i],
-        aggregatedApy: response.aggregatedApyList[i],
-        isPrime: response.isPrimeList[i],
-        isPasswordProtected: response.isPasswordProtectedList[i],
-      };
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch market tokens: ${response.statusText}`);
+      }
       
-      markets.push(market);
+      const data = await response.json();
+      return {
+        tokensMintSy: data.tokensMintSy || [],
+        tokensRedeemSy: data.tokensRedeemSy || [],
+        tokensIn: data.tokensIn || [],
+        tokensOut: data.tokensOut || []
+      };
+    } catch (error) {
+      console.error(`Error fetching tokens for market ${marketAddress}:`, error);
+      // Return empty arrays if there's an error
+      return {
+        tokensMintSy: [],
+        tokensRedeemSy: [],
+        tokensIn: [],
+        tokensOut: []
+      };
     }
-    
-    return markets;
   }
 
   /**
-   * Transforms the list-based assets API response into an array of asset objects
+   * Transforms the new API response format into an array of market objects
    */
-  private transformAssetsResponse(response: PendleAssetsResponse): PendleAsset[] {
-    const assets: PendleAsset[] = [];
-    const len = response.chainIdList.length;
+  private async transformNewMarketsResponse(results: any[]): Promise<PendleMarket[]> {
+    // Process markets sequentially to avoid too many concurrent requests
+    const markets: PendleMarket[] = [];
     
-    for (let i = 0; i < len; i++) {
-      const asset: PendleAsset = {
-        chainId: response.chainIdList[i],
-        address: response.addressList[i],
-        symbol: response.symbolList[i],
-        icon: response.iconList[i],
-        decimals: response.decimalsList[i],
-        price: response.priceList[i],
-        type: response.typeList[i],
-        underlyingPool: response.underlyingPoolList[i],
-        zappable: response.zappableList[i],
-        expiry: response.expiryList[i],
-      };
-      
-      assets.push(asset);
+    for (const result of results) {
+      try {
+        // Parse expiry date string to timestamp
+        const expiryTimestamp = result.expiry ? new Date(result.expiry).getTime() / 1000 : 0;
+        
+        // Extract addresses from nested objects
+        const ptAddress = result.pt?.address || '';
+        const ytAddress = result.yt?.address || '';
+        const syAddress = result.sy?.address || '';
+        const accountingAssetAddress = result.accountingAsset?.address || '';
+        const underlyingAssetAddress = result.underlyingAsset?.address || '';
+
+        // Transform liquidity and trading volume from objects to numbers
+        const liquidity = result.liquidity?.usd || 0;
+        const tradingVolume = result.tradingVolume?.usd || 0;
+
+        // Map reward tokens
+        const rewardTokens: { asset: string; amount: number }[] = 
+          (result.estimatedDailyPoolRewards || []).map((reward: any) => ({
+            asset: reward.asset || '',
+            amount: reward.amount || 0
+          }));
+
+        // Extract market math data
+        const marketMathData = {
+          interestFeeRate: result.extendedInfo?.feeRate || 0,
+          ptExchangeRate: result.pt?.price?.usd || 0,
+          syIndex: 0, // Not directly available in the response
+          totalActiveSupply: result.totalActiveSupply || 0
+        };
+
+        // Construct market info object
+        const info = {
+          deployedBy: '' // This field isn't directly available in the response
+        };
+
+        // Fetch token lists for this market
+        const tokenLists = await this.getMarketTokens(result.chainId, result.address);
+
+        // Map the response to match our PendleMarket interface
+        markets.push({
+          chainId: result.chainId,
+          address: result.address,
+          symbol: result.proSymbol || result.symbol,
+          expiry: expiryTimestamp,
+          icon: result.proIcon || result.simpleIcon || '',
+          pt: ptAddress,
+          yt: ytAddress,
+          sy: syAddress,
+          accountingAsset: accountingAssetAddress,
+          underlyingAsset: underlyingAssetAddress,
+          rewardTokens: rewardTokens,
+          // Use the fetched token lists
+          inputTokens: tokenLists.tokensIn,
+          outputTokens: tokenLists.tokensOut,
+          // Add new token lists for mint and redeem SY operations
+          tokensMintSy: tokenLists.tokensMintSy,
+          tokensRedeemSy: tokenLists.tokensRedeemSy,
+          protocol: result.protocol || '',
+          underlyingPool: result.underlyingPool || '',
+          isWhitelistedPro: result.isWhitelistedPro || false,
+          maxBoostedApy: result.maxBoostedApy || 0,
+          lpRewardApy: result.lpRewardApy || 0,
+          voterApy: result.voterApy || 0,
+          ytRoi: result.ytRoi || 0,
+          ptRoi: result.ptRoi || 0,
+          estimatedDailyPoolRewards: rewardTokens,
+          liquidityChange24h: result.liquidityChange24h || 0,
+          tradingVolumeChange24h: result.tradingVolumeChange24h || 0,
+          underlyingApyChange24h: result.underlyingApyChange24h || 0,
+          impliedApyChange24h: result.impliedApyChange24h || 0,
+          categoryIds: result.categoryIds || [],
+          timestamp: new Date(result.dataUpdatedAt || Date.now()).getTime(),
+          scalarRoot: result.scalarRoot || 0,
+          initialAnchor: result.initialAnchor || 0,
+          info: info,
+          extendedInfo: {
+            floatingPt: result.extendedInfo?.floatingPt || 0,
+            floatingSy: result.extendedInfo?.floatingSy || 0,
+            totalTvl: result.extendedInfo?.totalTvl || liquidity || 0,
+            pyUnit: result.extendedInfo?.pyUnit || '',
+            ptEqualsPyUnit: result.extendedInfo?.ptEqualsPyUnit || false,
+            underlyingAssetWorthMore: result.extendedInfo?.underlyingAssetWorthMore || '',
+            nativeWithdrawalURL: result.extendedInfo?.nativeWithdrawalURL || '',
+            movement10Percent: {
+              ptMovementUpUsd: result.extendedInfo?.movement10Percent?.ptMovementUpUsd || 0,
+              ptMovementDownUsd: result.extendedInfo?.movement10Percent?.ptMovementDownUsd || 0,
+              ytMovementUpUsd: result.extendedInfo?.movement10Percent?.ytMovementUpUsd || 0,
+              ytMovementDownUsd: result.extendedInfo?.movement10Percent?.ytMovementDownUsd || 0
+            },
+            feeRate: result.extendedInfo?.feeRate || 0,
+            yieldRange: {
+              min: result.extendedInfo?.yieldRange?.min || 0,
+              max: result.extendedInfo?.yieldRange?.max || 0
+            },
+            underlyingAssetSupply: result.extendedInfo?.underlyingAssetSupply || 0
+          },
+          tvlThresholdTimestamp: new Date(result.tvlThresholdTimestamp || Date.now()).getTime(),
+          offchainRewardApy: result.offchainRewardApy,
+          whitelistedAt: new Date(result.whitelistedAt || Date.now()).getTime(),
+          marketMathData: marketMathData,
+          isNew: result.isNew || false,
+          isFeatured: result.isFeatured || false,
+          isPopular: result.isPopular || false,
+          apyMethodology: result.apyMethodology || '',
+          groupId: result.groupId,
+          votable: result.votable || false,
+          isActive: result.isActive || false,
+          isWhitelistedLimitOrder: result.isWhitelistedLimitOrder || false,
+          accentColor: result.accentColor || '',
+          totalPt: result.totalPt || 0,
+          totalSy: result.totalSy || 0,
+          totalLp: result.totalLp || 0,
+          totalActiveSupply: result.totalActiveSupply || 0,
+          liquidity: liquidity,
+          tradingVolume: tradingVolume,
+          underlyingInterestApy: result.underlyingInterestApy || 0,
+          underlyingRewardApy: result.underlyingRewardApy || 0,
+          underlyingRewardApyBreakdown: result.underlyingRewardApyBreakdown || [],
+          underlyingApy: result.underlyingApy || 0,
+          impliedApy: result.impliedApy || 0,
+          ytFloatingApy: result.ytFloatingApy || 0,
+          ptDiscount: result.ptDiscount || 0,
+          swapFeeApy: result.swapFeeApy || 0,
+          pendleApy: result.pendleApy || 0,
+          arbApy: result.arbApy || 0,
+          aggregatedApy: result.aggregatedApy || 0,
+          isPrime: result.isPrime,
+          isPasswordProtected: result.isPasswordProtected
+        });
+      } catch (error) {
+        console.error(`Error processing market ${result.address}:`, error);
+        // Continue with next market if there's an error
+      }
     }
     
-    return assets;
+    return markets;
   }
 }

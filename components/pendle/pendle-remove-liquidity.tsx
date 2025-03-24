@@ -163,7 +163,7 @@ export function PendleRemoveLiquidity({ market }: PendleRemoveLiquidityProps) {
       const parsedTokenOut = pendleClient.parseTokenId(tokenOut)?.address || "";
       
       // Determine if we need to use aggregator based on token
-      const enableAggregator = !market.inputTokens.map(
+      const enableAggregator = ![...market.tokensRedeemSy, market.sy].map(
         token => pendleClient.parseTokenId(token)?.address
       ).includes(parsedTokenOut);
       
@@ -279,9 +279,7 @@ export function PendleRemoveLiquidity({ market }: PendleRemoveLiquidityProps) {
   };
 
   // Prepare available output tokens
-  const availableTokens = assets.length > 0 
-    ? assets.map(asset => `${asset.chainId}-${asset.address}`)
-    : [...(market.outputTokens || [market.underlyingAsset])].filter(Boolean);
+  const availableTokens = market.outputTokens
 
   return (
     <div className="space-y-6">

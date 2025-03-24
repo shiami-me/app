@@ -194,7 +194,7 @@ export function PendleMint({ market }: PendleMintProps) {
   // Get available token inputs based on mint mode
   const getAvailableInputTokens = () => {
     // For other modes, all assets can be input
-    return assets.map((asset) => `${asset.chainId}-${asset.address}`);
+    return market.inputTokens
   };
 
   // Handle mint operation
@@ -209,7 +209,7 @@ export function PendleMint({ market }: PendleMintProps) {
       const tokenInAddress = pendleClient.parseTokenId(tokenIn)?.address || "";
 
       // Determine if we need to use aggregator based on token
-      const enableAggregator = !market.inputTokens
+      const enableAggregator = ![...market.tokensMintSy, market.sy]
         .map((token) => pendleClient.parseTokenId(token)?.address)
         .includes(tokenInAddress);
 

@@ -195,7 +195,7 @@ export function PendleSwap({ market }: PendleSwapProps) {
       return [market.pt];
     } else {
       // When buying PT, all assets can be input
-      return assets.map(asset => `${asset.chainId}-${asset.address}`);
+      return market.inputTokens;
     }
   };
 
@@ -205,7 +205,7 @@ export function PendleSwap({ market }: PendleSwapProps) {
       return [market.pt];
     } else {
       // When selling PT, all assets can be output
-      return assets.map(asset => `${asset.chainId}-${asset.address}`);
+      return market.outputTokens;
     }
   };
 
@@ -225,9 +225,9 @@ export function PendleSwap({ market }: PendleSwapProps) {
       let enableAggregator = false;
       
       if (swapMode === "buyPT") {
-        enableAggregator = !market.inputTokens.map(token => pendleClient.parseTokenId(token)?.address).includes(tokenIn);
+        enableAggregator = ![...market.tokensMintSy, market.sy].includes(tokenIn);
       } else {
-        enableAggregator = !market.inputTokens.map(token => pendleClient.parseTokenId(token)?.address).includes(tokenOut);
+        enableAggregator = ![...market.tokensMintSy, market.sy].includes(tokenOut);
       }
       
       // Call swap function with aggregator flag

@@ -55,6 +55,8 @@ export interface PendleMarket {
   rewardTokens: RewardToken[];
   inputTokens: string[];
   outputTokens: string[];
+  tokensMintSy: string[];
+  tokensRedeemSy: string[];
   protocol: string;
   underlyingPool: string;
   isWhitelistedPro: boolean;
@@ -151,72 +153,6 @@ export interface LimitOrderResponse {
     /** Bytes string for permit */
     permit: string;
 }
-export interface PendleMarketsResponse {
-  chainIdList: ChainId[];
-  addressList: Address[];
-  symbolList: string[];
-  expiryList: number[];
-  iconList: string[];
-  ptList: string[];
-  ytList: string[];
-  syList: string[];
-  accountingAssetList: string[];
-  underlyingAssetList: string[];
-  rewardTokensList: RewardToken[][];
-  inputTokensList: string[][];
-  outputTokensList: string[][];
-  protocolList: string[];
-  underlyingPoolList: string[];
-  isWhitelistedProList: boolean[];
-  maxBoostedApyList: number[];
-  lpRewardApyList: number[];
-  voterApyList: number[];
-  ytRoiList: number[];
-  ptRoiList: number[];
-  estimatedDailyPoolRewardsList: RewardToken[][];
-  liquidityChange24hList: number[];
-  tradingVolumeChange24hList: number[];
-  underlyingApyChange24hList: number[];
-  impliedApyChange24hList: number[];
-  categoryIdsList: string[][];
-  timestampList: number[];
-  scalarRootList: number[];
-  initialAnchorList: number[];
-  infoList: MarketInfo[];
-  extendedInfoList: ExtendedInfo[];
-  tvlThresholdTimestampList: number[];
-  offchainRewardApyList: (number | null)[];
-  whitelistedAtList: number[];
-  marketMathDataList: MarketMathData[];
-  isNewList: boolean[];
-  isFeaturedList: boolean[];
-  isPopularList: boolean[];
-  apyMethodologyList: string[];
-  groupIdList: (string | null)[];
-  votableList: boolean[];
-  isActiveList: boolean[];
-  isWhitelistedLimitOrderList: boolean[];
-  accentColorList: string[];
-  totalPtList: number[];
-  totalSyList: number[];
-  totalLpList: number[];
-  totalActiveSupplyList: number[];
-  liquidityList: number[];
-  tradingVolumeList: number[];
-  underlyingInterestApyList: number[];
-  underlyingRewardApyList: number[];
-  underlyingRewardApyBreakdownList: any[][];
-  underlyingApyList: number[];
-  impliedApyList: number[];
-  ytFloatingApyList: number[];
-  ptDiscountList: number[];
-  swapFeeApyList: number[];
-  pendleApyList: number[];
-  arbApyList: number[];
-  aggregatedApyList: number[];
-  isPrimeList: (boolean | null)[];
-  isPasswordProtectedList: (boolean | null)[];
-}
 
 export interface PendleAsset {
   chainId: ChainId;
@@ -229,17 +165,4 @@ export interface PendleAsset {
   underlyingPool: string | null;
   zappable: boolean;
   expiry: number | null;
-}
-
-export interface PendleAssetsResponse {
-  chainIdList: ChainId[];
-  addressList: Address[];
-  symbolList: string[];
-  iconList: string[];
-  decimalsList: number[];
-  priceList: (number | null)[];
-  typeList: string[];
-  underlyingPoolList: (string | null)[];
-  zappableList: boolean[];
-  expiryList: (number | null)[];
 }

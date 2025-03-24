@@ -197,7 +197,7 @@ export function PendleRedeem({ market }: PendleRedeemProps) {
   // Get available token outputs
   const getAvailableOutputTokens = () => {
     // All assets can be output
-    return assets.map((asset) => `${asset.chainId}-${asset.address}`);
+    return market.outputTokens;
   };
 
   // Handle redeem operation
@@ -212,7 +212,7 @@ export function PendleRedeem({ market }: PendleRedeemProps) {
       const tokenOutAddress = pendleClient.parseTokenId(tokenOut)?.address || "";
       
       // Determine if we need to use aggregator based on token
-      const enableAggregator = !market.inputTokens
+      const enableAggregator = ![...market.tokensRedeemSy, market.sy]
         .map((token) => pendleClient.parseTokenId(token)?.address)
         .includes(tokenOutAddress);
 
