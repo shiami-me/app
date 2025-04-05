@@ -9,6 +9,7 @@ import { Gauge, Sprout, Database, TrendingUp } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import { useChat } from "@/providers/ChatProvider";
+import AssetTicker from "./AssetTicker";
 
 const chatSuggestions = [
   {
@@ -127,6 +128,10 @@ const ChatMain: React.FC<Props> = ({
               </div>
             </div>
           )}
+
+          <div className="w-full max-w-2xl">
+            <AssetTicker />
+          </div>
         </div>
       ) : (
         <>
